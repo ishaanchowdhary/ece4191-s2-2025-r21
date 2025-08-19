@@ -26,30 +26,21 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // --- Keyboard Controls ---
-// Currently, if a key is held down it sends lots of commands. Could change to only send one if held down, and a stop after being released
+let keyPressed = false; // Flag to indicate if a key is currently being pressed down
+
+// If a keydown is detected and the keyPressed flag is not already true:
 document.addEventListener("keydown", (event) => {
-  // Prevent page from scrolling with arrow keys
-  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
-    event.preventDefault(); 
-    console.log("Key pressed:", event.key); // <-- debug log
+  if (!keyPressed && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+    event.preventDefault(); // Needed to stops browser from thinking the arrow keys are to scroll
+    keyPressed = true; // Flag that a key has been pressed
+
+    console.log("Key pressed : ", event.key); // debug log
 
     switch (event.key) {
-      case "ArrowUp":
-        console.log("Command: forward");
-        sendCommand("forward");
-        break;
-      case "ArrowDown":
-        console.log("Command: backward");
-        sendCommand("backward");
-        break;
-      case "ArrowLeft":
-        console.log("Command: left");
-        sendCommand("left");
-        break;
-      case "ArrowRight":
-        console.log("Command: right");
-        sendCommand("right");
-        break;
+      case "ArrowUp": sendCommand("forward"); break;
+      case "ArrowDown": sendCommand("backward"); break;
+      case "ArrowLeft": sendCommand("left"); break;
+      case "ArrowRight": sendCommand("right"); break;
     }
   }
 });
@@ -57,6 +48,7 @@ document.addEventListener("keydown", (event) => {
 document.addEventListener("keyup", (event) => {
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
     event.preventDefault();
+    keyPressed = false; // release flag
     console.log("Command: stop");
     sendCommand("stop");
   }
