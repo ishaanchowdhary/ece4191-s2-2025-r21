@@ -12,12 +12,19 @@ socket.onclose = () => console.log("WebSocket closed");
 
 function sendCommand(cmd) {
   if (socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify({ action: cmd }));
-    console.log("Command sent:", cmd);
+    socket.send(JSON.stringify({ action: cmd })); // send command
+    console.log("Command sent:", cmd);  
   } else {
     console.error("WebSocket not connected");
   }
 }
+
+
+// Command Logging !!!!!!!!!!!!!!!!! UNFINISHED
+let n = 10
+let commandHistoryArray = Array(n).fill("n/a")
+
+
 
 // --- Video Setup ---
 document.addEventListener("DOMContentLoaded", () => {
