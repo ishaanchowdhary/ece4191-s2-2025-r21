@@ -1,13 +1,14 @@
-// Change to your Pi's IP
-const RPI_IP = "192.168.1.100";
-const WS_PORT = 9000;
+// Update these to match your Pi setup
+const RPI_IP = "192.168.1.150";   // Pi's LAN IP (or hostname)
+const WS_PORT = 9000;             // WebSocket server port on Pi
+const VIDEO_URL = `http://${RPI_IP}:8889/cam`; // MediaMTX stream
 
-// WebSocket connection for commands
+// --- WebSocket Setup ---
 let socket = new WebSocket(`ws://${RPI_IP}:${WS_PORT}`);
 
-socket.onopen = () => console.log("✅ Connected to Raspberry Pi");
+socket.onopen = () => console.log("✅ Connected to Raspberry Pi WebSocket");
 socket.onerror = (err) => console.error("❌ WebSocket Error:", err);
-socket.onclose = () => console.log("🔌 Connection closed");
+socket.onclose = () => console.log("🔌 WebSocket closed");
 
 function sendCommand(cmd) {
   if (socket.readyState === WebSocket.OPEN) {
@@ -18,9 +19,8 @@ function sendCommand(cmd) {
   }
 }
 
-// Video stream setup
+// --- Video Setup ---
 document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("cam-stream");
-  // MediaMTX will provide a WebRTC or HLS URL; start simple with HLS via <video>
-  video.src = `http://${RPI_IP}:8889/cam`;
+  video.src = VIDEO_URL;
 });
