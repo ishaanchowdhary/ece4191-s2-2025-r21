@@ -11,6 +11,7 @@ socket.onerror = (err) => console.error("WebSocket Error:", err);
 socket.onclose = () => console.log("WebSocket closed");
 
 function sendCommand(cmd) {
+  addTXLogEntry(cmd);
   if (socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify({ action: cmd })); // send command
     console.log("Command sent:", cmd);  
@@ -19,10 +20,16 @@ function sendCommand(cmd) {
   }
 }
 
-
-// Command Logging !!!!!!!!!!!!!!!!! UNFINISHED
-let n = 10
-let commandHistoryArray = Array(n).fill("n/a")
+// Logging transmissions
+function addTXLogEntry(message) {
+  const log = document.getElementById('tx');
+  const entry = document.createElement('div');
+  const timestamp = new Date().toLocaleTimeString();
+  entry.textContent = `[${timestamp}] ${message}`;
+  log.appendChild(entry);
+  // Auto-scroll to the bottom
+  log.scrollTop = log.scrollHeight;
+}
 
 
 

@@ -40,3 +40,10 @@ body {
   border-style: inset;
 }
 
+#tx {
+  margin: 3%;
+  background: lightgrey;
+  height: 80%;
+  overflow-y: scroll;     /* scroll when content overflows */
+  text-align: left;
+}
