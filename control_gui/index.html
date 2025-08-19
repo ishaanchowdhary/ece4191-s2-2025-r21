@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Raspberry Pi Robot Control</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Raspberry Pi Robot Controller</h1>
+
+  <!-- Video Stream -->
+  <div id="video-container">
+    <video id="cam-stream" autoplay playsinline controls></video>
+  </div>
+
+  <!-- Controls -->
+  <div id="controls">
+    <button onclick="sendCommand('forward')">⬆️ Forward</button>
+    <button onclick="sendCommand('left')">⬅️ Left</button>
+    <button onclick="sendCommand('stop')">⏹ Stop</button>
+    <button onclick="sendCommand('right')">➡️ Right</button>
+    <button onclick="sendCommand('backward')">⬇️ Backward</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
