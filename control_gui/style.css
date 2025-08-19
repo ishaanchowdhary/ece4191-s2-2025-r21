@@ -16,11 +16,3 @@ body {
   height: auto;
   border-radius: 10px;
 }
-
-#controls button {
-  font-size: 1.2rem;
-  margin: 10px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-}
