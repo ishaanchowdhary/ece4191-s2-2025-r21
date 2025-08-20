@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ------------------------------------------
 // Keyboard Controls
+// TODO: make commands sent match expected commands in drive_server.py, maybe make it send back an acknowledge?
 // ------------------------------------------
 let keyPressed = false; // Flag to indicate if a key is currently being pressed down
 
