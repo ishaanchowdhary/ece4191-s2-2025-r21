@@ -1,11 +1,16 @@
-// Constants for interfacing with Raspberry Pi
-const RPI_IP = "192.168.1.150";   // Pi's LAN IP (or hostname)
-const WS_PORT = 9000;             // WebSocket server port on Pi
-const VIDEO_URL = `http://${RPI_IP}:8889/cam`; // MediaMTX stream - or whatever we use to stream video
 
-// --- WebSocket Setup ---
+// -------------------------------------------
+// Config
+// TODO: Add real values - everything here is a placeholder
+// -------------------------------------------
+const RPI_IP = "192.168.1.150";                 // Pi's LAN IP (or hostname)
+const WS_PORT = 9000;                           // WebSocket server port on Pi
+const VIDEO_URL = `http://${RPI_IP}:8889/cam`;  // stream of whatever we use to stream video
+
+// -------------------------------------------
+// Websocket Setup
+// -------------------------------------------
 let socket = new WebSocket(`ws://${RPI_IP}:${WS_PORT}`);
-
 socket.onopen = () => console.log("Successfully connected to Raspberry Pi WebSocket");
 socket.onerror = (err) => console.error("WebSocket Error:", err);
 socket.onclose = () => console.log("WebSocket closed");
@@ -20,26 +25,35 @@ function sendCommand(cmd) {
   }
 }
 
-// Logging transmissions
+// ------------------------------------------
+// Transmission Handling - instead of this, maybe a scrolling box that shows everything in different cols, e.g.
+// red text for errors, blue for transmission, green for received...
+// ------------------------------------------
+/**
+ * Adds string into transmission log on GUI.
+ * Creates a new div element in 'tx' element on webpage.
+ */
 function addTXLogEntry(message) {
   const log = document.getElementById('tx');
   const entry = document.createElement('div');
   const timestamp = new Date().toLocaleTimeString();
   entry.textContent = `[${timestamp}] ${message}`;
   log.appendChild(entry);
-  // Auto-scroll to the bottom
-  log.scrollTop = log.scrollHeight;
+  log.scrollTop = log.scrollHeight; // Auto-scroll to the bottom
 }
 
 
-
-// --- Video Setup ---
+// ------------------------------------------
+// Video Stream
+// ------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("cam-stream");
   video.src = VIDEO_URL;
 });
 
-// --- Keyboard Controls ---
+// ------------------------------------------
+// Keyboard Controls
+// ------------------------------------------
 let keyPressed = false; // Flag to indicate if a key is currently being pressed down
 
 // If a keydown is detected and the keyPressed flag is not already true:
