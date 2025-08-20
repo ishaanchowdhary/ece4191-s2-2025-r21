@@ -2,6 +2,7 @@
 // -------------------------------------------
 // Config
 // TODO: Add real values - everything here is a placeholder
+// TODO: Auto-reconnect on disconnect?
 // -------------------------------------------
 const RPI_IP = "192.168.1.150";                 // Pi's LAN IP (or hostname)
 const WS_PORT = 9000;                           // WebSocket server port on Pi
