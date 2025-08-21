@@ -45,6 +45,16 @@ function sendCommand(cmd) {
 // Log Handling
 // ------------------------------------------
 
+// Listen for checkbox changes
+document.querySelectorAll("#log-filter .log-filter-checkbox").forEach(cb => {
+  cb.addEventListener("change", applyLogFilter);
+});
+
+function applyLogFilter() {
+  // TODO
+}
+
+
 /** Function addLogEntry(message, type) 
  * message : unique event text to be displayed
  * type : type of log entry, default 'info'
@@ -75,6 +85,7 @@ function addLogEntry(message, type = "info") {
   log.appendChild(entry);
   log.scrollTop = log.scrollHeight; // Auto-scroll to the bottom
 }
+
 
 
 // ------------------------------------------
