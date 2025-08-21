@@ -52,3 +52,15 @@ body {
   overflow-y: scroll;     /* scroll when content overflows */
   text-align: left;
 }
+
+
+/* *********************************** Controls *********************************** */
+#controls-container {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);  
+  grid-template-rows: repeat(3, 1fr);  
+  gap: 5px;
+  justify-items: center;  /* center content horizontally */
+  align-items: center;    /* center content vertically */
+  text-align: center;     /* center text under icons */
+}

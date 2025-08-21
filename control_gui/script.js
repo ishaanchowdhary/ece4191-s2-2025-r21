@@ -8,7 +8,6 @@
 // TODO: add checlist for landmarks + animals for each stage
 // TODO: Camera stream overlay with yolo  - Liv
 // TODO: make it look pretty - Liv
-// TODO: instructional for keys to move + keys to camera pan - Jaiden
 // TODO: key to take a photo - Liv
 // TODO: add connect after testing
 // TODO: add info on connection status
