@@ -3,7 +3,6 @@
 // Config
 // TODO: Add real values - everything here is a placeholder
 // TODO: Auto-reconnect on disconnect - Jaiden
-// TODO: Add in cntrls for camera pan - need to make sure it stops at 180 deg or a bit before - Jaiden
 // TODO: Add e-stop command - Liv
 // TODO: add rx to tx box + colours and filters - Jaiden / Liv
 // TODO: add checlist for landmarks + animals for each stage
@@ -16,6 +15,11 @@
 // TODO: switch camera mode to IR - Liv
 // TODO: button to rehome the camera - Liv
 // TODO: documentation to use the gui - Liv
+
+//------------------------
+// TODO: Track camera position and not allow it to go out of bounds. Can be done in JS or on the Pi side.
+
+
 // -------------------------------------------
 const RPI_IP = "192.168.1.150";                 // Pi's LAN IP (or hostname)
 const WS_PORT = 9000;                           // WebSocket server port on Pi
@@ -69,13 +73,14 @@ document.addEventListener("DOMContentLoaded", () => {
 // Keyboard Controls
 // TODO: make commands sent match expected commands in drive_server.py, maybe make it send back an acknowledge?
 // ------------------------------------------
-let keyPressed = false; // Flag to indicate if a key is currently being pressed down
 
+// ARROW KEYs
+let arrowKeyPressed = false; // Flag to indicate if a key is currently being pressed down
 // If a keydown is detected and the keyPressed flag is not already true:
 document.addEventListener("keydown", (event) => {
-  if (!keyPressed && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+  if (!arrowKeyPressed && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
     event.preventDefault(); // Needed to stops browser from thinking the arrow keys are to scroll
-    keyPressed = true; // Flag that a key has been pressed
+    arrowKeyPressed = true; // Flag that a key has been pressed
 
     console.log("Key pressed : ", event.key); // debug log
 
@@ -87,14 +92,36 @@ document.addEventListener("keydown", (event) => {
     }
   }
 });
-
 document.addEventListener("keyup", (event) => {
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
     event.preventDefault();
-    keyPressed = false; // release flag
-    console.log("Command: stop");
-    sendCommand("stop");
+    arrowKeyPressed = false; // release flag
+    sendCommand("DRIVE_STOP"); // send stop command
   }
+});
 
+// CAMERA KEYS
+let cameraKeyPressed = false; // Flag to indicate if a key is currently being pressed down
+// If a keydown is detected and the keyPressed flag is not already true:
+document.addEventListener("keydown", (event) => {
+  if (!cameraKeyPressed && ["w", "a", "s", "d"].includes(event.key)) {
+    //event.preventDefault(); // Needed to stops browser from thinking the arrow keys are to scroll
+    cameraKeyPressed = true; // Flag that a key has been pressed
 
+    console.log("Key pressed : ", event.key); // debug log
+
+    switch (event.key) {
+      case "w": sendCommand("CAM_UP"); break;
+      case "a": sendCommand("CAM_LEFT"); break;
+      case "s": sendCommand("CAM_DOWN"); break;
+      case "d": sendCommand("CAM_RIGHT"); break;
+    }
+  }
+});
+document.addEventListener("keyup", (event) => {
+  if (["w", "a", "s", "d"].includes(event.key)) {
+    event.preventDefault();
+    cameraKeyPressed = false; // release flag
+    sendCommand("CAM_STOP");
+  }
 });
