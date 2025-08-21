@@ -39,18 +39,28 @@ body {
   border-radius: 10px;
 }
 
-#tx-container {
+/* *********************************** Log *********************************** */
+#log-container {
   grid-row: 3 / span 3;
   grid-column: 2 / span 3;
   border-style: inset;
 }
 
-#tx {
+#log {
   margin: 3%;
   background: lightgrey;
   height: 80%;
   overflow-y: scroll;     /* scroll when content overflows */
   text-align: left;
+}
+
+.log-error {
+  color: red;
+}
+
+.log-info {
+  color: darkgray;
+  font-style: italic;
 }
 
 

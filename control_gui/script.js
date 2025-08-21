@@ -33,12 +33,13 @@ socket.onerror = (err) => console.error("WebSocket Error:", err);
 socket.onclose = () => console.log("WebSocket closed");
 
 function sendCommand(cmd) {
-  addTXLogEntry(cmd);
+  addLogEntry(cmd);
   if (socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify({ action: cmd })); // send command
-    console.log("Command sent:", cmd);  
+    sentCmd = socket.send(cmd); // send command
+    console.log(sentCmd);  
   } else {
-    console.error("WebSocket not connected");
+    addLogEntry("WebSocket not connected", type="error");
+    //console.error("WebSocket not connected");
   }
 }
 
@@ -48,13 +49,23 @@ function sendCommand(cmd) {
 // ------------------------------------------
 /**
  * Adds string into transmission log on GUI.
- * Creates a new div element in 'tx' element on webpage.
+ * Creates a new div element in 'log' element on webpage.
  */
-function addTXLogEntry(message) {
-  const log = document.getElementById('tx');
+function addLogEntry(message, type = "info") {
+  const log = document.getElementById('log');
   const entry = document.createElement('div');
   const timestamp = new Date().toLocaleTimeString();
-  entry.textContent = `[${timestamp}] ${message}`;
+  switch (type) {
+      case "info": 
+        entry.textContent = `[${timestamp}] ${message}`;
+        entry.classList.add("log-info");
+        break;
+      case "error": 
+        entry.textContent = `[${timestamp}] ERROR | ${message}`;
+        entry.classList.add("log-error");
+        break;
+  }
+  //entry.textContent = `[${timestamp}] ${message}`;
   log.appendChild(entry);
   log.scrollTop = log.scrollHeight; // Auto-scroll to the bottom
 }
