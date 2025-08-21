@@ -3,7 +3,6 @@
 // Config
 // TODO: Add real values - everything here is a placeholder
 // TODO: Auto-reconnect on disconnect - Jaiden
-// TODO: Add e-stop command - Liv
 // TODO: add rx to tx box + colours and filters - Jaiden / Liv
 // TODO: add checlist for landmarks + animals for each stage
 // TODO: Camera stream overlay with yolo  - Liv
@@ -140,5 +139,23 @@ document.addEventListener("keyup", (event) => {
     event.preventDefault();
     cameraKeyPressed = false; // release flag
     sendCommand("CAM_STOP");
+  }
+});
+
+//E-STOP
+document.addEventListener("keydown", (event) => {
+  if (["x"].includes(event.key)){
+    event.preventDefault();
+    sendCommand("CAM_STOP");
+    sendCommand("DRIVE_STOP");
+  }
+});
+
+//Rehome camera
+document.addEventListener("keydown", (event) => {
+  if (["home"].includes(event.key)){
+    event.preventDefault();
+    sendCommand("CAM_STOP");
+    sendCommand("CAM_REHOME");
   }
 });
