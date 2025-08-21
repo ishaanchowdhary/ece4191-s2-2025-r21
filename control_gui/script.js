@@ -2,7 +2,20 @@
 // -------------------------------------------
 // Config
 // TODO: Add real values - everything here is a placeholder
-// TODO: Auto-reconnect on disconnect?
+// TODO: Auto-reconnect on disconnect - Jaiden
+// TODO: Add in cntrls for camera pan - need to make sure it stops at 180 deg or a bit before - Jaiden
+// TODO: Add e-stop command - Liv
+// TODO: add rx to tx box + colours and filters - Jaiden / Liv
+// TODO: add checlist for landmarks + animals for each stage
+// TODO: Camera stream overlay with yolo  - Liv
+// TODO: make it look pretty - Liv
+// TODO: instructional for keys to move + keys to camera pan - Jaiden
+// TODO: key to take a photo - Liv
+// TODO: add connect after testing
+// TODO: add info on connection status
+// TODO: switch camera mode to IR - Liv
+// TODO: button to rehome the camera - Liv
+// TODO: documentation to use the gui - Liv
 // -------------------------------------------
 const RPI_IP = "192.168.1.150";                 // Pi's LAN IP (or hostname)
 const WS_PORT = 9000;                           // WebSocket server port on Pi
@@ -82,4 +95,6 @@ document.addEventListener("keyup", (event) => {
     console.log("Command: stop");
     sendCommand("stop");
   }
+
+
 });
