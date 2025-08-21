@@ -7,11 +7,8 @@
 // TODO: add checlist for landmarks + animals for each stage
 // TODO: Camera stream overlay with yolo  - Liv
 // TODO: make it look pretty - Liv
-// TODO: key to take a photo - Liv
 // TODO: add connect after testing
 // TODO: add info on connection status
-// TODO: switch camera mode to IR - Liv
-// TODO: button to rehome the camera - Liv
 // TODO: documentation to use the gui - Liv
 
 //------------------------
@@ -164,9 +161,26 @@ document.addEventListener("keydown", (event) => {
 
 //Rehome camera
 document.addEventListener("keydown", (event) => {
-  if (["home"].includes(event.key)){
+  if (["Home"].includes(event.key)){
     event.preventDefault();
     sendCommand("CAM_STOP");
     sendCommand("CAM_REHOME");
+  }
+});
+
+//Take photo
+document.addEventListener("keydown", (event) => {
+  if ([" "].includes(event.key)){
+    event.preventDefault();
+    sendCommand("CAM_STOP");
+    sendCommand("CAM_TAKE_PHOTO");
+  }
+});
+
+//Turn on IR LED 
+document.addEventListener("keydown", (event) => {
+  if (["i"].includes(event.key)){
+    event.preventDefault();
+    sendCommand("IR_ON");
   }
 });
