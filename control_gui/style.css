@@ -63,6 +63,11 @@ body {
   font-style: italic;
 }
 
+.log-warn {
+  color: orange;
+  font-style: italic;
+}
+
 
 /* *********************************** Controls *********************************** */
 #controls-container {

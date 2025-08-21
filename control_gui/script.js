@@ -39,22 +39,26 @@ function sendCommand(cmd) {
     console.log(sentCmd);  
   } else {
     addLogEntry("WebSocket not connected", type="error");
-    //console.error("WebSocket not connected");
   }
 }
 
 // ------------------------------------------
-// Transmission Handling - instead of this, maybe a scrolling box that shows everything in different cols, e.g.
-// red text for errors, blue for transmission, green for received...
+// Log Handling
 // ------------------------------------------
-/**
- * Adds string into transmission log on GUI.
- * Creates a new div element in 'log' element on webpage.
- */
+
+/** Function addLogEntry(message, type) 
+ * message : unique event text to be displayed
+ * type : type of log entry, default 'info'
+ *            info - low importance infomation about operation
+ *            error - important, critical fault
+ *            warn - medium importance, fault that does not end operation
+*/
+
 function addLogEntry(message, type = "info") {
-  const log = document.getElementById('log');
-  const entry = document.createElement('div');
-  const timestamp = new Date().toLocaleTimeString();
+  const log = document.getElementById('log');         // Fetch 'log' element from HTML
+  const entry = document.createElement('div');        // New div inside 'log' for a new entry
+  const timestamp = new Date().toLocaleTimeString();  // Fetch date/time for timestamp
+  // Change message attributes based on 'type' variable
   switch (type) {
       case "info": 
         entry.textContent = `[${timestamp}] ${message}`;
@@ -64,8 +68,11 @@ function addLogEntry(message, type = "info") {
         entry.textContent = `[${timestamp}] ERROR | ${message}`;
         entry.classList.add("log-error");
         break;
+      case "warn": 
+        entry.textContent = `[${timestamp}] warn | ${message}`;
+        entry.classList.add("log-warn");
+        break;
   }
-  //entry.textContent = `[${timestamp}] ${message}`;
   log.appendChild(entry);
   log.scrollTop = log.scrollHeight; // Auto-scroll to the bottom
 }
