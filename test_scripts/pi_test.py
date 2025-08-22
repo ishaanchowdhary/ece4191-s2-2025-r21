@@ -35,6 +35,9 @@ async def handle_client(websocket, path):
                         "velocities": {"left": "v_l", "right": "v_r"}
                     }))
 
+                    #for testing 
+                    print("Received:", action)
+
                 else:
                     print("Unknown command:", action)
                     await websocket.send(json.dumps({"status": "error", "msg": "Invalid command"}))
