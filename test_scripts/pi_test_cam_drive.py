@@ -75,7 +75,7 @@ async def handle_client(websocket):
 
 async def camera_stream():
     """Capture frames from USB camera and stream to clients"""
-    cap = cv2.VideoCapture(0)  # change to 1 if your cam is /dev/video1
+    cap = cv2.VideoCapture(0, cv2.CAP_V4L2)  # change to 1 if your cam is /dev/video1
 
     # Optional: set resolution/FPS
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
