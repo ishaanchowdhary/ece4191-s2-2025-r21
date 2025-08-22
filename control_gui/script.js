@@ -109,10 +109,10 @@ document.addEventListener("keydown", (event) => {
     console.log("Key pressed : ", event.key); // debug log
 
     switch (event.key) {
-      case "ArrowUp": sendCommand("forward"); break;
-      case "ArrowDown": sendCommand("backward"); break;
-      case "ArrowLeft": sendCommand("left"); break;
-      case "ArrowRight": sendCommand("right"); break;
+      case "ArrowUp": sendCommand("FORWARD"); break;
+      case "ArrowDown": sendCommand("REVERSE"); break;
+      case "ArrowLeft": sendCommand("LEFT"); break;
+      case "ArrowRight": sendCommand("RIGHT"); break;
     }
   }
 });
@@ -120,7 +120,7 @@ document.addEventListener("keyup", (event) => {
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
     event.preventDefault();
     arrowKeyPressed = false; // release flag
-    sendCommand("DRIVE_STOP"); // send stop command
+    sendCommand("STOP"); // send stop command
   }
 });
 
