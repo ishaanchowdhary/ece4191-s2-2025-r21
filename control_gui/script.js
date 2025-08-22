@@ -45,20 +45,24 @@ function sendCommand(cmd) {
 // Websocket Listening
 // -------------------------------------------
 socket.onmessage = (event) => {
+  let msg;
   try {
-    const msg = JSON.parse(event.data);
+    msg = JSON.parse(event.data);
   } catch (err) {
     console.error("Invalid message from server:", event.data);
+    return;
   }
   if (msg.status === "ok")  {
     switch (msg.command) {
       case "action":
         addLogEntry(`Action received: ${msg.action}`, "reception");
         break;
+      default:
+        addLogEntry(`Unknown command received: ${msg.command}`, "reception");
     }
   }
   else if (msg.status === "error") {
-    addLogEntry(`${msg.error}`, "error");
+    addLogEntry(`${msg.msg}`, "error");
   }
   else {
     console.warn("Unknown message type:", msg);
