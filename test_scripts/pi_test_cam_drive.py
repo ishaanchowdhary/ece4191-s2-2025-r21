@@ -1,4 +1,10 @@
-# --- Combined Command + Video WebSocket Server ---
+#!/usr/bin/env python3
+"""
+WebSocket server for:
+ - Receiving velocity commands (linear v, angular w)
+ - Sending back acknowledgements
+ - Streaming video frames from a USB camera
+"""
 
 import asyncio
 import json
@@ -6,9 +12,10 @@ import websockets
 import cv2
 import numpy as np
 
+# --- Settings ---
 WS_PORT = 9000
 
-# --- Command Mapping ---
+# Command mapping (adjust speeds as needed)
 COMMAND_MAP = {
     "FORWARD":  {"v": 0.5, "w": 0.0},
     "REVERSE":  {"v": -0.5, "w": 0.0},
@@ -22,34 +29,42 @@ connected_clients = set()
 
 
 async def handle_client(websocket):
+    """Handle incoming messages from a client"""
     print("Client connected")
     connected_clients.add(websocket)
 
     try:
         async for message in websocket:
-            # Try parsing JSON (assume commands are JSON, not bytes)
+            # Distinguish between JSON commands and anything else
             try:
                 data = json.loads(message)
-                action = data.get("action", "").upper()
 
-                if action in COMMAND_MAP:
-                    vel = COMMAND_MAP[action]
-
-                    # Send acknowledgement
-                    await websocket.send(json.dumps({
-                        "status": "YIPPE",
-                        "command": action,
-                        "velocities": vel
-                    }))
-
-                    print(f"Received command: {action}")
-
+                # Support both high-level commands (FORWARD) and raw v,w
+                if "action" in data:
+                    action = data["action"].upper()
+                    if action in COMMAND_MAP:
+                        vel = COMMAND_MAP[action]
+                    else:
+                        await websocket.send(json.dumps({"status": "error", "msg": "Invalid command"}))
+                        continue
+                elif "v" in data and "w" in data:
+                    vel = {"v": float(data["v"]), "w": float(data["w"])}
+                    action = "CUSTOM"
                 else:
-                    await websocket.send(json.dumps({"status": "error", "msg": "Invalid command"}))
+                    await websocket.send(json.dumps({"status": "error", "msg": "Invalid format"}))
+                    continue
+
+                # Send acknowledgement
+                await websocket.send(json.dumps({
+                    "status": "OK",
+                    "command": action,
+                    "velocities": vel
+                }))
+
+                print(f"Command: {action}, v={vel['v']}, w={vel['w']}")
 
             except json.JSONDecodeError:
                 print("Non-JSON message ignored")
-                # Could be image bytes from client, just ignore here
 
     except websockets.exceptions.ConnectionClosed:
         print("Client disconnected")
@@ -59,7 +74,13 @@ async def handle_client(websocket):
 
 
 async def camera_stream():
-    cap = cv2.VideoCapture(0)  # Pi camera or USB camera
+    """Capture frames from USB camera and stream to clients"""
+    cap = cv2.VideoCapture(0)  # change to 1 if your cam is /dev/video1
+
+    # Optional: set resolution/FPS
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_FPS, 20)
 
     while True:
         await asyncio.sleep(0.05)  # ~20 FPS
@@ -67,11 +88,11 @@ async def camera_stream():
         if not ret:
             continue
 
-        # Encode as JPEG
+        # Encode frame as JPEG
         _, buffer = cv2.imencode(".jpg", frame)
         frame_bytes = buffer.tobytes()
 
-        # Send to all connected clients
+        # Broadcast to all clients
         if connected_clients:
             await asyncio.gather(*[
                 ws.send(frame_bytes) for ws in connected_clients
@@ -81,7 +102,7 @@ async def camera_stream():
 async def main():
     async with websockets.serve(handle_client, "0.0.0.0", WS_PORT):
         print(f"WebSocket server running on port {WS_PORT}")
-        await camera_stream()  # Run camera loop
+        await camera_stream()  # Run camera loop forever
 
 
 if __name__ == "__main__":
