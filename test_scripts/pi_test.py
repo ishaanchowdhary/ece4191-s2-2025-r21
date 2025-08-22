@@ -89,7 +89,7 @@ async def camera_stream():
 async def main():
     async with websockets.serve(handle_client, "0.0.0.0", WS_PORT):
         print(f"WebSocket server running on port {WS_PORT}")
-        await asyncio.Future()  # run forever
+        #await asyncio.Future()  # run forever
         await camera_stream()
 
 if __name__ == "__main__":
