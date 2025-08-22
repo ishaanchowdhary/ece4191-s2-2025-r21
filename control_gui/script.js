@@ -24,7 +24,7 @@ const VIDEO_URL = `http://${RPI_IP}:8889/cam`;  // stream of whatever we use to 
 // -------------------------------------------
 let socket = new WebSocket(`ws://${RPI_IP}:${WS_PORT}`);
 socket.onopen = () => console.log("Successfully connected to Raspberry Pi WebSocket");
-socket.onerror = (err) => console.error("WebSocket Error:", err);
+socket.onerror = (err) => addLogEntry("Websocket connection failed", "error");
 socket.onclose = () => console.log("WebSocket closed");
 
 function sendCommand(cmd) {
@@ -50,32 +50,53 @@ function webSocketReconnect() {
 // Websocket Listening
 // -------------------------------------------
 socket.onmessage = (event) => {
-  const msg = JSON.parse(event.data);
-  console.log(`Received message: ${msg}`); // Debug log
-  if (msg.camera_frame) {
-    console.log("Received camera frame data");
-    const img = document.getElementById("video");
-    img.src = "data:image/jpeg;base64," + data.camera_frame;
-  }
-  else if (msg.status === "ok")  {
-    addLogEntry(`Message received OK`, "reception");
-    switch (msg.command) {
-      case "action":
-        addLogEntry(`Action received: ${msg.action}`, "reception");
-        break;
-      default:
-        addLogEntry(`Unknown command received: ${msg.command}`, "reception");
+  if (event.data instanceof Blob) {
+    // Binary frame
+    const url = URL.createObjectURL(event.data);
+    document.getElementById("video").src = url;
+  } else {
+    try {
+      const msg = JSON.parse(event.data);
+      console.log("Server message:", msg);
+
+      if (msg.camera_frame) {
+        // Base64 frame
+        const img = document.getElementById("video");
+        img.src = "data:image/jpeg;base64," + msg.camera_frame;
+      } 
+      else if (msg.status === "ok") {
+        addLogEntry(`Message received OK`, "reception");
+        switch (msg.command) {
+          case "action":
+            addLogEntry(`Action received: ${msg.action}`, "reception");
+            break;
+          default:
+            addLogEntry(`Unknown command received: ${msg.command}`, "reception");
+        }
+      } 
+      else if (msg.status === "error") {
+        addLogEntry(`${msg.msg}`, "error");
+      } 
+      else {
+        console.warn("Unknown message type:", msg);
+      }
+    } catch (e) {
+      console.error("Failed to parse message:", e);
     }
-  }
-  else if (msg.status === "error") {
-    addLogEntry(`${msg.msg}`, "error");
-  }
-  else {
-    console.warn("Unknown message type:", msg);
   }
 };
 
-
+ws.onmessage = function(event) {
+    if (event.data instanceof Blob) {
+        // This is a video frame (binary)
+        let url = URL.createObjectURL(event.data);
+        document.getElementById("video").src = url;
+    } else {
+        // This is a JSON message
+        let msg = JSON.parse(event.data);
+        console.log("Server message:", msg);
+    }
+};
 // ------------------------------------------
 // Log Handling
 // ------------------------------------------
