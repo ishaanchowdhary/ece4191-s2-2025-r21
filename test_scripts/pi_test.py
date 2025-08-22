@@ -62,7 +62,7 @@ async def handle_client(websocket, path):
 async def camera_stream():
     """Continuously capture frames and send to clients if active"""
     global camera_active
-    cap = cv2.VideoCapture(CAMERA_INDEX)
+    cap = cv2.VideoCapture(CAMERA_INDEX, cv2.CAP_V4L2)
 
     if not cap.isOpened():
         print("Could not open camera :()")
