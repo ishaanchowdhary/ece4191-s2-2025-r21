@@ -1,3 +1,4 @@
+# Old script
 # This Python script will be used for testing connectivity with the client GUI
 
 import asyncio
