@@ -41,7 +41,7 @@ function sendCommand(cmd) {
 function webSocketReconnect() {
   socket = new WebSocket(`ws://${RPI_IP}:${WS_PORT}`);
   socket.onopen = () => console.log("Successfully connected to Raspberry Pi WebSocket");
-  socket.onerror = (err) => console.error("WebSocket Error:", err);
+  socket.onerror = (err) => addLogEntry("Websocket connection failed", "error");
   socket.onclose = () => console.log("WebSocket closed");
 }
 
@@ -50,15 +50,15 @@ function webSocketReconnect() {
 // Websocket Listening
 // -------------------------------------------
 socket.onmessage = (event) => {
-  let msg;
+  const msg = JSON.parse(event.data);
   console.log(`Received message: ${msg}`); // Debug log
-  try {
-    msg = JSON.parse(event.data);
-  } catch (err) {
-    console.error("Invalid message from server:", event.data);
-    return;
+  if (msg.camera_frame) {
+    console.log("Received camera frame data");
+    const img = document.getElementById("video");
+    img.src = "data:image/jpeg;base64," + data.camera_frame;
   }
-  if (msg.status === "ok")  {
+  else if (msg.status === "ok")  {
+    addLogEntry(`Message received OK`, "reception");
     switch (msg.command) {
       case "action":
         addLogEntry(`Action received: ${msg.action}`, "reception");
