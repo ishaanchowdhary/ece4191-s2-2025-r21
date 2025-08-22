@@ -3,7 +3,6 @@
 // Config
 // TODO: Add real values - everything here is a placeholder
 // TODO: Auto-reconnect on disconnect - Jaiden
-// TODO: add rx to tx box + colours and filters - Jaiden / Liv
 // TODO: add checlist for landmarks + animals for each stage
 // TODO: Camera stream overlay with yolo  - Liv
 // TODO: make it look pretty - Liv
@@ -16,7 +15,7 @@
 
 
 // -------------------------------------------
-const RPI_IP = "192.168.1.150";                 // Pi's LAN IP (or hostname)
+const RPI_IP = "172.20.10.2";                 // Pi's LAN IP (or hostname)
 const WS_PORT = 9000;                           // WebSocket server port on Pi
 const VIDEO_URL = `http://${RPI_IP}:8889/cam`;  // stream of whatever we use to stream video
 
@@ -39,6 +38,12 @@ function sendCommand(cmd) {
   }
 }
 
+function webSocketReconnect() {
+  socket = new WebSocket(`ws://${RPI_IP}:${WS_PORT}`);
+  socket.onopen = () => console.log("Successfully connected to Raspberry Pi WebSocket");
+  socket.onerror = (err) => console.error("WebSocket Error:", err);
+  socket.onclose = () => console.log("WebSocket closed");
+}
 
 
 // -------------------------------------------
@@ -46,6 +51,7 @@ function sendCommand(cmd) {
 // -------------------------------------------
 socket.onmessage = (event) => {
   let msg;
+  console.log(`Received message: ${msg}`); // Debug log
   try {
     msg = JSON.parse(event.data);
   } catch (err) {
@@ -160,7 +166,7 @@ document.addEventListener("keyup", (event) => {
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
     event.preventDefault();
     arrowKeyPressed = false; // release flag
-    sendCommand("STOP"); // send stop command
+    sendCommand("DRIVE_STOP"); // send stop command
   }
 });
 
