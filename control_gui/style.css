@@ -83,6 +83,11 @@ body {
   font-style: italic;
 }
 
+.log-reception {
+  color: blue;
+  font-style: italic;
+}
+
 /* *********************************** Controls *********************************** */
 #controls-container {
   display: grid;

@@ -33,11 +33,39 @@ function sendCommand(cmd) {
   if (socket.readyState === WebSocket.OPEN) {
     let payload = JSON.stringify({ action: cmd });
     socket.send(payload);  
-    addLogEntry(payload, "trasnmission");
+    addLogEntry(payload, "transmission");
   } else {
     addLogEntry("WebSocket not connected", "error");
   }
 }
+
+
+
+// -------------------------------------------
+// Websocket Listening
+// -------------------------------------------
+socket.onmessage = (event) => {
+  try {
+    const msg = JSON.parse(event.data);
+  } catch (err) {
+    console.error("Invalid message from server:", event.data);
+  }
+  if (msg.status === "ok")  {
+    switch (msg.command) {
+      case "action":
+        addLogEntry(`Action received: ${msg.action}`, "reception");
+        break;
+    }
+  }
+  else if (msg.status === "error") {
+    addLogEntry(`${msg.error}`, "error");
+  }
+  else {
+    console.warn("Unknown message type:", msg);
+  }
+};
+
+
 // ------------------------------------------
 // Log Handling
 // ------------------------------------------
@@ -81,6 +109,10 @@ function addLogEntry(message, type = "info") {
       case "transmission":
         entry.textContent = `[${timestamp}] transmitted: | ${message}`;
         entry.classList.add("log-transmission");
+        break;
+      case "reception":
+        entry.textContent = `[${timestamp}] received: | ${message}`;
+        entry.classList.add("log-reception");
         break;
   }
   log.appendChild(entry);
