@@ -31,13 +31,13 @@ socket.onclose = () => console.log("WebSocket closed");
 function sendCommand(cmd) {
   addLogEntry(cmd);
   if (socket.readyState === WebSocket.OPEN) {
-    sentCmd = socket.send(cmd); // send command
-    console.log(sentCmd);  
+    let payload = JSON.stringify({ action: cmd });
+    socket.send(payload);  
+    addLogEntry(payload, "trasnmission");
   } else {
-    addLogEntry("WebSocket not connected", type="error");
+    addLogEntry("WebSocket not connected", "error");
   }
 }
-
 // ------------------------------------------
 // Log Handling
 // ------------------------------------------
@@ -77,6 +77,10 @@ function addLogEntry(message, type = "info") {
       case "warn": 
         entry.textContent = `[${timestamp}] warn | ${message}`;
         entry.classList.add("log-warn");
+        break;
+      case "transmission":
+        entry.textContent = `[${timestamp}] transmitted: | ${message}`;
+        entry.classList.add("log-transmission");
         break;
   }
   log.appendChild(entry);

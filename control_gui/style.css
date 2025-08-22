@@ -78,6 +78,10 @@ body {
   font-style: italic;
 }
 
+.log-transmission {
+  color: green;
+  font-style: italic;
+}
 
 /* *********************************** Controls *********************************** */
 #controls-container {
