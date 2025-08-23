@@ -15,23 +15,42 @@
 
 
 // -------------------------------------------
-const RPI_IP = "172.20.10.2";                 // Pi's LAN IP (or hostname)
-const WS_PORT = 9000;                           // WebSocket server port on Pi
-const VIDEO_URL = `http://${RPI_IP}:8889/cam`;  // stream of whatever we use to stream video
+const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname)
+const CMD_PORT = 9000;        // WebSocket Port for commands
+const VIDEO_PORT = 9001;      // WebSocket Port for camera feed
 
 // -------------------------------------------
 // Websocket Setup
 // -------------------------------------------
-let socket = new WebSocket(`ws://${RPI_IP}:${WS_PORT}`);
-socket.onopen = () => console.log("Successfully connected to Raspberry Pi WebSocket");
-socket.onerror = (err) => addLogEntry("Websocket connection failed", "error");
-socket.onclose = () => console.log("WebSocket closed");
+// ON PAGE LOAD
+let video_socket;
+let cmd_socket;
+document.addEventListener("DOMContentLoaded", () => {
+  addLogEntry("Attempting Connection to Camera Feed WebSocket...", "info");
+  video_socket = new WebSocket(`ws://${RPI_IP}:${VIDEO_PORT}`);
+  video_socket.onopen   = () => addLogEntry("Connected to camera", "info");
+  video_socket.onerror  = () => addLogEntry("Camera connection failed", "error");
+  video_socket.onclose  = () => addLogEntry("Camera connection closed", "warn");
+
+  // video message handler
+  video_socket.onmessage = handleVideoMessage;
+
+  addLogEntry("Attempting Connection to Command WebSocket...", "info");
+  cmd_socket = new WebSocket(`ws://${RPI_IP}:${CMD_PORT}`);
+  cmd_socket.onopen   = () => addLogEntry("Connected to command feed", "info");
+  cmd_socket.onerror  = () => addLogEntry("Command connection failed", "error");
+  cmd_socket.onclose  = () => addLogEntry("Command connection closed", "warn");
+
+  // command message handler
+  cmd_socket.onmessage = handleCommandMessage;
+});
+
 
 function sendCommand(cmd) {
   addLogEntry(cmd);
-  if (socket.readyState === WebSocket.OPEN) {
+  if (cmd_socket.readyState === WebSocket.OPEN) {
     let payload = JSON.stringify({ action: cmd });
-    socket.send(payload);  
+    cmd_socket.send(payload);  
     addLogEntry(payload, "transmission");
   } else {
     addLogEntry("WebSocket not connected", "error");
@@ -39,64 +58,61 @@ function sendCommand(cmd) {
 }
 
 function webSocketReconnect() {
-  socket = new WebSocket(`ws://${RPI_IP}:${WS_PORT}`);
-  socket.onopen = () => console.log("Successfully connected to Raspberry Pi WebSocket");
-  socket.onerror = (err) => addLogEntry("Websocket connection failed", "error");
-  socket.onclose = () => console.log("WebSocket closed");
+  addLogEntry("Reconnecting WebSockets...", "warn");
+
+  cmd_socket = new WebSocket(`ws://${RPI_IP}:${CMD_PORT}`);
+  cmd_socket.onopen = () => addLogEntry("Reconnected to command WebSocket", "info");
+  cmd_socket.onerror = () => addLogEntry("Command WebSocket reconnection failed", "error");
+  cmd_socket.onclose = () => addLogEntry("Command WebSocket closed", "warn");
+  cmd_socket.onmessage = handleCommandMessage;
+
+  video_socket = new WebSocket(`ws://${RPI_IP}:${VIDEO_PORT}`);
+  video_socket.onopen = () => addLogEntry("Reconnected to video WebSocket", "info");
+  video_socket.onerror = () => addLogEntry("Video WebSocket reconnection failed", "error");
+  video_socket.onclose = () => addLogEntry("Video WebSocket closed", "warn");
+  video_socket.onmessage = handleVideoMessage;
 }
-
-
 // -------------------------------------------
 // Websocket Listening
 // -------------------------------------------
-socket.onmessage = (event) => {
+function handleVideoMessage(event) {
   if (event.data instanceof Blob) {
-    // Binary frame
     const url = URL.createObjectURL(event.data);
     document.getElementById("video").src = url;
   } else {
     try {
       const msg = JSON.parse(event.data);
-      console.log("Server message:", msg);
-
       if (msg.camera_frame) {
-        // Base64 frame
-        const img = document.getElementById("video");
-        img.src = "data:image/jpeg;base64," + msg.camera_frame;
-      } 
-      else if (msg.status === "ok") {
-        addLogEntry(`Message received OK`, "reception");
-        switch (msg.command) {
-          case "action":
-            addLogEntry(`Action received: ${msg.action}`, "reception");
-            break;
-          default:
-            addLogEntry(`Unknown command received: ${msg.command}`, "reception");
-        }
-      } 
-      else if (msg.status === "error") {
-        addLogEntry(`${msg.msg}`, "error");
-      } 
-      else {
-        console.warn("Unknown message type:", msg);
+        document.getElementById("video").src = "data:image/jpeg;base64," + msg.camera_frame;
+      } else {
+        console.warn("Unknown video message:", msg);
       }
     } catch (e) {
-      console.error("Failed to parse message:", e);
+      console.error("Failed to parse video message:", e);
     }
   }
-};
+}
 
-ws.onmessage = function(event) {
-    if (event.data instanceof Blob) {
-        // This is a video frame (binary)
-        let url = URL.createObjectURL(event.data);
-        document.getElementById("video").src = url;
+function handleCommandMessage(event) {
+  try {
+    const msg = JSON.parse(event.data);
+    console.log("Command message:", msg);
+
+    if (msg.status === "ok") {
+      addLogEntry(`Message received OK`, "reception");
+      if (msg.command === "action") {
+        addLogEntry(`Action received: ${msg.action}`, "reception");
+      }
+    } else if (msg.status === "error") {
+      addLogEntry(`${msg.msg}`, "error");
     } else {
-        // This is a JSON message
-        let msg = JSON.parse(event.data);
-        console.log("Server message:", msg);
+      console.warn("Unknown command message type:", msg);
     }
-};
+  } catch (e) {
+    console.error("Failed to parse command message:", e);
+  }
+}
+
 // ------------------------------------------
 // Log Handling
 // ------------------------------------------
@@ -151,14 +167,6 @@ function addLogEntry(message, type = "info") {
 }
 
 
-
-// ------------------------------------------
-// Video Stream
-// ------------------------------------------
-document.addEventListener("DOMContentLoaded", () => {
-  const video = document.getElementById("cam-stream");
-  video.src = VIDEO_URL;
-});
 
 // ------------------------------------------
 // Keyboard Controls
