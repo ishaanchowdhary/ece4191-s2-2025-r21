@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
+'''
+Written by: Ishaan Chowdhary (33115303)
+Last edited: 26/08/2025
 
+Testing script for testing trained YOLO Models through camera feed or stored video.
+Additionally measures latency to run model and display image feed.
+'''
 from ultralytics import YOLO
 import cv2
 import numpy as np
+import time
 
 VIDEO_PATH = "object_detection/data_collection/videos/WIN_20250808_10_49_48_Pro.mp4"  # Change to your test video file
 MODEL_PATH = "models/best_v1.pt"  # Change to your YOLO model file
@@ -49,6 +56,7 @@ if __name__ == '__main__':
     
     while cap.isOpened():
         try:
+            start = time.time()
             ret, frame = cap.read()
 
             if not ret:
@@ -57,12 +65,13 @@ if __name__ == '__main__':
             detections = run_yolo(model, frame)            
             annotated_frame = annotate_image(frame, detections[0])
             cv2.imshow("YOLO Animal Detection", annotated_frame)
-
+            print(f"Latency: {(time.time() - start)*1000:.2f} ms")
             cv2.waitKey(1)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         except KeyboardInterrupt:
+            print("Terminating Script ...")
             break
     
     cap.release()
