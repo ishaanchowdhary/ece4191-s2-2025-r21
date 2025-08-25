@@ -20,7 +20,7 @@ def annotate_image(image, detections):
 
 def run_yolo(model, images):
     """Runs YOLO model on a batch of images."""
-    results = model(images)
+    results = model(images,verbose=False)
     detections = []
 
     for result in results:
