@@ -23,7 +23,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url('camo-pattern.png') no-repeat center/cover;
+  border: 1px solid black;
 }
 
 #title {
@@ -100,4 +100,5 @@ body {
   justify-items: center;  /* center content horizontally */
   align-items: center;    /* center content vertically */
   text-align: center;     /* center text under icons */
+  font-size: small;
 }
