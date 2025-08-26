@@ -93,14 +93,14 @@ function handleCommandMessage(event) {
     const msg = JSON.parse(event.data);
     console.log("Command message:", msg);
 
-    if (msg.status === "ok") {
+    if (msg.status === "OK") {
       addLogEntry(`Message received OK`, "reception");
-      if (msg.command === "action") {
-        addLogEntry(`Action received: ${msg.action}`, "reception");
-      }
-    } else if (msg.status === "error") {
+      addLogEntry(`Command received: ${msg.command}`, "reception");
+    } 
+    else if (msg.status === "error") {
       addLogEntry(`${msg.msg}`, "error");
-    } else {
+    } 
+    else {
       console.warn("Unknown command message type:", msg);
     }
   } catch (e) {
