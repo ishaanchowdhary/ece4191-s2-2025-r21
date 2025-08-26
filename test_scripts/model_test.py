@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 import time
 
-VIDEO_PATH = "object_detection/data_collection/videos/WIN_20250808_10_49_48_Pro.mp4"  # Change to your test video file
+VIDEO_PATH = "object_detection/data_collection/videos/second_batch.mp4"  # Change to your test video file
 MODEL_PATH = "models/best_v1.pt"  # Change to your YOLO model file
 USE_CAM = False
 
