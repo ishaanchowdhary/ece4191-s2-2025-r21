@@ -1,9 +1,10 @@
+# Script for motor control signals 
 import RPi.GPIO as GPIO
 import time
 
 # GPIO pin setup
 LEFT_PWM, LEFT_IN1, LEFT_IN2 = 12, 23, 24
-RIGHT_PWM, RIGHT_IN1, RIGHT_IN2 = 13, 27, 22
+RIGHT_PWM, RIGHT_IN1, RIGHT_IN2 = 13, 8, 7
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup([LEFT_IN1, LEFT_IN2, RIGHT_IN1, RIGHT_IN2], GPIO.OUT)
@@ -17,8 +18,9 @@ pwm_right.start(0)
 def set_motor_command(v_l, v_r):
     """Convert wheel velocity to PWM signals"""
     # Map velocities to duty cycle [-1,1] → [0,100]
-    duty_l = max(min(abs(v_l) * 100, 100), 0)
-    duty_r = max(min(abs(v_r) * 100, 100), 0)
+    MAX_WHEEL_SPEED = 10.0  # TO TUNE 
+    duty_l = min(abs(v_l) / MAX_WHEEL_SPEED * 100, 100)
+    duty_r = min(abs(v_r) / MAX_WHEEL_SPEED * 100, 100)
 
     # Left motor direction
     if v_l >= 0:
@@ -38,3 +40,8 @@ def set_motor_command(v_l, v_r):
 
     pwm_left.ChangeDutyCycle(duty_l)
     pwm_right.ChangeDutyCycle(duty_r)
+
+def cleanup():
+    pwm_left.stop()
+    pwm_right.stop()
+    GPIO.cleanup()

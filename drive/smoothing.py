@@ -1,4 +1,4 @@
-import time
+# Script for velocity smoothing 
 
 class VelocitySmoother:
     def __init__(self, max_accel=0.5, max_ang_accel=1.0, rate_hz=50):

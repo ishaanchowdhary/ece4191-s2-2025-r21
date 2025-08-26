@@ -1,7 +1,9 @@
+# Main script that reads in commands from websocket 
 import asyncio
 import json
 import websockets
 from motor_control import set_motor_command
+from motor_control import cleanup  
 from smoothing import VelocitySmoother
 
 # --- Settings ---
@@ -37,7 +39,7 @@ async def handle_client(websocket, path):
                     # Convert to wheel velocities
                     # Differential drive equations
                     L = 0.15  # wheelbase (m) - adjust!
-                    R = 0.05  # wheel radius (m) - adjust!
+                    R = 0.065  # wheel radius (m) - adjust!
                     v_r = (2*v_smooth + w_smooth*L) / (2*R)
                     v_l = (2*v_smooth - w_smooth*L) / (2*R)
 
@@ -74,3 +76,5 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         print("Server stopped")
+    finally:
+        cleanup()
