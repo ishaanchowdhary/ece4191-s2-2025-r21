@@ -82,7 +82,7 @@ function handleVideoMessage(event) {
     videoEl.src = url;
 
     // Revoke old object URLs to save memory
-    videoEl.onload = () => URL.revokeObjectURL(url);
+    videoEl.onload = () => URL.revokeObjectURL(videoEl.src);
   } else {
     console.warn("Unexpected video message type:", event.data);
   }
@@ -92,10 +92,9 @@ function handleCommandMessage(event) {
   try {
     const msg = JSON.parse(event.data);
     console.log("Command message:", msg);
-
     if (msg.status === "OK") {
       addLogEntry(`Message received OK`, "reception");
-      addLogEntry(`Command received: ${msg.command}`, "reception");
+      addLogEntry(`Command received: ${msg.command}, Velocities: ${msg.velocities}`, "reception");
     } 
     else if (msg.status === "error") {
       addLogEntry(`${msg.msg}`, "error");
