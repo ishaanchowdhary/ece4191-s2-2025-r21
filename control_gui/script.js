@@ -78,18 +78,13 @@ function webSocketReconnect() {
 function handleVideoMessage(event) {
   if (event.data instanceof Blob) {
     const url = URL.createObjectURL(event.data);
-    document.getElementById("video").src = url;
+    const videoEl = document.getElementById("video");
+    videoEl.src = url;
+
+    // Revoke old object URLs to save memory
+    videoEl.onload = () => URL.revokeObjectURL(videoEl.src);
   } else {
-    try {
-      const msg = JSON.parse(event.data);
-      if (msg.camera_frame) {
-        document.getElementById("video").src = "data:image/jpeg;base64," + msg.camera_frame;
-      } else {
-        console.warn("Unknown video message:", msg);
-      }
-    } catch (e) {
-      console.error("Failed to parse video message:", e);
-    }
+    console.warn("Unexpected video message type:", event.data);
   }
 }
 
@@ -97,15 +92,14 @@ function handleCommandMessage(event) {
   try {
     const msg = JSON.parse(event.data);
     console.log("Command message:", msg);
-
-    if (msg.status === "ok") {
+    if (msg.status === "OK") {
       addLogEntry(`Message received OK`, "reception");
-      if (msg.command === "action") {
-        addLogEntry(`Action received: ${msg.action}`, "reception");
-      }
-    } else if (msg.status === "error") {
+      addLogEntry(`Command received: ${msg.command}, Velocities: ${msg.velocities}`, "reception");
+    } 
+    else if (msg.status === "error") {
       addLogEntry(`${msg.msg}`, "error");
-    } else {
+    } 
+    else {
       console.warn("Unknown command message type:", msg);
     }
   } catch (e) {
