@@ -78,18 +78,13 @@ function webSocketReconnect() {
 function handleVideoMessage(event) {
   if (event.data instanceof Blob) {
     const url = URL.createObjectURL(event.data);
-    document.getElementById("video").src = url;
+    const videoEl = document.getElementById("video");
+    videoEl.src = url;
+
+    // Revoke old object URLs to save memory
+    videoEl.onload = () => URL.revokeObjectURL(url);
   } else {
-    try {
-      const msg = JSON.parse(event.data);
-      if (msg.camera_frame) {
-        document.getElementById("video").src = "data:image/jpeg;base64," + msg.camera_frame;
-      } else {
-        console.warn("Unknown video message:", msg);
-      }
-    } catch (e) {
-      console.error("Failed to parse video message:", e);
-    }
+    console.warn("Unexpected video message type:", event.data);
   }
 }
 
