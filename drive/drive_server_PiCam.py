@@ -14,7 +14,7 @@ VIDEO_PORT = 9001
 
 # Init camera
 picam2 = Picamera2()
-config = picam2.create_preview_configuration(main={"size": (640, 480)})
+config = picam2.create_video_configuration(main={"size": (640, 480), "format": "RGB888"})
 picam2.configure(config)
 picam2.start()
 
@@ -112,14 +112,13 @@ async def camera_stream():
 # ---------------- MAIN ----------------
 async def main():
     # Start both servers
-    await websockets.serve(handle_client, "0.0.0.0", CMD_PORT)
-    await websockets.serve(handle_video, "0.0.0.0", VIDEO_PORT)
+    cmd_server = await websockets.serve(handle_client, "0.0.0.0", CMD_PORT)
+    video_server = await websockets.serve(handle_video, "0.0.0.0", VIDEO_PORT)
 
     print(f"Command WebSocket server on port {CMD_PORT}")
     print(f"Video WebSocket server on port {VIDEO_PORT}")
 
-    # Run camera stream forever
-    await camera_stream()
+    await camera_stream()  # runs forever
 
 
 if __name__ == "__main__":
