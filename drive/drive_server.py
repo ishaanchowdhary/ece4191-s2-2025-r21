@@ -18,7 +18,7 @@ COMMAND_MAP = {
     "REVERSE":  {"v": -0.5, "w": 0.0},
     "LEFT":     {"v": 0.0, "w": 0.8},
     "RIGHT":    {"v": 0.0, "w": -0.8},
-    "STOP":     {"v": 0.0, "w": 0.0}
+    "DRIVE_STOP":     {"v": 0.0, "w": 0.0}
 }
 
 async def handle_client(websocket, path):
