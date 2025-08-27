@@ -1,6 +1,6 @@
 """
 last edited : 28/08/2025
-motor_controller.py
+motor_control.py
 --------------------
 Low-level motor control module for differential drive.
 ---------------------
@@ -19,7 +19,7 @@ Dependencies:
 - config.py for motor constants and PWM settings
 
 Usage:
-    from controllers.motor_controller import set_motor_command, cleanup
+    from controllers.motor_control import set_motor_command, cleanup
 """
 
 import RPi.GPIO as GPIO

@@ -19,7 +19,7 @@ from config import CMD_PORT, VIDEO_PORT
 from servers.command_server import handle_client
 from servers.video_server import handle_video
 from servers.camera_stream import camera_stream
-from controllers.motor_controller import cleanup as motor_cleanup
+from controllers.motor_control import cleanup as motor_cleanup
 
 async def main():
     # Start both servers (handlers keep the original (websocket, path) signature)
