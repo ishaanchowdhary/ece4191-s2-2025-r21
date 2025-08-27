@@ -15,7 +15,7 @@ Usage:
 
 import json
 import websockets
-from controllers.motor_controller import set_motor_command
+from controllers.motor_control import set_motor_command
 from controllers.velocity_smoother import VelocitySmoother
 from config import WHEEL_BASE, WHEEL_RADIUS
 
