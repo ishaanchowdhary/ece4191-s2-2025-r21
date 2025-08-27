@@ -10,7 +10,7 @@ from smoothing import VelocitySmoother
 WS_PORT = 9000
 
 # Velocity smoother instance
-smoother = VelocitySmoother(max_accel=0.5, max_ang_accel=1.0, rate_hz=50)
+smoother = VelocitySmoother(max_accel=0.5, max_ang_accel=2.0, rate_hz=50)
 
 # Command mapping (adjust speeds as needed)
 COMMAND_MAP = {
