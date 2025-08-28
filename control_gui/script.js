@@ -29,18 +29,18 @@ let cmd_socket;
 document.addEventListener("DOMContentLoaded", () => {
   addLogEntry("Attempting Connection to Camera Feed WebSocket...", "info");
   video_socket = new WebSocket(`ws://${RPI_IP}:${VIDEO_PORT}`);
-  video_socket.onopen   = () => addLogEntry("Connected to camera", "info");
-  video_socket.onerror  = () => addLogEntry("Camera connection failed", "error");
-  video_socket.onclose  = () => addLogEntry("Camera connection closed", "warn");
+  video_socket.onopen   = () => addLogEntry("Connected to camera WebSocket", "info");
+  video_socket.onerror  = () => addLogEntry("Camera WebSocket connection failed", "error");
+  video_socket.onclose  = () => addLogEntry("Camera WebSocket connection closed", "warn");
 
   // video message handler
   video_socket.onmessage = handleVideoMessage;
 
   addLogEntry("Attempting Connection to Command WebSocket...", "info");
   cmd_socket = new WebSocket(`ws://${RPI_IP}:${CMD_PORT}`);
-  cmd_socket.onopen   = () => addLogEntry("Connected to command feed", "info");
-  cmd_socket.onerror  = () => addLogEntry("Command connection failed", "error");
-  cmd_socket.onclose  = () => addLogEntry("Command connection closed", "warn");
+  cmd_socket.onopen   = () => addLogEntry("Connected to command feed WebSocket", "info");
+  cmd_socket.onerror  = () => addLogEntry("Command WebSocket connection failed", "error");
+  cmd_socket.onclose  = () => addLogEntry("Command WebSocket connection closed", "warn");
 
   // command message handler
   cmd_socket.onmessage = handleCommandMessage;
