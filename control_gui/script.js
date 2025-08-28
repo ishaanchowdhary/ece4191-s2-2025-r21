@@ -15,6 +15,7 @@
 
 
 // -------------------------------------------
+
 //const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname)
 const RPI_IP = "192.168.20.12"; // Pi's LAN IP (or hostname)
 const CMD_PORT = 9000;        // WebSocket Port for commands
@@ -26,24 +27,11 @@ const VIDEO_PORT = 9001;      // WebSocket Port for camera feed
 // ON PAGE LOAD
 let video_socket;
 let cmd_socket;
+
 document.addEventListener("DOMContentLoaded", () => {
-  addLogEntry("Attempting Connection to Camera Feed WebSocket...", "info");
-  video_socket = new WebSocket(`ws://${RPI_IP}:${VIDEO_PORT}`);
-  video_socket.onopen   = () => addLogEntry("Connected to camera WebSocket", "info");
-  video_socket.onerror  = () => addLogEntry("Camera WebSocket connection failed", "error");
-  video_socket.onclose  = () => addLogEntry("Camera WebSocket connection closed", "warn");
-
-  // video message handler
-  video_socket.onmessage = handleVideoMessage;
-
-  addLogEntry("Attempting Connection to Command WebSocket...", "info");
-  cmd_socket = new WebSocket(`ws://${RPI_IP}:${CMD_PORT}`);
-  cmd_socket.onopen   = () => addLogEntry("Connected to command feed WebSocket", "info");
-  cmd_socket.onerror  = () => addLogEntry("Command WebSocket connection failed", "error");
-  cmd_socket.onclose  = () => addLogEntry("Command WebSocket connection closed", "warn");
-
-  // command message handler
-  cmd_socket.onmessage = handleCommandMessage;
+  if (CONFIG.CONNECT_ON_PAGE_LOAD == true) {
+    webSocketReconnect()
+  }
 });
 
 
@@ -62,9 +50,18 @@ function webSocketReconnect() {
   addLogEntry("Reconnecting WebSockets...", "warn");
 
   cmd_socket = new WebSocket(`ws://${RPI_IP}:${CMD_PORT}`);
-  cmd_socket.onopen = () => addLogEntry("Reconnected to command WebSocket", "info");
-  cmd_socket.onerror = () => addLogEntry("Command WebSocket reconnection failed", "error");
-  cmd_socket.onclose = () => addLogEntry("Command WebSocket closed", "warn");
+  cmd_socket.onopen = () => {
+    addLogEntry("Reconnected to command WebSocket", "info");
+    document.getElementById("websocket-connect-button").disabled = true;
+  }
+  cmd_socket.onerror = () => {
+    addLogEntry("Command WebSocket reconnection failed", "error");
+    document.getElementById("websocket-connect-button").disabled = false;
+  }
+  cmd_socket.onclose = () => {
+    addLogEntry("Command WebSocket closed", "warn");
+    document.getElementById("websocket-connect-button").disabled = false;
+  }
   cmd_socket.onmessage = handleCommandMessage;
 
   video_socket = new WebSocket(`ws://${RPI_IP}:${VIDEO_PORT}`);
