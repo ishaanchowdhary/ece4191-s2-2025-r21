@@ -82,11 +82,14 @@ def set_motor_command(v_l, v_r):
     # Debug print (helpful while testing)
     print(f"[MOTOR] v_l={v_l:.2f} rad/s v_r={v_r:.2f} rad/s -> duty_l={duty_l:.1f}% duty_r={duty_r:.1f}%")
 
+
+
 def cleanup():
     """Stop PWM and clean up GPIO. Safe to call multiple times."""
     try:
         pwm_left.stop()
         pwm_right.stop()
-    except Exception:
-        pass
-    GPIO.cleanup()
+        GPIO.cleanup()
+        print("GPIO cleanup done.")
+    except Exception as e:
+        print("Error during GPIO cleanup:", e)

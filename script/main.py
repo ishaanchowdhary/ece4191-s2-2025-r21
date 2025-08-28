@@ -22,7 +22,7 @@ from servers.camera_stream import camera_stream
 from controllers.motor_control import cleanup as motor_cleanup
 
 async def main():
-    # Start both servers (handlers keep the original (websocket, path) signature)
+    # Start both servers
     await websockets.serve(handle_client, "0.0.0.0", CMD_PORT)
     await websockets.serve(handle_video, "0.0.0.0", VIDEO_PORT)
 
@@ -32,14 +32,11 @@ async def main():
     # Run camera stream forever
     await camera_stream()
 
-if __name__ == "__main__":
+
+if __name__ == "__main__": 
     try:
-        asyncio.run(main())
+        asyncio.run(main())                             
     except KeyboardInterrupt:
         print("Server stopped")
-    finally:
-        # safety stop
-        try:
-            motor_cleanup()
-        except Exception as e:
-            print("Error during motor cleanup:", e)
+    finally: # Runs on exit
+        motor_cleanup()
