@@ -89,6 +89,8 @@ def cleanup():
     try:
         pwm_left.stop()
         pwm_right.stop()
+        pwm_left = None
+        pwm_right = None
         GPIO.cleanup()
         print("GPIO cleanup done.")
     except Exception as e:
