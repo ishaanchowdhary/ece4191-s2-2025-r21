@@ -11,7 +11,7 @@ Usage:
     from utils.safety import emergency_stop
 """
 
-from controllers.motor_controller import set_motor_command, cleanup as motor_cleanup
+from controllers.motor_control import set_motor_command, cleanup as motor_cleanup
 
 def emergency_stop():
     """Immediately stop motors (zero velocities) and perform cleanup."""
