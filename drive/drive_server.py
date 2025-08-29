@@ -43,8 +43,8 @@ async def handle_client(websocket, path):
                     v_smooth, w_smooth = smoother.update(target["v"], target["w"])
 
                     # Differential drive equations
-                    L = 0.15   # wheelbase (m) - adjust!
-                    R = 0.065  # wheel radius (m) - adjust!
+                    L = 0.12   # wheelbase (m) - adjust!
+                    R = 0.034  # wheel radius (m) - adjust!
                     v_r = (2*v_smooth + w_smooth*L) / (2*R)
                     v_l = (2*v_smooth - w_smooth*L) / (2*R)
 
