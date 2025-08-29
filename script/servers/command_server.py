@@ -21,10 +21,10 @@ from config import WHEEL_BASE, WHEEL_RADIUS
 
 # Command mapping (adjust speeds as needed)
 COMMAND_MAP = {
-    "FORWARD":    {"v": 0.5, "w": 0.0},
-    "REVERSE":    {"v": -0.5, "w": 0.0},
-    "LEFT":       {"v": 0.0, "w": 0.8},
-    "RIGHT":      {"v": 0.0, "w": -0.8},
+    "FORWARD":    {"v": -0.5, "w": 0.0},
+    "REVERSE":    {"v": 0.5, "w": 0.0},
+    "LEFT":       {"v": 0.0, "w": -0.8},
+    "RIGHT":      {"v": 0.0, "w": 0.8},
     "DRIVE_STOP": {"v": 0.0, "w": 0.0}
 }
 
