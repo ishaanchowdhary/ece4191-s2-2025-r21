@@ -22,7 +22,7 @@ WHEEL_BASE = 0.15   # meters (L)
 WHEEL_RADIUS = 0.065  # meters (R)
 
 # PWM & motor tuning
-PWM_FREQ = 200  # Hz
+PWM_FREQ = 1000  # Hz
 MEASURED_MAX_WHEEL_SPEED = None  # rad/s, set measured value if available
 FALLBACK_MAX_WHEEL_SPEED = 40.0   # rad/s — conservative starting point
 MIN_START_DUTY = 30.0             # percent, minimum duty to reliably start motor
