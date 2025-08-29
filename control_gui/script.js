@@ -16,8 +16,12 @@
 
 // -------------------------------------------
 
-const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname)
-//const RPI_IP = "192.168.20.12"; // Pi's LAN IP (or hostname)
+// IP Address: Switch / change as required
+const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname): Ishaan's iPhone
+//const RPI_IP = "192.168.20.12"; // Pi's LAN IP (or hostname): Jaiden and Liv's house wifi (i think)
+//const RPI_IP = "172.20.10.3"; // Pi's LAN IP (or hostname): Jaiden's iPhone
+
+// Websocket Ports
 const CMD_PORT = 9000;        // WebSocket Port for commands
 const VIDEO_PORT = 9001;      // WebSocket Port for camera feed
 
