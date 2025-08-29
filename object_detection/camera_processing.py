@@ -13,7 +13,7 @@ Dependencies:
 - asyncio
 
 Usage:
-    python yolo_relay.py
+    python camera_processing.py
 """
 
 import asyncio
