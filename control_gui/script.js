@@ -19,7 +19,7 @@
 const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname)
 //const RPI_IP = "192.168.20.12"; // Pi's LAN IP (or hostname)
 const CMD_PORT = 9000;        // WebSocket Port for commands
-const VIDEO_PORT = 9001;      // WebSocket Port for camera feed
+const VIDEO_PORT = 9002;      // WebSocket Port for camera feed
 
 // -------------------------------------------
 // Websocket Setup
