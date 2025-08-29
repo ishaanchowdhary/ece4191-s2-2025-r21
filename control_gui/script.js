@@ -18,8 +18,8 @@
 
 // IP Address: Switch / change as required
 //const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname): Ishaan's iPhone
-const RPI_IP = "192.168.4.110"; // Pi's LAN IP (or hostname): Ishaan's house wifi (i think)
-//const RPI_IP = "192.168.20.12"; // Pi's LAN IP (or hostname): Jaiden and Liv's house wifi (i think)
+//const RPI_IP = "192.168.4.110"; // Pi's LAN IP (or hostname): Ishaan's house wifi (i think)
+const RPI_IP = "192.168.20.12"; // Pi's LAN IP (or hostname): Jaiden and Liv's house wifi (i think)
 //const RPI_IP = "172.20.10.3"; // Pi's LAN IP (or hostname): Jaiden's iPhone
 
 // Websocket Ports
@@ -95,9 +95,9 @@ function handleCommandMessage(event) {
   try {
     const msg = JSON.parse(event.data);
     console.log("Command message:", msg);
-    if (msg.status === "OK") {
+    if (msg.status === "ok") {
       addLogEntry(`Message received OK`, "reception");
-      addLogEntry(`Command received: ${msg.command}, Velocities: ${msg.velocities}`, "reception");
+      addLogEntry(`Command received: ${msg.command}, Velocities: ${JSON.stringify(msg.velocities)}, Duty: ${msg.duty_cycles}`, "reception");
     } 
     else if (msg.status === "error") {
       addLogEntry(`${msg.msg}`, "error");
