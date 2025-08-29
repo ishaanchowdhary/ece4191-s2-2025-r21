@@ -27,7 +27,7 @@ from ultralytics import YOLO
 # ----------------------------
 IN_PORT = 9001   # incoming frames
 OUT_PORT = 9002  # outgoing frames
-MODEL_PATH = "model/best_v1.pt"  # change if you trained your own model
+MODEL_PATH = "models/best_v1.pt"  # change if you trained your own model
 
 # Track connected clients for output
 output_clients = set()
@@ -40,44 +40,49 @@ model = YOLO(MODEL_PATH)
 # Handle incoming frames
 # ----------------------------
 async def handle_incoming(websocket):
-    async for message in websocket:
-        try:
-            # Convert bytes -> numpy -> BGR frame
-            img_array = np.frombuffer(message, np.uint8)
-            frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+    print(f"[INPUT] Client connected: {websocket.remote_address}")
+    try:
+        async for message in websocket:
+            try:
+                # Convert bytes -> numpy -> BGR frame
+                img_array = np.frombuffer(message, np.uint8)
+                frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
-            if frame is None:
-                continue
+                if frame is None:
+                    continue
 
-            # Run YOLO inference
-            results = model(frame, verbose=False)
-            annotated = results[0].plot()  # draws bounding boxes
+                # Run YOLO inference
+                results = model(frame, verbose=False)
+                annotated = results[0].plot()
 
-            # Encode back to JPEG
-            ret_enc, buffer = cv2.imencode(".jpg", annotated)
-            if not ret_enc:
-                continue
-            frame_bytes = buffer.tobytes()
+                # Encode back to JPEG
+                ret_enc, buffer = cv2.imencode(".jpg", annotated)
+                if not ret_enc:
+                    continue
+                frame_bytes = buffer.tobytes()
 
-            # Broadcast to connected output clients
-            if output_clients:
-                await asyncio.gather(*[
-                    ws.send(frame_bytes) for ws in list(output_clients)
-                ])
-
-        except Exception as e:
-            print(f"[ERROR] Failed to process frame: {e}")
+                # Broadcast to connected output clients
+                if output_clients:
+                    await asyncio.gather(*[
+                        ws.send(frame_bytes) for ws in list(output_clients)
+                    ])
+            except Exception as e:
+                print(f"[ERROR] Failed to process frame: {e}")
+    finally:
+        print(f"[INPUT] Client disconnected: {websocket.remote_address}")
 
 
 # ----------------------------
 # Manage output connections
 # ----------------------------
 async def handle_output(websocket):
+    print(f"[OUTPUT] Viewer connected: {websocket.remote_address}")
     output_clients.add(websocket)
     try:
         await websocket.wait_closed()
     finally:
         output_clients.remove(websocket)
+        print(f"[OUTPUT] Viewer disconnected: {websocket.remote_address}")
 
 
 # ----------------------------
@@ -94,4 +99,9 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\n[INFO] Server stopped by user.")
+    except asyncio.CancelledError:
+        pass
