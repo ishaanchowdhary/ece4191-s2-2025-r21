@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 last edited: 28/08/2025
 main.py
