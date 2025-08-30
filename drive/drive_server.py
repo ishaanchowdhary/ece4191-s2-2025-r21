@@ -4,9 +4,7 @@ import asyncio
 import json
 import websockets
 import cv2   # <-- needed for camera
-#from motor_control import set_motor_command, cleanup
-import motor_control
-import RPi.GPIO as GPIO
+from motor_control import set_motor_command, cleanup
 from smoothing import VelocitySmoother
 
 # --- Settings ---
@@ -133,6 +131,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Server stopped")
         set_motor_command(0, 0)  # safety stop
-        pwm_left.stop()
-        pwm_right.stop()
-        GPIO.cleanup()
+        cleanup()
