@@ -2,7 +2,22 @@
 Github Repository for Team R21 in ECE4191 S2 2025
 
 ## SSH into pi
+Open command prompt on laptop.
+
+If Pi3:
+ssh admin@(ip address)
+password: admin
+cd ece4191-s2-2025-r21
+git pull
+python script/main.py
+
+If Pi4
+ssh master@(ip address)
 pw: shreklovers
+cd ece4191-s2-2025-r21
+git pull
+python script/main.py
+
 
 ## Configuration
 **control_gui/config.js:**
