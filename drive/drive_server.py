@@ -130,6 +130,5 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         print("Server stopped")
-    finally:
         set_motor_command(0, 0)  # safety stop
         cleanup()
