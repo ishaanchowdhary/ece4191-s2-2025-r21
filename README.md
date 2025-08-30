@@ -16,7 +16,7 @@ ssh master@(ip address)<br>
 pw: shreklovers<br>
 cd ece4191-s2-2025-r21<br>
 git pull<br>
-python script/main.py<br>
+python3 script/main.py<br>
 
 
 ## Configuration
