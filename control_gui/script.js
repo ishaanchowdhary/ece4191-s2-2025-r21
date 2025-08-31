@@ -19,8 +19,9 @@
 // IP Address: Switch / change as required
 //const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname): Ishaan's iPhone
 //const RPI_IP = "192.168.4.110"; // Pi's LAN IP (or hostname): Ishaan's house wifi (i think)
-const RPI_IP = "192.168.20.12"; // Pi's LAN IP (or hostname): Jaiden and Liv's house wifi (i think)
+// const RPI_IP = "192.168.20.12"; // Pi's LAN IP (or hostname): Jaiden and Liv's house wifi (i think)
 //const RPI_IP = "172.20.10.3"; // Pi's LAN IP (or hostname): Jaiden's iPhone
+const RPI_IP = "192.168.20.50"; // Pi's LAN IP (or hostname): Michael's house wifi
 
 // Websocket Ports
 const CMD_PORT = 9000;        // WebSocket Port for commands
