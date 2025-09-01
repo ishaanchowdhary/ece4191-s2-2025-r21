@@ -5,21 +5,35 @@ Github Repository for Team R21 in ECE4191 S2 2025
 Open command prompt on laptop.
 
 If Pi3:<br>
-ssh admin@(ip address)<br>
-password: admin<br>
-cd ece4191-s2-2025-r21<br>
-git pull<br>
-python script/main.py<br>
+```
+ssh admin@(ip address)
+```
+<b>password:</b> admin<br>
+```
+cd ece4191-s2-2025-r21
+git pull
+python script/main.py
+```
 
 If Pi4<br>
+```
 ssh master@(ip address)<br>
-pw: shreklovers<br>
-cd ece4191-s2-2025-r21<br>
-git pull<br>
-python3 script/main.py<br>
-
+```
+<b>password:</b> shreklovers<br>
+```
+cd ece4191-s2-2025-r21
+git pull
+python3 script/main.py
+```
 
 ## Configuration
+
+execute the following:
+```
+cd object_detection
+python3 camera_processing.py
+```
+then do: <br>
 **control_gui/config.js:**
 |  |  |  |
 |--|--|--|
@@ -30,6 +44,7 @@ python3 script/main.py<br>
 |--|--|--|
 | CMD_PORT | 9000 | Websocket command port |
 | VIDEO_PORT | 9001 | Websocket video port |
+| PROCESSED_PORT | 9001 | Websocket processed video port |
 |--|--|--|
 | WHEEL_BASE | 0.15 | Wheelbase in meters (L) |
 | WHEEL_RADIUS | 0.065 | Wheel radius in meters (R) |
