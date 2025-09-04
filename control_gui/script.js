@@ -71,8 +71,8 @@ function webSocketReconnect() {
   }
   cmd_socket.onmessage = handleCommandMessage;
 
-  //video_socket = new WebSocket(`ws://${RPI_IP}:${VIDEO_PORT}`);
-  video_socket = new WebSocket(`ws://localhost:${VIDEO_PORT}`);
+  //video_socket = new WebSocket(`ws://${RPI_IP}:${VIDEO_PORT}`); // Raw Feed
+  video_socket = new WebSocket(`ws://localhost:${VIDEO_PORT}`); // Yolo Feed
   video_socket.onopen = () => addLogEntry("Reconnected to video WebSocket", "info");
   video_socket.onerror = () => addLogEntry("Video WebSocket reconnection failed", "error");
   video_socket.onclose = () => addLogEntry("Video WebSocket closed", "warn");
