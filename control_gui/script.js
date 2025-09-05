@@ -29,6 +29,12 @@ const CMD_PORT = 9000;        // WebSocket Port for commands
 const VIDEO_PORT = 9002;      // WebSocket Port for camera feed
 
 // -------------------------------------------
+// GUI Setup
+// -------------------------------------------
+let connection_info = document.getElementById('connection-info');
+connection_info.innerHTML += `cmd: ws://${RPI_IP}:${CMD_PORT}<br>vid: ws://${RPI_IP}:${VIDEO_PORT}`;
+
+// -------------------------------------------
 // Websocket Setup
 // -------------------------------------------
 // ON PAGE LOAD
