@@ -25,7 +25,7 @@ WHEEL_RADIUS = 0.065  # meters (R)
 PWM_FREQ = 50  # Hz
 MEASURED_MAX_WHEEL_SPEED = None  # rad/s, set measured value if available
 FALLBACK_MAX_WHEEL_SPEED = 40.0   # rad/s — conservative starting point
-MIN_START_DUTY = 30.0             # percent, minimum duty to reliably start motor
+MIN_START_DUTY = 90.0             # percent, minimum duty to reliably start motor
 
 # Camera defaults (used by camera_stream)
 CAM_INDEX = 0
