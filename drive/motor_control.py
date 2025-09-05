@@ -21,7 +21,7 @@ pwm_right.start(0)
 # If you haven't measured it yet, set a conservative default and then measure & update.
 MEASURED_MAX_WHEEL_SPEED = None  # set to None to use fallback below
 FALLBACK_MAX_WHEEL_SPEED = 20.0   # rad/s — conservative starting point
-MIN_START_DUTY = 90.0             # minimum duty % to reliably start motor
+MIN_START_DUTY = 30.0             # minimum duty % to reliably start motor
 
 def _get_max_wheel_speed():
     if MEASURED_MAX_WHEEL_SPEED is not None:
