@@ -17,9 +17,9 @@
 // -------------------------------------------
 
 // IP Address: Switch / change as required
-const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname): Ishaan's iPhone
+//const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname): Ishaan's iPhone
 // const RPI_IP = "192.168.4.110"; // Pi's LAN IP (or hostname): Ishaan's house wifi (i think)
-// const RPI_IP = "192.168.20.12"; // Pi's LAN IP (or hostname): Jaiden and Liv's house wifi (i think)
+const RPI_IP = "192.168.20.9"; // Pi's LAN IP (or hostname): Jaiden and Liv's house wifi (i think)
 //const RPI_IP = "172.20.10.3"; // Pi's LAN IP (or hostname): Jaiden's iPhone
 //const RPI_IP = "192.168.20.50"; // Pi's LAN IP (or hostname): Michael's house wifi
 //const RPI_IP = "172.20.10.4"; // Pi's LAN IP (or hostname): Michael's iPhone pi 3
@@ -129,6 +129,60 @@ function webSocketReconnect() {
   video_socket.onmessage = handleVideoMessage;
 
 }
+
+
+function switchVideoFeed() {
+  if (video_socket.url.includes(RAW_VIDEO_PORT)) {
+    // Switch to YOLO feed
+    video_socket.close();
+    video_socket = new WebSocket(`ws://localhost:${VIDEO_PORT}`); // Yolo Feed = new WebSocket(`ws://localhost:${VIDEO_PORT}`); // Yolo Feed
+    updateIcon("DET-icon", "connecting");
+    addLogEntry(`Attempting DET connection on ${video_socket.url}`, "info");
+    video_socket.onopen = () => {
+      addLogEntry("Reconnected to YOLO WebSocket", "info");
+      document.getElementById("websocket-connect-button").disabled = true;
+      updateIcon("DET-icon", "connected");
+    }
+    video_socket.onerror = () => {
+      addLogEntry("YOLO WebSocket reconnection failed", "error");
+      document.getElementById("websocket-connect-button").disabled = false;
+      updateIcon("DET-icon", "disconnected");
+    }
+    video_socket.onclose = () => {
+      addLogEntry("YOLO WebSocket closed", "warn");
+      document.getElementById("websocket-connect-button").disabled = false;
+      updateIcon("DET-icon", "disconnected");
+    }
+    video_socket.onmessage = handleVideoMessage;
+  } else {
+    // Switch to RAW feed
+    video_socket.close();
+    video_socket = new WebSocket(`ws://${RPI_IP}:${RAW_VIDEO_PORT}`); // Raw Feed
+    updateIcon("CAM-icon", "connecting");
+    addLogEntry(`Attempting DET connection on ${video_socket.url}`, "info");
+    video_socket.onopen = () => {
+      addLogEntry("Reconnected to CAM WebSocket", "info");
+      document.getElementById("websocket-connect-button").disabled = true;
+      updateIcon("CAM-icon", "connected");
+    }
+    video_socket.onerror = () => {
+      addLogEntry("CAM WebSocket reconnection failed", "error");
+      document.getElementById("websocket-connect-button").disabled = false;
+      updateIcon("CAM-icon", "disconnected");
+    }
+    video_socket.onclose = () => {
+      addLogEntry("CAM WebSocket closed", "warn");
+      document.getElementById("websocket-connect-button").disabled = false;
+      updateIcon("CAM-icon", "disconnected");
+    }
+    video_socket.onmessage = handleVideoMessage;
+  }
+}
+
+
+
+
+
 // -------------------------------------------
 // Websocket Listening
 // -------------------------------------------
