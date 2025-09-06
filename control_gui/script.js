@@ -26,13 +26,32 @@ const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname): Ishaan's iPhone
 
 // Websocket Ports
 const CMD_PORT = 9000;        // WebSocket Port for commands
-const VIDEO_PORT = 9002;      // WebSocket Port for camera feed
+const RAW_VIDEO_PORT = 9001;   // WebSocket Port for raw camera feed
+const VIDEO_PORT = 9002;      // WebSocket Port for vision model feed
 
-// -------------------------------------------
-// GUI Setup
-// -------------------------------------------
-let connection_info = document.getElementById('connection-info');
-connection_info.innerHTML += `cmd: ws://${RPI_IP}:${CMD_PORT}<br>vid: ws://${RPI_IP}:${VIDEO_PORT}`;
+
+// ---------------------------------
+// On page load
+// ---------------------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Setup connection status icons
+  let connection_info = document.getElementById('connection-info');
+  connection_info.innerHTML += `
+    CMD: ws://${RPI_IP}:${CMD_PORT} <span id="CMD-icon" class='material-icons disconnected'>circle</span><br>
+    CAM: ws://${RPI_IP}:${RAW_VIDEO_PORT} <span id="CAM-icon" class='material-icons disconnected'>circle</span><br>                              
+    DET: ws://localhost:${VIDEO_PORT}<span>&nbsp;&nbsp;&nbsp;</span><span id="DET-icon" class='material-icons disconnected'>circle</span>`;
+
+  // If config set to connect on page load, do so
+  if (CONFIG.CONNECT_ON_PAGE_LOAD == true) {
+    webSocketReconnect()
+  }
+});
+
+
+
+
 
 // -------------------------------------------
 // Websocket Setup
@@ -59,30 +78,56 @@ function sendCommand(cmd) {
   }
 }
 
+// --------------------------------------------
+// Websocket Connect / Reconnect
+// --------------------------------------------
 function webSocketReconnect() {
-  addLogEntry("Reconnecting WebSockets...", "warn");
 
+  addLogEntry("Connecting WebSockets...", "info");
+
+  // Command socket
   cmd_socket = new WebSocket(`ws://${RPI_IP}:${CMD_PORT}`);
+  updateIcon("CMD-icon", "connecting");
+  addLogEntry(`Attempting CMD connection on ${cmd_socket.url}`, "info");
   cmd_socket.onopen = () => {
     addLogEntry("Reconnected to command WebSocket", "info");
     document.getElementById("websocket-connect-button").disabled = true;
+    updateIcon("CMD-icon", "connected");
   }
   cmd_socket.onerror = () => {
     addLogEntry("Command WebSocket reconnection failed", "error");
     document.getElementById("websocket-connect-button").disabled = false;
+    updateIcon("CMD-icon", "disconnected");
   }
   cmd_socket.onclose = () => {
     addLogEntry("Command WebSocket closed", "warn");
     document.getElementById("websocket-connect-button").disabled = false;
+    updateIcon("CMD-icon", "disconnected");
   }
   cmd_socket.onmessage = handleCommandMessage;
 
+  // Vision Model socket
   //video_socket = new WebSocket(`ws://${RPI_IP}:${VIDEO_PORT}`); // Raw Feed
-  video_socket = new WebSocket(`ws://localhost:${VIDEO_PORT}`); // Yolo Feed
-  video_socket.onopen = () => addLogEntry("Reconnected to video WebSocket", "info");
-  video_socket.onerror = () => addLogEntry("Video WebSocket reconnection failed", "error");
-  video_socket.onclose = () => addLogEntry("Video WebSocket closed", "warn");
+  video_socket = new WebSocket(`ws://localhost:${VIDEO_PORT}`); // Yolo Feed = new WebSocket(`ws://localhost:${VIDEO_PORT}`); // Yolo Feed
+  updateIcon("DET-icon", "connecting");
+  addLogEntry(`Attempting DET connection on ${video_socket.url}`, "info");
+  video_socket.onopen = () => {
+    addLogEntry("Reconnected to YOLO WebSocket", "info");
+    document.getElementById("websocket-connect-button").disabled = true;
+    updateIcon("DET-icon", "connected");
+  }
+  video_socket.onerror = () => {
+    addLogEntry("YOLO WebSocket reconnection failed", "error");
+    document.getElementById("websocket-connect-button").disabled = false;
+    updateIcon("DET-icon", "disconnected");
+  }
+  video_socket.onclose = () => {
+    addLogEntry("YOLO WebSocket closed", "warn");
+    document.getElementById("websocket-connect-button").disabled = false;
+    updateIcon("DET-icon", "disconnected");
+  }
   video_socket.onmessage = handleVideoMessage;
+
 }
 // -------------------------------------------
 // Websocket Listening
@@ -265,3 +310,24 @@ document.addEventListener("keydown", (event) => {
     sendCommand("IR_ON");
   }
 });
+
+
+
+
+// Update connection status icons
+function updateIcon(id, state) {
+  const icon = document.getElementById(id);
+  if (!icon) return;
+
+  // Remove any old state classes
+  icon.classList.remove("connected", "disconnected", "connecting");
+
+  // Add new state
+  icon.classList.add(state);
+
+  switch (state) {
+    case "connected":   icon.textContent = "circle"; break;
+    case "connecting":  icon.textContent = "sync"; break;
+    case "disconnected": default: icon.textContent = "circle"; break;
+  }
+}

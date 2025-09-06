@@ -52,6 +52,31 @@ body {
   border-radius: 10px;
 }
 
+#connection-info {
+  font-size: small;
+  color: gray;
+  margin: 4%;
+  font-family: monospace;
+}
+
+/******** Connection Status Indicators ********/
+.material-icons.connected {
+  color: green;
+  vertical-align: middle;
+  font-size: small;
+}
+.material-icons.connecting {
+  color: orange;
+  vertical-align: middle;
+  font-size: small;
+}
+.material-icons.disconnected {
+  color: red;
+  vertical-align: middle;
+  font-size: small;
+}
+
+
 /* *********************************** Log *********************************** */
 #log-container {
   grid-row: 3 / span 3;
