@@ -80,6 +80,9 @@ def set_motor_command(v_l, v_r):
     pwm_left.ChangeDutyCycle(duty_l)
     pwm_right.ChangeDutyCycle(duty_r)
 
+    # Return duty cycles for testing/verification
+    return duty_l, duty_r
+
     # Debug print (helpful while testing)
     print(f"[MOTOR] v_l={v_l:.2f} rad/s v_r={v_r:.2f} rad/s -> duty_l={duty_l:.1f}% duty_r={duty_r:.1f}%")
 

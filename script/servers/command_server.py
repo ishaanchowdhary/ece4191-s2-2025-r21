@@ -53,13 +53,14 @@ async def handle_client(websocket, path):
                     v_r = (2*v_smooth + w_smooth*L) / (2*R)
                     v_l = (2*v_smooth - w_smooth*L) / (2*R)
 
-                    set_motor_command(v_l, v_r)
+                    duty_l, duty_r = set_motor_command(v_l, v_r)
 
                     # Send acknowledgement
                     await websocket.send(json.dumps({
                         "status": "ok",
                         "command": action,
-                        "velocities": {"left": v_l, "right": v_r}
+                        "velocities": {"left": v_l, "right": v_r},
+                        "duty_cycles": {"left": duty_l, "right": duty_r}
                     }))
 
                     print(f"Command: {action} | v_l={v_l:.2f}, v_r={v_r:.2f}")
