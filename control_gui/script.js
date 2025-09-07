@@ -194,8 +194,6 @@ function handleCommandMessage(event) {
     const msg = JSON.parse(event.data);
     console.log("Command message:", msg);
     if (msg.status === "ok") {
-      addLogEntry(`OK`, "reception");
-      console.log(msg.velocities)
       addLogEntry(`${msg.command}, Velocities: ${msg.velocities.left.toFixed(2)}, ${msg.velocities.right.toFixed(2)}, Duty: ${msg.duty_cycles.left}`, "reception");
     } 
     else if (msg.status === "error") {
