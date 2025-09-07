@@ -56,9 +56,69 @@ document.addEventListener("DOMContentLoaded", () => {
 // -------------------------------------------
 // Websocket Setup
 // -------------------------------------------
-// ON PAGE LOAD
-let video_socket;
-let cmd_socket;
+class WebSocketManager {
+  constructor({url, label, onMessage, iconId}) {
+    this.url = url;              // WebSocket URL
+    this.iconId = iconId;       // ID of the icon element to update connection status
+    this.label = label;         // Shown in logs, e.g., "CMD" or "DET"
+    this.onMessage = onMessage; // Message handler function
+    this.socket = null;         // Create WebSocket instance
+    this.connect();             // Initiate connection
+  }
+
+  // Establish WebSocket connection
+  connect() {
+    this.socket = new WebSocket(this.url);
+    updateIcon(this.iconId, "connecting");
+    addLogEntry(`Attempting ${this.label} connection on ${this.url}`, "info");
+    this.socket.onopen = () => {
+      addLogEntry(`${this.label} WebSocket connected`, "info");
+      document.getElementById("websocket-connect-button").disabled = true;
+      updateIcon(this.iconId, "connected");
+    };
+
+    this.socket.onerror = () => {
+      addLogEntry(`${this.label} WebSocket connection error`, "error");
+      document.getElementById("websocket-connect-button").disabled = false;
+      updateIcon(this.iconId, "disconnected");
+    };
+
+    this.socket.onclose = () => {
+      addLogEntry(`${this.label} WebSocket closed`, "warn");
+      document.getElementById("websocket-connect-button").disabled = false;
+      updateIcon(this.iconId, "disconnected");
+    };
+
+    this.socket.onmessage = this.onMessage;
+  }
+
+  // Send data if connection is open
+  send(data) {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(data);
+    } else {
+      addLogEntry(`${this.label} WebSocket not connected`, "error");
+    }
+  }
+
+  // Close the WebSocket connection
+  close() {
+    if (this.socket) {
+      this.socket.close();
+    }
+  }
+  
+  // Switch to a new WebSocket URL
+  switchURL(newUrl) {
+    this.url = newUrl;
+    this.close();
+    this.connect();
+  }
+
+}
+
+let cmdManager;
+let videoManager;
 
 document.addEventListener("DOMContentLoaded", () => {
   if (CONFIG.CONNECT_ON_PAGE_LOAD == true) {
@@ -69,113 +129,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function sendCommand(cmd) {
   addLogEntry(cmd);
-  if (cmd_socket.readyState === WebSocket.OPEN) {
-    let payload = JSON.stringify({ action: cmd });
-    cmd_socket.send(payload);  
-    addLogEntry(payload, "transmission");
-  } else {
-    addLogEntry("WebSocket not connected", "error");
-  }
+  const payload = JSON.stringify({ action: cmd });
+  cmdManager.send(payload);
+  addLogEntry(payload, "transmission");
 }
 
 // --------------------------------------------
 // Websocket Connect / Reconnect
 // --------------------------------------------
-function webSocketReconnect() {
 
+function webSocketReconnect() {
   addLogEntry("Connecting WebSockets...", "info");
 
-  // Command socket
-  cmd_socket = new WebSocket(`ws://${RPI_IP}:${CMD_PORT}`);
-  updateIcon("CMD-icon", "connecting");
-  addLogEntry(`Attempting CMD connection on ${cmd_socket.url}`, "info");
-  cmd_socket.onopen = () => {
-    addLogEntry("Reconnected to command WebSocket", "info");
-    document.getElementById("websocket-connect-button").disabled = true;
-    updateIcon("CMD-icon", "connected");
-  }
-  cmd_socket.onerror = () => {
-    addLogEntry("Command WebSocket reconnection failed", "error");
-    document.getElementById("websocket-connect-button").disabled = false;
-    updateIcon("CMD-icon", "disconnected");
-  }
-  cmd_socket.onclose = () => {
-    addLogEntry("Command WebSocket closed", "warn");
-    document.getElementById("websocket-connect-button").disabled = false;
-    updateIcon("CMD-icon", "disconnected");
-  }
-  cmd_socket.onmessage = handleCommandMessage;
+  cmdManager = new WebSocketManager({
+    url: `ws://${RPI_IP}:${CMD_PORT}`,
+    iconId: "CMD-icon",
+    label: "Command",
+    onMessage: handleCommandMessage
+  });
 
-  // Vision Model socket
-  //video_socket = new WebSocket(`ws://${RPI_IP}:${VIDEO_PORT}`); // Raw Feed
-  video_socket = new WebSocket(`ws://localhost:${VIDEO_PORT}`); // Yolo Feed = new WebSocket(`ws://localhost:${VIDEO_PORT}`); // Yolo Feed
-  updateIcon("DET-icon", "connecting");
-  addLogEntry(`Attempting DET connection on ${video_socket.url}`, "info");
-  video_socket.onopen = () => {
-    addLogEntry("Reconnected to YOLO WebSocket", "info");
-    document.getElementById("websocket-connect-button").disabled = true;
-    updateIcon("DET-icon", "connected");
-  }
-  video_socket.onerror = () => {
-    addLogEntry("YOLO WebSocket reconnection failed", "error");
-    document.getElementById("websocket-connect-button").disabled = false;
-    updateIcon("DET-icon", "disconnected");
-  }
-  video_socket.onclose = () => {
-    addLogEntry("YOLO WebSocket closed", "warn");
-    document.getElementById("websocket-connect-button").disabled = false;
-    updateIcon("DET-icon", "disconnected");
-  }
-  video_socket.onmessage = handleVideoMessage;
-
+  videoManager = new WebSocketManager({
+    url: `ws://localhost:${VIDEO_PORT}`,
+    iconId: "DET-icon",
+    label: "YOLO",
+    onMessage: handleVideoMessage
+  });
 }
 
 
 function switchVideoFeed() {
-  if (video_socket.url.includes(RAW_VIDEO_PORT)) {
-    // Switch to YOLO feed
-    video_socket.close();
-    video_socket = new WebSocket(`ws://localhost:${VIDEO_PORT}`); // Yolo Feed = new WebSocket(`ws://localhost:${VIDEO_PORT}`); // Yolo Feed
-    updateIcon("DET-icon", "connecting");
-    addLogEntry(`Attempting DET connection on ${video_socket.url}`, "info");
-    video_socket.onopen = () => {
-      addLogEntry("Reconnected to YOLO WebSocket", "info");
-      document.getElementById("websocket-connect-button").disabled = true;
-      updateIcon("DET-icon", "connected");
-    }
-    video_socket.onerror = () => {
-      addLogEntry("YOLO WebSocket reconnection failed", "error");
-      document.getElementById("websocket-connect-button").disabled = false;
-      updateIcon("DET-icon", "disconnected");
-    }
-    video_socket.onclose = () => {
-      addLogEntry("YOLO WebSocket closed", "warn");
-      document.getElementById("websocket-connect-button").disabled = false;
-      updateIcon("DET-icon", "disconnected");
-    }
-    video_socket.onmessage = handleVideoMessage;
+  if (videoManager.url.includes(RAW_VIDEO_PORT)) {
+    videoManager.switchURL(`ws://localhost:${VIDEO_PORT}`);
+    videoManager.iconId = "DET-icon";
+    videoManager.label = "YOLO";
   } else {
-    // Switch to RAW feed
-    video_socket.close();
-    video_socket = new WebSocket(`ws://${RPI_IP}:${RAW_VIDEO_PORT}`); // Raw Feed
-    updateIcon("CAM-icon", "connecting");
-    addLogEntry(`Attempting DET connection on ${video_socket.url}`, "info");
-    video_socket.onopen = () => {
-      addLogEntry("Reconnected to CAM WebSocket", "info");
-      document.getElementById("websocket-connect-button").disabled = true;
-      updateIcon("CAM-icon", "connected");
-    }
-    video_socket.onerror = () => {
-      addLogEntry("CAM WebSocket reconnection failed", "error");
-      document.getElementById("websocket-connect-button").disabled = false;
-      updateIcon("CAM-icon", "disconnected");
-    }
-    video_socket.onclose = () => {
-      addLogEntry("CAM WebSocket closed", "warn");
-      document.getElementById("websocket-connect-button").disabled = false;
-      updateIcon("CAM-icon", "disconnected");
-    }
-    video_socket.onmessage = handleVideoMessage;
+    videoManager.switchURL(`ws://${RPI_IP}:${RAW_VIDEO_PORT}`);
+    videoManager.iconId = "CAM-icon";
+    videoManager.label = "Camera";
   }
 }
 
