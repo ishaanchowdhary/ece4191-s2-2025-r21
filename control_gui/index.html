@@ -19,7 +19,7 @@
       <h2>Cunningly Understanding Nature Then Investigating Native Genomes</h2>
     </div>
     <!-- Connection Info  -->
-    <div id="connection-info" style="grid-column: 1 / span 2; grid-row: 1 / span 1;"></div>
+    <div id="connection-info" style="grid-column: 1 / span 2; grid-row: 1 / span 1; text-align: left;"></div>
     <!-- Video Stream -->
     <div id="video-container">
        <img id="video" width="640px" height="480px" alt="Video not available" 
@@ -78,10 +78,13 @@
       </div>
     </div>
     <div id="button-container">
-      <button id="websocket-connect-button", onclick="webSocketReconnect();">Connect to Websockets</button>
+      <button id="websocket-connect-button" onclick="webSocketReconnect();">Connect to Websockets</button>
+      <button onclick="switchVideoFeed();">Switch Video Feed</button>
+    </div>
+  
+  <img class="camera-img" src="img/camera.png">
+  <img src="img/flash.png" class="camera-flash" id="camFlash">
   </div>
-
-
   <script src="config.js"></script>
   <script src="script.js"></script>
 </body>

@@ -17,29 +17,109 @@
 // -------------------------------------------
 
 // IP Address: Switch / change as required
-const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname): Ishaan's iPhone
+//const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname): Ishaan's iPhone
 // const RPI_IP = "192.168.4.110"; // Pi's LAN IP (or hostname): Ishaan's house wifi (i think)
-// const RPI_IP = "192.168.20.12"; // Pi's LAN IP (or hostname): Jaiden and Liv's house wifi (i think)
+const RPI_IP = "192.168.20.9"; // Pi's LAN IP (or hostname): Jaiden and Liv's house wifi (i think)
 //const RPI_IP = "172.20.10.3"; // Pi's LAN IP (or hostname): Jaiden's iPhone
 //const RPI_IP = "192.168.20.50"; // Pi's LAN IP (or hostname): Michael's house wifi
 //const RPI_IP = "172.20.10.4"; // Pi's LAN IP (or hostname): Michael's iPhone pi 3
 
 // Websocket Ports
 const CMD_PORT = 9000;        // WebSocket Port for commands
-const VIDEO_PORT = 9002;      // WebSocket Port for camera feed
+const RAW_VIDEO_PORT = 9001;   // WebSocket Port for raw camera feed
+const VIDEO_PORT = 9002;      // WebSocket Port for vision model feed
 
-// -------------------------------------------
-// GUI Setup
-// -------------------------------------------
-let connection_info = document.getElementById('connection-info');
-connection_info.innerHTML += `cmd: ws://${RPI_IP}:${CMD_PORT}<br>vid: ws://${RPI_IP}:${VIDEO_PORT}`;
+
+// ---------------------------------
+// On page load
+// ---------------------------------
+
+let camImg
+document.addEventListener("DOMContentLoaded", () => {
+  camImg = document.querySelector(".camera-img");
+  // Setup connection status icons
+  let connection_info = document.getElementById('connection-info');
+  connection_info.innerHTML += `
+    CMD: ws://${RPI_IP}:${CMD_PORT} <span id="CMD-icon" class='material-icons disconnected'>circle</span><br>
+    CAM: ws://${RPI_IP}:${RAW_VIDEO_PORT} <span id="CAM-icon" class='material-icons disconnected'>circle</span><br>                              
+    DET: ws://localhost:${VIDEO_PORT}<span>&nbsp;&nbsp;&nbsp;</span><span id="DET-icon" class='material-icons disconnected'>circle</span>`;
+
+  // If config set to connect on page load, do so
+  if (CONFIG.CONNECT_ON_PAGE_LOAD == true) {
+    webSocketReconnect()
+  }
+});
+
+
+
+
 
 // -------------------------------------------
 // Websocket Setup
 // -------------------------------------------
-// ON PAGE LOAD
-let video_socket;
-let cmd_socket;
+class WebSocketManager {
+  constructor({url, label, onMessage, iconId}) {
+    this.url = url;              // WebSocket URL
+    this.iconId = iconId;       // ID of the icon element to update connection status
+    this.label = label;         // Shown in logs, e.g., "CMD" or "DET"
+    this.onMessage = onMessage; // Message handler function
+    this.socket = null;         // Create WebSocket instance
+    this.connect();             // Initiate connection
+  }
+
+  // Establish WebSocket connection
+  connect() {
+    this.socket = new WebSocket(this.url);
+    updateIcon(this.iconId, "connecting");
+    addLogEntry(`Attempting ${this.label} connection on ${this.url}`, "info");
+    this.socket.onopen = () => {
+      addLogEntry(`${this.label} WebSocket connected`, "info");
+      document.getElementById("websocket-connect-button").disabled = true;
+      updateIcon(this.iconId, "connected");
+    };
+
+    this.socket.onerror = () => {
+      addLogEntry(`${this.label} WebSocket connection error`, "error");
+      document.getElementById("websocket-connect-button").disabled = false;
+      updateIcon(this.iconId, "disconnected");
+    };
+
+    this.socket.onclose = () => {
+      addLogEntry(`${this.label} WebSocket closed`, "warn");
+      document.getElementById("websocket-connect-button").disabled = false;
+      updateIcon(this.iconId, "disconnected");
+    };
+
+    this.socket.onmessage = this.onMessage;
+  }
+
+  // Send data if connection is open
+  send(data) {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(data);
+    } else {
+      addLogEntry(`${this.label} WebSocket not connected`, "error");
+    }
+  }
+
+  // Close the WebSocket connection
+  close() {
+    if (this.socket) {
+      this.socket.close();
+    }
+  }
+  
+  // Switch to a new WebSocket URL
+  switchURL(newUrl) {
+    this.url = newUrl;
+    this.close();
+    this.connect();
+  }
+
+}
+
+let cmdManager;
+let videoManager;
 
 document.addEventListener("DOMContentLoaded", () => {
   if (CONFIG.CONNECT_ON_PAGE_LOAD == true) {
@@ -50,40 +130,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function sendCommand(cmd) {
   addLogEntry(cmd);
-  if (cmd_socket.readyState === WebSocket.OPEN) {
-    let payload = JSON.stringify({ action: cmd });
-    cmd_socket.send(payload);  
-    addLogEntry(payload, "transmission");
-  } else {
-    addLogEntry("WebSocket not connected", "error");
-  }
+  const payload = JSON.stringify({ action: cmd });
+  cmdManager.send(payload);
+  addLogEntry(payload, "transmission");
 }
+
+// --------------------------------------------
+// Websocket Connect / Reconnect
+// --------------------------------------------
 
 function webSocketReconnect() {
-  addLogEntry("Reconnecting WebSockets...", "warn");
+  addLogEntry("Connecting WebSockets...", "info");
 
-  cmd_socket = new WebSocket(`ws://${RPI_IP}:${CMD_PORT}`);
-  cmd_socket.onopen = () => {
-    addLogEntry("Reconnected to command WebSocket", "info");
-    document.getElementById("websocket-connect-button").disabled = true;
-  }
-  cmd_socket.onerror = () => {
-    addLogEntry("Command WebSocket reconnection failed", "error");
-    document.getElementById("websocket-connect-button").disabled = false;
-  }
-  cmd_socket.onclose = () => {
-    addLogEntry("Command WebSocket closed", "warn");
-    document.getElementById("websocket-connect-button").disabled = false;
-  }
-  cmd_socket.onmessage = handleCommandMessage;
+  cmdManager = new WebSocketManager({
+    url: `ws://${RPI_IP}:${CMD_PORT}`,
+    iconId: "CMD-icon",
+    label: "Command",
+    onMessage: handleCommandMessage
+  });
 
-  //video_socket = new WebSocket(`ws://${RPI_IP}:${VIDEO_PORT}`); // Raw Feed
-  video_socket = new WebSocket(`ws://localhost:${VIDEO_PORT}`); // Yolo Feed
-  video_socket.onopen = () => addLogEntry("Reconnected to video WebSocket", "info");
-  video_socket.onerror = () => addLogEntry("Video WebSocket reconnection failed", "error");
-  video_socket.onclose = () => addLogEntry("Video WebSocket closed", "warn");
-  video_socket.onmessage = handleVideoMessage;
+  videoManager = new WebSocketManager({
+    url: `ws://localhost:${VIDEO_PORT}`,
+    iconId: "DET-icon",
+    label: "YOLO",
+    onMessage: handleVideoMessage
+  });
 }
+
+
+function switchVideoFeed() {
+  if (videoManager.url.includes(RAW_VIDEO_PORT)) {
+    videoManager.switchURL(`ws://localhost:${VIDEO_PORT}`);
+    videoManager.iconId = "DET-icon";
+    videoManager.label = "YOLO";
+  } else {
+    videoManager.switchURL(`ws://${RPI_IP}:${RAW_VIDEO_PORT}`);
+    videoManager.iconId = "CAM-icon";
+    videoManager.label = "Camera";
+  }
+}
+
+
+
+
+
 // -------------------------------------------
 // Websocket Listening
 // -------------------------------------------
@@ -105,8 +195,7 @@ function handleCommandMessage(event) {
     const msg = JSON.parse(event.data);
     console.log("Command message:", msg);
     if (msg.status === "ok") {
-      addLogEntry(`Message received OK`, "reception");
-      addLogEntry(`Command received: ${msg.command}, Velocities: ${JSON.stringify(msg.velocities)}, Duty: ${msg.duty_cycles}`, "reception");
+      addLogEntry(`${msg.command}, Velocities: ${msg.velocities.left.toFixed(2)}, ${msg.velocities.right.toFixed(2)}, Duty: ${msg.duty_cycles.left}`, "reception");
     } 
     else if (msg.status === "error") {
       addLogEntry(`${msg.msg}`, "error");
@@ -251,10 +340,36 @@ document.addEventListener("keydown", (event) => {
 
 //Take photo
 document.addEventListener("keydown", (event) => {
-  if ([" "].includes(event.key)){
+  if (event.key === " ") {  // Space key
     event.preventDefault();
+
     sendCommand("CAM_STOP");
     sendCommand("CAM_TAKE_PHOTO");
+
+    const camImg = document.querySelector(".camera-img");
+    const camFlash = document.querySelector(".camera-flash");
+
+    // Reset classes
+    camImg.classList.remove("animate-in", "animate-out");
+    camFlash.style.opacity = 0;
+
+    // Spin in
+    camImg.classList.add("animate-in");
+
+    // After spinIn finishes, flash and then spinOut
+    setTimeout(() => {
+      // Show flash
+      camFlash.style.opacity = 1;
+
+      // Hide flash after 0.2s
+      setTimeout(() => {
+        camFlash.style.opacity = 0;
+      }, 400);
+
+      // Start spin out
+      camImg.classList.remove("animate-in");
+      camImg.classList.add("animate-out");
+    }, 2500); // 2s spinIn + small buffer
   }
 });
 
@@ -265,3 +380,24 @@ document.addEventListener("keydown", (event) => {
     sendCommand("IR_ON");
   }
 });
+
+
+
+
+// Update connection status icons
+function updateIcon(id, state) {
+  const icon = document.getElementById(id);
+  if (!icon) return;
+
+  // Remove any old state classes
+  icon.classList.remove("connected", "disconnected", "connecting");
+
+  // Add new state
+  icon.classList.add(state);
+
+  switch (state) {
+    case "connected":   icon.textContent = "circle"; break;
+    case "connecting":  icon.textContent = "sync"; break;
+    case "disconnected": default: icon.textContent = "circle"; break;
+  }
+}
