@@ -18,6 +18,8 @@ import websockets
 from controllers.motor_control import set_motor_command
 from controllers.velocity_smoother import VelocitySmoother
 from config import WHEEL_BASE, WHEEL_RADIUS
+import asyncio
+import time
 
 # Command mapping (adjust speeds as needed)
 COMMAND_MAP = {
@@ -28,13 +30,70 @@ COMMAND_MAP = {
     "DRIVE_STOP": {"v": 0.0, "w": 0.0}
 }
 
+# Shared variables
 # Velocity smoother instance
 smoother = VelocitySmoother(max_accel=0.5, max_ang_accel=2.0, rate_hz=50)
+
+# Target velocity variables
+v_target, w_target = 0.0, 0.0
+
+# Last command variable for telemetry
+last_command = "DRIVE_STOP"
+
+# Websocket
+current_client = None 
+
+async def smoother_loop(websocket=None): 
+    """
+    Function calls smoother.update() at a fixed rate and sends telemetry
+    """
+    global v_target, w_target, last_command, current_client
+
+    # smoothing rate variables    
+    rate_hz = 50 # to tune
+    dt = 1.0 / rate_hz
+
+    # telemetry rate
+    send_rate_hz = 10 
+    send_dt = 1.0 / send_rate_hz
+    last_send = 0
+
+    while True:
+        v_smooth, w_smooth = smoother.update(v_target, w_target)
+
+        # Differential drive kinematics
+        L = WHEEL_BASE
+        R = WHEEL_RADIUS
+        v_r = (2*v_smooth + w_smooth*L) / (2*R)
+        v_l = (2*v_smooth - w_smooth*L) / (2*R)
+
+        duty_l, duty_r = set_motor_command(v_l, v_r)
+
+        now = time.time()
+
+        if current_client and (now - last_send) >= send_dt:
+            await websocket.send(json.dumps({
+                "status": "ok",
+                "command": last_command,
+                "velocities": {"left": v_l, "right": v_r},
+                "duty_cycles": {"left": duty_l, "right": duty_r}
+            }))
+            
+            print(f"Command: {action} | v_l={v_l:.2f}, v_r={v_r:.2f}")
+
+            last_send = now
+
+        await asyncio.sleep(dt)
+
 
 async def handle_client(websocket, path):
     """Handle a single command WebSocket client (keeps original signature)."""
     print("Command client connected")
 
+    global v_target, w_target, last_command, current_client # so variables can be modified
+
+    current_client = websocket
+    
     try:
         async for message in websocket:
             try:
@@ -44,26 +103,11 @@ async def handle_client(websocket, path):
                 if action in COMMAND_MAP:
                     target = COMMAND_MAP[action]
 
-                    # Smooth velocities
-                    v_smooth, w_smooth = smoother.update(target["v"], target["w"])
+                    # Update target velocities
+                    v_target, w_target = target["v"], target["w"]
 
-                    # Differential drive equations
-                    L = WHEEL_BASE
-                    R = WHEEL_RADIUS
-                    v_r = (2*v_smooth + w_smooth*L) / (2*R)
-                    v_l = (2*v_smooth - w_smooth*L) / (2*R)
-
-                    duty_l, duty_r = set_motor_command(v_l, v_r)
-
-                    # Send acknowledgement
-                    await websocket.send(json.dumps({
-                        "status": "ok",
-                        "command": action,
-                        "velocities": {"left": v_l, "right": v_r},
-                        "duty_cycles": {"left": duty_l, "right": duty_r}
-                    }))
-
-                    print(f"Command: {action} | v_l={v_l:.2f}, v_r={v_r:.2f}")
+                    # Update command variabl for telemetry 
+                    last_command = action
 
                 else:
                     print("Unknown command:", action)
