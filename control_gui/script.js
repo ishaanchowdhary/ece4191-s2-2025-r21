@@ -34,8 +34,9 @@ const VIDEO_PORT = 9002;      // WebSocket Port for vision model feed
 // On page load
 // ---------------------------------
 
+let camImg
 document.addEventListener("DOMContentLoaded", () => {
-
+  camImg = document.querySelector(".camera-img");
   // Setup connection status icons
   let connection_info = document.getElementById('connection-info');
   connection_info.innerHTML += `
@@ -339,10 +340,36 @@ document.addEventListener("keydown", (event) => {
 
 //Take photo
 document.addEventListener("keydown", (event) => {
-  if ([" "].includes(event.key)){
+  if (event.key === " ") {  // Space key
     event.preventDefault();
+
     sendCommand("CAM_STOP");
     sendCommand("CAM_TAKE_PHOTO");
+
+    const camImg = document.querySelector(".camera-img");
+    const camFlash = document.querySelector(".camera-flash");
+
+    // Reset classes
+    camImg.classList.remove("animate-in", "animate-out");
+    camFlash.style.opacity = 0;
+
+    // Spin in
+    camImg.classList.add("animate-in");
+
+    // After spinIn finishes, flash and then spinOut
+    setTimeout(() => {
+      // Show flash
+      camFlash.style.opacity = 1;
+
+      // Hide flash after 0.2s
+      setTimeout(() => {
+        camFlash.style.opacity = 0;
+      }, 400);
+
+      // Start spin out
+      camImg.classList.remove("animate-in");
+      camImg.classList.add("animate-out");
+    }, 2500); // 2s spinIn + small buffer
   }
 });
 

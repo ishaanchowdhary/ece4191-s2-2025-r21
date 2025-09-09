@@ -127,3 +127,65 @@ body {
   text-align: center;     /* center text under icons */
   font-size: small;
 }
+
+.camera-img {
+  position: absolute;           /* so we can animate across the page */
+  z-index: 9999;   /* make sure it's on top */
+  top: -1000px;                  /* start off-screen */
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none; /* so it won’t block clicks */
+}
+
+/* Entry animation */
+@keyframes spinIn {
+  0% {
+    transform: translateX(-50%) translateY(-1000px) rotate(-720deg) scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(-50%) translateY(1200px) rotate(95deg) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(1050px) rotate(90deg) scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* Exit animation */
+@keyframes spinOut {
+  0% {
+    transform: translateX(-50%) translateY(1050px) rotate(90deg) scale(1.2);
+    opacity: 1;
+  }
+  40% {
+    transform: translateX(-50%) translateY(-50px) rotate(-90deg) scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-50%) translateY(-1000px) rotate(-720deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Classes to trigger animation */
+.animate-in {
+  animation: spinIn 2s ease-out forwards;
+}
+
+.animate-out {
+  animation: spinOut 2s ease-in forwards;
+}
+.camera-flash {
+  position: absolute;
+  top: 400px;
+  left: 1200px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  width: 500px; /* adjust size */
+  height: auto;
+  z-index: 10000;
+  transition: opacity 0.2s ease-out;
+}
