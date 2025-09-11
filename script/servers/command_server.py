@@ -43,7 +43,7 @@ last_command = "DRIVE_STOP"
 # Websocket
 current_client = None 
 
-async def smoother_loop(websocket=None): 
+async def smoother_loop(): 
     """
     Function calls smoother.update() at a fixed rate and sends telemetry
     """
@@ -72,14 +72,14 @@ async def smoother_loop(websocket=None):
         now = time.time()
 
         if current_client and (now - last_send) >= send_dt:
-            await websocket.send(json.dumps({
+            await current_client.send(json.dumps({
                 "status": "ok",
                 "command": last_command,
                 "velocities": {"left": v_l, "right": v_r},
                 "duty_cycles": {"left": duty_l, "right": duty_r}
             }))
             
-            print(f"Command: {action} | v_l={v_l:.2f}, v_r={v_r:.2f}")
+            print(f"Command: | v_l={v_l:.2f}, v_r={v_r:.2f}")
 
             last_send = now
 
