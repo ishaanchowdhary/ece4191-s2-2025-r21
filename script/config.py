@@ -29,6 +29,6 @@ MIN_START_DUTY = 100.0             # percent, minimum duty to reliably start mot
 
 # Camera defaults (used by camera_stream)
 CAM_INDEX = 0
-CAM_WIDTH = 640
-CAM_HEIGHT = 480
-CAM_FPS = 60
+CAM_WIDTH = 1920
+CAM_HEIGHT = 1080
+CAM_FPS = 30
