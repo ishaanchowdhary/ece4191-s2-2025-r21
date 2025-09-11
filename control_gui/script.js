@@ -343,33 +343,45 @@ document.addEventListener("keydown", (event) => {
   if (event.key === " ") {  // Space key
     event.preventDefault();
 
-    sendCommand("CAM_STOP");
-    sendCommand("CAM_TAKE_PHOTO");
-
     const camImg = document.querySelector(".camera-img");
     const camFlash = document.querySelector(".camera-flash");
+    const videoEl = document.getElementById("video");
 
-    // Reset classes
+    // Save current frame
+    if (videoEl.src && videoEl.naturalWidth > 0) {
+      const canvas = document.createElement("canvas");
+      canvas.width = videoEl.naturalWidth;
+      canvas.height = videoEl.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(videoEl, 0, 0);
+
+      // turn into downloadable image
+      const link = document.createElement("a");
+      link.download = `photo_${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } else {
+      console.warn("No video frame available to save");
+    }
+
+    // Animation
     camImg.classList.remove("animate-in", "animate-out");
     camFlash.style.opacity = 0;
-
-    // Spin in
     camImg.classList.add("animate-in");
-
     // After spinIn finishes, flash and then spinOut
     setTimeout(() => {
       // Show flash
       camFlash.style.opacity = 1;
-
       // Hide flash after 0.2s
       setTimeout(() => {
         camFlash.style.opacity = 0;
       }, 400);
-
       // Start spin out
       camImg.classList.remove("animate-in");
       camImg.classList.add("animate-out");
     }, 2500); // 2s spinIn + small buffer
+
+    
   }
 });
 
