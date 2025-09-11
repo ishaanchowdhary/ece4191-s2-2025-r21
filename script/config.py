@@ -31,4 +31,4 @@ MIN_START_DUTY = 100.0             # percent, minimum duty to reliably start mot
 CAM_INDEX = 0
 CAM_WIDTH = 640
 CAM_HEIGHT = 480
-CAM_FPS = 20
+CAM_FPS = 60
