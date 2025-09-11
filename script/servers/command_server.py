@@ -32,7 +32,7 @@ COMMAND_MAP = {
 
 # Shared variables
 # Velocity smoother instance
-smoother = VelocitySmoother(max_accel=0.5, max_ang_accel=2.0, rate_hz=50)
+smoother = VelocitySmoother(max_accel=5, max_ang_accel=10.0, rate_hz=50)
 
 # Target velocity variables
 v_target, w_target = 0.0, 0.0
