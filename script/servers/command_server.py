@@ -71,7 +71,7 @@ async def smoother_loop():
 
         now = time.time()
 
-        if current_client and (now - last_send) >= send_dt:
+        if current_client and (now - last_send) >= send_dt and duty_l != 0:
             await current_client.send(json.dumps({
                 "status": "ok",
                 "command": last_command,
