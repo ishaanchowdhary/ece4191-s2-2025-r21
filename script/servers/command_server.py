@@ -79,7 +79,6 @@ async def smoother_loop():
                 "duty_cycles": {"left": duty_l, "right": duty_r}
             }))
             
-            print(f"Command: | v_l={v_l:.2f}, v_r={v_r:.2f}")
 
             last_send = now
 
