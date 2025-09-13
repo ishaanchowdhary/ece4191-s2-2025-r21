@@ -129,8 +129,8 @@ def pwm_update_loop():
         elapsed = min(elapsed, RAMP_TIME)
 
         # Compute tanh ramp values
-        new_duty_l = tanh_ramp(ramp_start_l, target_duty_l, elapsed, RAMP_TIME)
-        new_duty_r = tanh_ramp(ramp_start_r, target_duty_r, elapsed, RAMP_TIME)
+        new_duty_l = tanh_ramp(ramp_start_l, target_duty_l, elapsed, RAMP_TIME, MIN_DUTY)
+        new_duty_r = tanh_ramp(ramp_start_r, target_duty_r, elapsed, RAMP_TIME, MIN_DUTY)
 
         # Enforce MIN_DUTY when moving
         if target_duty_l != 0:
