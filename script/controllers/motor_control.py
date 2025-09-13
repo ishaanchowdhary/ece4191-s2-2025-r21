@@ -106,28 +106,25 @@ def set_motor_command(direction_l, direction_r, duty):
 def pwm_update_loop():
     global current_duty, target_duty, prev_target_duty
     step_time = 1.0 / UPDATE_HZ
-    elapsed = 0.0
 
     while running:
-        print(current_duty)
-        # Detect change in target duty
-        if target_duty != prev_target_duty:
-            elapsed = 0.0
-            ramp_start_duty = current_duty # capture current duty as start of ramp
-            while elapsed < RAMP_TIME:
-                print(current_duty)
-                # Smooth ramping using tanh function
-                current_duty = tanh_ramp(ramp_start_duty, target_duty, elapsed, RAMP_TIME, MIN_DUTY)
-                pwm_left.ChangeDutyCycle(current_duty)
-                pwm_right.ChangeDutyCycle(current_duty)
-                timestamp = time.time()
-                csv_writer.writerow([timestamp, current_duty, target_duty])
-                log_fh.flush()  # make sure it's written to disk
+        # Smoothly chase target using tanh ramp
+        # Always pass a small "elapsed" increment each cycle
+        current_duty = tanh_ramp(current_duty, target_duty, step_time, RAMP_TIME, MIN_DUTY)
 
-                elapsed += step_time
-                time.sleep(step_time)
-            current_duty = target_duty # ensure we hit target exactly
-            prev_target_duty = target_duty
+        # Apply PWM duty
+        pwm_left.ChangeDutyCycle(current_duty)
+        pwm_right.ChangeDutyCycle(current_duty)
+
+        # Log for debugging
+        timestamp = time.time()
+        csv_writer.writerow([timestamp, current_duty, target_duty])
+        log_fh.flush()
+
+        # Update "prev" tracking (not strictly needed anymore)
+        prev_target_duty = target_duty
+
+        time.sleep(step_time)
 
 threading.Thread(target=pwm_update_loop, daemon=True).start()
 
