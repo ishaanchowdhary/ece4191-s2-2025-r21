@@ -50,6 +50,7 @@ async def handle_client(websocket, path):
     print("Command client connected")
 
     global v_target, w_target, last_command, current_client # so variables can be modified
+    global MIN_START_DUTY, MAX_DUTY   # <-- allow updating the config variables
 
     current_client = websocket
     
