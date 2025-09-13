@@ -25,7 +25,7 @@ Usage:
 import RPi.GPIO as GPIO
 import threading, time, math
 from config import PWM_FREQ, MEASURED_MAX_WHEEL_SPEED, FALLBACK_MAX_WHEEL_SPEED, MIN_START_DUTY
-from velocity_smoother import tanh_ramp
+from .velocity_smoother import tanh_ramp
 # Pins
 LEFT_PWM, LEFT_IN1, LEFT_IN2 = 12, 23, 24
 RIGHT_PWM, RIGHT_IN1, RIGHT_IN2 = 13, 8, 7
