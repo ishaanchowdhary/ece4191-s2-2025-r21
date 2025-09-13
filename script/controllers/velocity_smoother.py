@@ -44,6 +44,7 @@ def tanh_ramp(start, target, elapsed, total_time, min_duty):
     """
     # Map elapsed to 0-100
     # +51 ensures that the tan function will go to 100
+    print(f"Ramping from {start} to {target} over {total_time}s, elapsed {elapsed}s")
     if start < min_duty and target != 0:
         start = min_duty
     tuning_param = 7.6
