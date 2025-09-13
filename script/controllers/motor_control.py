@@ -67,8 +67,6 @@ def set_motor_command(direction_l, direction_r):
         target_duty = 0
     else:
         target_duty = globals.max_duty  # use max duty for movement commands
-
-    print(f"Set target duty: {target_duty}% ")
     # Direction logic (assuming IN1 HIGH, IN2 LOW => forward)
     if direction_l == -1:
         GPIO.output(LEFT_IN1, GPIO.HIGH) # left backward
@@ -121,7 +119,7 @@ def pwm_update_loop(min_duty, max_duty):
         # Apply PWM duty
         pwm_left.ChangeDutyCycle(current_duty)
         pwm_right.ChangeDutyCycle(current_duty)
-
+        print(current_duty)
         # Log for debugging
         if LOGGING:
             timestamp = time.time()
