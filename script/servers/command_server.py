@@ -1,15 +1,25 @@
 """
 command_server.py
--------------------
-WebSocket server for handling motion commands from remote clients.
--------------------
+-----------------
+WebSocket server for handling commands.
 
-- Receive JSON-encoded commands via WebSocket.
-- Map actions (FORWARD, REVERSE, LEFT, RIGHT, DRIVE_STOP) to target velocities.
-- Convert velocities to wheel commands and call motor controller.
+This module:
+- Accepts JSON-encoded commands over WebSocket from remote clients.
+- Maps high-level actions (FORWARD, REVERSE, LEFT, RIGHT, DRIVE_STOP) to left/right motor directions.
+- Updates motor commands via the motor_control module.
+- Supports dynamic adjustment of minimum and maximum PWM duty cycles via "SET_DUTY" commands.
+- Maintains the last received command for telemetry or logging purposes.
 
-Usage:
-    await websockets.serve(handle_client, "0.0.0.0", CMD_PORT)
+Main Functions:
+- handle_client(websocket, path)
+    Asynchronous function to handle a single WebSocket client connection.
+    Processes incoming JSON commands and updates motor directions or PWM limits.
+
+Dependencies:
+- websockets: For asynchronous WebSocket communication.
+- json: For decoding/encoding JSON messages.
+- controllers.motor_control: To send motor direction commands.
+- globals: For runtime configuration (e.g., min/max duty cycles).
 """
 
 import json
@@ -17,8 +27,6 @@ import websockets
 from config import *
 from controllers.motor_control import set_motor_command
 import globals
-import asyncio
-import time
 
 # Command mapping (adjust speeds as needed)
 COMMAND_MAP = {
@@ -30,9 +38,6 @@ COMMAND_MAP = {
 }
 
 
-# Target velocity variables
-v_target, w_target = 0.0, 0.0
-
 # Last command variable for telemetry
 last_command = "DRIVE_STOP"
 
@@ -43,7 +48,7 @@ async def handle_client(websocket, path):
     """Handle a single command WebSocket client (keeps original signature)."""
     print("Command client connected")
 
-    global v_target, w_target, last_command, current_client # so variables can be modified
+    global last_command, current_client # so variables can be modified
 
     current_client = websocket
     
@@ -52,17 +57,20 @@ async def handle_client(websocket, path):
             try:
                 data = json.loads(message)
                 action = data.get("action", "").upper()
-
+                
+                # If action is a motor command:
                 if action in COMMAND_MAP:
                     target = COMMAND_MAP[action]
-
-                    # Update target velocities
+                    # Extract directions and set motor command
                     direction_l, direction_r = target["direction_l"], target["direction_r"]
                     set_motor_command(direction_l, direction_r)
-                    # Update command variabl for telemetry 
+                    # Update command variable for telemetry 
                     last_command = action
+
+                # If action is to set new duty cycle limits:
                 elif "SET_DUTY" in action:
-                    set_motor_command(0, 0)  # stop motors before changing duty
+                    # stop motors before changing duty
+                    set_motor_command(0, 0)  
                     # Update minimum starting duty cycle
                     action = str.split(action)
                     new_duty = [int(action[1]), int(action[2])]

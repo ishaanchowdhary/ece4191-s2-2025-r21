@@ -1,13 +1,23 @@
 """
-last edited : 28/08/2025
 velocity_smoother.py
-----------------------
-Implements velocity smoothing to prevent abrupt motor commands.
-----------------------
-- Gradually adjust linear and angular velocity commands based on max acceleration limits.
-- Provide a method to compute smoothed velocity values each update cycle.
+--------------------
+Provides functions to smoothly ramp motor PWM duty cycles using a hyperbolic tangent (tanh) function.
 
+This module is used by the motor control system to:
+- Gradually adjust motor speeds to avoid abrupt starts or stops.
+- Ensure a minimum duty cycle is applied to overcome motor deadzone.
+- Smoothly transition between target PWM values over a specified ramp time.
+
+Main Functions:
+- tanh_ramp(start, target, elapsed, total_time)
+    Computes a smooth PWM duty cycle based on a tanh curve from start to target.
+    Ensures minimum duty cycle is applied if target is non-zero and clamps values for safety.
+
+Dependencies:
+- math: For tanh function calculation.
+- globals: For global min_duty used to handle motor deadzone.
 """
+
 import math
 import globals
 
