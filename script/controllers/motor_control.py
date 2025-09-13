@@ -55,7 +55,7 @@ target_duty = 0.0
 prev_target_duty = 0.0
 
 # Ramp parameters
-RAMP_TIME = 2      # seconds to go from 0→100%
+RAMP_TIME = 0.5      # seconds to go from 0→100%
 UPDATE_HZ = 50       # update loop frequency
 running = True
 
