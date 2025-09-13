@@ -60,8 +60,7 @@ def set_motor_command(direction_l, direction_r):
     Converts to PWM duty cycles with minimum start duty and debug prints.
     """
     print(f"Motor command: L={direction_l}, R={direction_r}, MIN_START_DUTY={MIN_START_DUTY}, MAX_DUTY={MAX_DUTY}")
-    global target_duty, MAX_DUTY
-
+    
     # Set new target duty cycles
     if direction_l == 0 and direction_r == 0:
         duty = 0
@@ -89,6 +88,8 @@ def set_motor_command(direction_l, direction_r):
     else:
         GPIO.output(RIGHT_IN1, GPIO.LOW) # right stop
         GPIO.output(RIGHT_IN2, GPIO.LOW)
+    
+    return target_duty
 
 
 """
