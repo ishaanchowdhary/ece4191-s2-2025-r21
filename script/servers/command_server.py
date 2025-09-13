@@ -6,7 +6,6 @@ WebSocket server for handling motion commands from remote clients.
 
 - Receive JSON-encoded commands via WebSocket.
 - Map actions (FORWARD, REVERSE, LEFT, RIGHT, DRIVE_STOP) to target velocities.
-- Use VelocitySmoother to limit acceleration.
 - Convert velocities to wheel commands and call motor controller.
 
 Usage:
@@ -17,7 +16,6 @@ import json
 import websockets
 from config import *
 from controllers.motor_control import set_motor_command
-from controllers.velocity_smoother import VelocitySmoother
 import globals
 import asyncio
 import time
@@ -31,9 +29,6 @@ COMMAND_MAP = {
     "DRIVE_STOP": {"direction_l": 0, "direction_r": 0}
 }
 
-# Shared variables
-# Velocity smoother instance
-smoother = VelocitySmoother(max_accel=5, max_ang_accel=10.0, rate_hz=50)
 
 # Target velocity variables
 v_target, w_target = 0.0, 0.0

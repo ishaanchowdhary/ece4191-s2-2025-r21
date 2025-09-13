@@ -1,40 +1,46 @@
 """
-last edited : 28/08/2025
 motor_control.py
---------------------
-Low-level motor control module for differential drive.
----------------------
+----------------
 
-- Configure GPIO pins for motor control.
-- Convert wheel angular velocities (rad/s) to PWM duty cycles.
-- Handle direction control for left and right motors.
-- Provide cleanup function to safely stop motors and release GPIO.
+This module handles:
+- GPIO setup for motor driver control.
+- Conversion of direction commands to PWM duty cycles.
+- Smooth ramping of motor speeds using a tanh ramp.
+- Logging of PWM activity to CSV.
+- Safe cleanup of GPIO and PWM on exit.
 
 Main Functions:
-- set_motor_command(v_l, v_r): Apply motor speeds for left and right wheels.
-- cleanup(): Stop PWM signals and reset GPIO state.
+- set_motor_command(direction_l, direction_r)
+    Set left and right motor directions: 1 = forward, -1 = backward, 0 = stop.
+
+- cleanup()
+    Stop PWM outputs and clean up GPIO pins safely.
+
+Background Thread:
+- pwm_update_loop(min_duty, max_duty)
+    Continuously ramps the PWM duty cycle towards the target value to prevent abrupt changes.
 
 Dependencies:
-- RPi.GPIO for hardware access
-- config.py for motor constants and PWM settings
-
-Usage:
-    from controllers.motor_control import set_motor_command, cleanup
+- RPi.GPIO: Access to GPIO pins.
+- config.py: Motor constants, PWM frequency, ramp time.
+- globals.py: Global variables including min/max duty and logging flag.
+- velocity_smoother.py: Provides tanh_ramp function for smooth duty cycle transitions.
 """
+
 
 import RPi.GPIO as GPIO
 import threading, time
 from config import *
 from .velocity_smoother import tanh_ramp
-import servers.command_server
 import csv
 import globals
 
-LOG_FILE = "pwm_log.csv"  # adjust path as needed
+# ------- CSV Logging setup -------
+path = "pwm_log.csv"
 # Open CSV and write header
-log_fh = open(LOG_FILE, "w", newline="")
+log_fh = open(path, "w", newline="")
 csv_writer = csv.writer(log_fh)
-csv_writer.writerow(["timestamp", "current_duty", "target_duty"])
+csv_writer.writerow(["timestamp", "current_duty", "target_duty", "min_duty"])
 
 # GPIO setup
 GPIO.setmode(GPIO.BCM)
@@ -46,11 +52,12 @@ pwm_left = GPIO.PWM(LEFT_PWM, PWM_FREQ)
 pwm_right = GPIO.PWM(RIGHT_PWM, PWM_FREQ)
 pwm_left.start(0)
 pwm_right.start(0)
+
+
 # === State variables ===
 current_duty = 0.0
 target_duty = 0.0
 prev_target_duty = 0.0
-
 running = True
 
 
@@ -62,11 +69,14 @@ def set_motor_command(direction_l, direction_r):
     """
     global target_duty
 
-    # Set new target duty cycles
+    # If both directions are 0, set target duty to 0 (stop)
     if direction_l == 0 and direction_r == 0:
         target_duty = 0
+    # If either direction is non-zero, set target duty to max_duty
     else:
-        target_duty = globals.max_duty  # use max duty for movement commands
+        target_duty = globals.max_duty 
+
+
     # Direction logic (assuming IN1 HIGH, IN2 LOW => forward)
     if direction_l == -1:
         GPIO.output(LEFT_IN1, GPIO.HIGH) # left backward
@@ -92,20 +102,21 @@ def set_motor_command(direction_l, direction_r):
 
 """
 Background thread to smoothly update PWM duty cycle towards target.
+- The motors operate in a loop, with PWM values calculated with a tanh ramp function.
+  Upon a change in target duty, the ramp resets.
 """
-def pwm_update_loop(min_duty, max_duty):
+def pwm_update_loop():
     global current_duty, target_duty, prev_target_duty
     step_time = 1.0 / UPDATE_HZ
     elapsed = 0.0
     ramp_start_duty = current_duty
 
     while running:
-        # When there is a change in target duty cycle, reset ramp and set elapsed time to 0
-        # Reset ramp if target duty changes or MIN/MAX changes
+        # Check if the target duty has changed. If so, reset ramp parameters.
         if target_duty != prev_target_duty:
             elapsed = 0.0
             ramp_start_duty = current_duty
-            prev_target_duty = target_duty # check this line
+            prev_target_duty = target_duty
 
         # Compute smoothed duty based on elapsed time in ramp
         current_duty = tanh_ramp(
@@ -121,7 +132,7 @@ def pwm_update_loop(min_duty, max_duty):
         # Log for debugging
         if LOGGING:
             timestamp = time.time()
-            csv_writer.writerow([timestamp, current_duty, target_duty])
+            csv_writer.writerow([timestamp, current_duty, target_duty, globals.min_duty])
             log_fh.flush()
 
         # Increment elapsed time
@@ -130,8 +141,7 @@ def pwm_update_loop(min_duty, max_duty):
             elapsed = RAMP_TIME  # clamp at end of ramp
 
         time.sleep(step_time)
-
-threading.Thread(target=pwm_update_loop, args=(globals.min_duty, globals.max_duty), daemon=True).start()
+threading.Thread(target=pwm_update_loop, daemon=True).start()
 
 
 def cleanup():
