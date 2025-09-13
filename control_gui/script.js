@@ -49,7 +49,8 @@ noUiSlider.create(pwm_slider, {
       from: function (value) {
         return Number(value);       // parse back to number
       }
-    }
+    },
+    keyboardSupport: false
 
 });
 

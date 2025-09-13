@@ -15,9 +15,9 @@ Usage:
 
 import json
 import websockets
+from config import *
 from controllers.motor_control import set_motor_command
 from controllers.velocity_smoother import VelocitySmoother
-from config import *
 import asyncio
 import time
 
