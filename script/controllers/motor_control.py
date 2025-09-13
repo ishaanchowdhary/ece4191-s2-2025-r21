@@ -47,7 +47,7 @@ target_duty_l = 0.0
 target_duty_r = 0.0
 
 # Ramp parameters
-RAMP_TIME = 0.5      # seconds to go from 0→100%
+RAMP_TIME = 2      # seconds to go from 0→100%
 UPDATE_HZ = 50       # update loop frequency
 running = True
 
@@ -111,6 +111,7 @@ def pwm_update_loop():
     elapsed = 0.0
 
     while running:
+        print(current_duty_l)
         # If target changed, restart ramp
         if target_duty_l != last_target_l:
             ramp_start_l = current_duty_l
