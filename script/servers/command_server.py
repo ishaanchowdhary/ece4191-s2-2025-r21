@@ -18,6 +18,7 @@ import websockets
 from config import *
 from controllers.motor_control import set_motor_command
 from controllers.velocity_smoother import VelocitySmoother
+import globals
 import asyncio
 import time
 
@@ -43,15 +44,11 @@ last_command = "DRIVE_STOP"
 # Websocket
 current_client = None 
 
-MIN_START_DUTY = MIN_START_DUTY
-MAX_DUTY = MAX_DUTY 
-
 async def handle_client(websocket, path):
     """Handle a single command WebSocket client (keeps original signature)."""
     print("Command client connected")
 
     global v_target, w_target, last_command, current_client # so variables can be modified
-    global MIN_START_DUTY, MAX_DUTY   # <-- allow updating the config variables
 
     current_client = websocket
     
@@ -74,9 +71,9 @@ async def handle_client(websocket, path):
                     # Update minimum starting duty cycle
                     action = str.split(action)
                     new_duty = [int(action[1]), int(action[2])]
-                    MIN_START_DUTY = min(new_duty)
-                    MAX_DUTY = max(new_duty)
-                    print(f"Updated duty cycle limits: MIN_START_DUTY={MIN_START_DUTY}, MAX_DUTY={MAX_DUTY}")
+                    globals.min_duty = min(new_duty)
+                    globals.max_duty= max(new_duty)
+                    print(f"Updated duty cycle limits: MIN_START_DUTY={globals.min_duty}, MAX_DUTY={globals.max_duty}")
                 else:
                     print("Unknown command:", action)
                     await websocket.send(json.dumps(

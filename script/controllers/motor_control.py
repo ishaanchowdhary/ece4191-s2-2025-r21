@@ -28,6 +28,7 @@ from config import *
 from .velocity_smoother import tanh_ramp
 import servers.command_server
 import csv
+import globals
 
 LOG_FILE = "pwm_log.csv"  # adjust path as needed
 # Open CSV and write header
@@ -65,7 +66,7 @@ def set_motor_command(direction_l, direction_r):
     if direction_l == 0 and direction_r == 0:
         target_duty = 0
     else:
-        target_duty = servers.command_server.MAX_DUTY
+        target_duty = globals.max_duty  # use max duty for movement commands
 
     print(f"Set target duty: {target_duty}% ")
     # Direction logic (assuming IN1 HIGH, IN2 LOW => forward)
@@ -134,7 +135,7 @@ def pwm_update_loop(min_duty, max_duty):
 
         time.sleep(step_time)
 
-threading.Thread(target=pwm_update_loop, args=(servers.command_server.MIN_START_DUTY, servers.command_server.MAX_DUTY), daemon=True).start()
+threading.Thread(target=pwm_update_loop, args=(globals.min_duty, globals.max_duty), daemon=True).start()
 
 
 def cleanup():
