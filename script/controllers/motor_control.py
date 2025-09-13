@@ -63,21 +63,21 @@ def set_motor_command(direction_l, direction_r):
         duty_r = MIN_START_DUTY
 
     # Direction logic (assuming IN1 HIGH, IN2 LOW => forward)
-    if direction_l == 1:
-        GPIO.output(LEFT_IN1, GPIO.HIGH) # left forward
+    if direction_l == -1:
+        GPIO.output(LEFT_IN1, GPIO.HIGH) # left backward
         GPIO.output(LEFT_IN2, GPIO.LOW)
-    elif direction_l == -1:
-        GPIO.output(LEFT_IN1, GPIO.LOW) # left backward
+    elif direction_l == 1:
+        GPIO.output(LEFT_IN1, GPIO.LOW) # left forward
         GPIO.output(LEFT_IN2, GPIO.HIGH)
     else:
         GPIO.output(LEFT_IN1, GPIO.LOW) # left stop
         GPIO.output(LEFT_IN2, GPIO.LOW)
 
-    if direction_r == 1:
-        GPIO.output(RIGHT_IN1, GPIO.HIGH)   # right forward
+    if direction_r == -1:
+        GPIO.output(RIGHT_IN1, GPIO.HIGH)   # right backward
         GPIO.output(RIGHT_IN2, GPIO.LOW)
-    elif direction_l == -1:
-        GPIO.output(RIGHT_IN1, GPIO.LOW) # right backward
+    elif direction_r == 1:
+        GPIO.output(RIGHT_IN1, GPIO.LOW) # right forward
         GPIO.output(RIGHT_IN2, GPIO.HIGH)
     else:
         GPIO.output(RIGHT_IN1, GPIO.LOW) # right stop
