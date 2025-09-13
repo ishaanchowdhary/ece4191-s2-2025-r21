@@ -49,7 +49,8 @@ pwm_right.start(0)
 current_duty = 0.0
 target_duty = 0.0
 prev_target_duty = 0.0
-
+MAX_DUTY = MAX_DUTY  # copy from config for local use
+MIN_START_DUTY = MIN_START_DUTY  # copy from config for local use
 
 running = True
 
@@ -108,7 +109,7 @@ def pwm_update_loop():
         if target_duty != prev_target_duty or MIN_START_DUTY != old_min_duty or MAX_DUTY != old_max_duty:
             elapsed = 0.0
             ramp_start_duty = current_duty
-            prev_target_duty = target_duty
+            prev_target_duty = target_duty # check this line
             old_min_duty = MIN_START_DUTY
             old_max_duty = MAX_DUTY
 
