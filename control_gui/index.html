@@ -13,12 +13,15 @@
 </head>
 <body>
   <div class="container">
-    <div id="title">
-      <h1>It's C.U.N.T.I.N.G Season!!!</h1>
+    <div id="title-container">
+      <div id="title">
+        <h1>It's C.U.N.T.I.N.G Season!!!</h1>
+      </div>
+      <div id="sub-title">
+        <h2>Cunningly Understanding Nature Then Investigating Native Genomes</h2>
+      </div>
     </div>
-    <div id="sub-title">
-      <h2>Cunningly Understanding Nature Then Investigating Native Genomes</h2>
-    </div>
+    
     <!-- Connection Info  -->
     <div id="connection-info" style="grid-column: 1 / span 2; grid-row: 1 / span 1; text-align: left;"></div>
     <!-- Video Stream -->
@@ -80,9 +83,10 @@
     </div>
     <!-------------- Options -------------------------------->
     <div id="options-container">
-      <b>Control</b><br>
-      <button id="websocket-connect-button" onclick="webSocketReconnect();">Connect to Websockets</button>
-      <button onclick="switchVideoFeed();">Switch Video Feed</button>
+      <div class="options-item"><b>Control</b></div>
+      <div class="options-item"><button class="options-button" id="websocket-connect-button" onclick="webSocketReconnect();">Connect to Websockets</button></div>
+      <div class="options-item"><button class="options-button" onclick="switchVideoFeed();">Switch Video Feed</button></div>
+      
       <div id="pwm-container">
         <div id="pwm-slider"></div>
         <br>

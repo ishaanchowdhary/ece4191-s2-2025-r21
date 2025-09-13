@@ -1,3 +1,9 @@
+:root {
+  --pink: #f6c0cf;
+}
+
+
+
 body {
   font-family: Arial, sans-serif;
   text-align: center;
@@ -18,12 +24,11 @@ body {
 } 
 
 #video-container {
-  grid-row: 5 / span 6;     
+  grid-row: 4 / span 6;     
   grid-column: 4 / span 6;  
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid black;
 }
 
 #title {
@@ -58,6 +63,28 @@ body {
   margin: 4%;
   font-family: monospace;
 }
+/********* Title **********/
+#title-container {
+  grid-row: 1 / span 1;
+  grid-column: 1 / span 12;
+}
+#title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+
+  /* Camo effect */
+  background: url('camo-pattern.png') no-repeat center/cover;
+  background-size: 600px 150px;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+#sub-title{
+  font-family: 'Imperial Script', cursive; 
+}
+
+
 /******** Options ********/
 #options-container {
   grid-row: 2 / span 10;
@@ -65,11 +92,19 @@ body {
   border-style: inset;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   gap: 5px;
 }
-
+.options-item {
+  width: 100%;
+}
+.options-button {
+  margin: 5%;
+  height: 50px;
+}
+#pwm-container {
+  margin-top: auto;
+}
 #pwm-slider {
   height: 300px; 
   margin: 0 auto; 
@@ -81,9 +116,10 @@ body {
 }
 #pwm-slider .noUi-handle {
     border-radius: 0;
-
 }
-
+#pwm-slider .noUi-connect {
+  background: var(--pink);
+}
 
 
 /******** Connection Status Indicators ********/
