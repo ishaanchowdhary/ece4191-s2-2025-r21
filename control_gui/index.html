@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Imperial+Script&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+  <link href="packages/nouislider.min.css" rel="stylesheet">
 </head>
 <body>
   <div class="container">
@@ -81,11 +82,19 @@
       <button id="websocket-connect-button" onclick="webSocketReconnect();">Connect to Websockets</button>
       <button onclick="switchVideoFeed();">Switch Video Feed</button>
     </div>
+    <div id="pwm-container">
+      <div id="pwm-slider"></div>
+      <br>
+      <b>PWM Control</b>
+      
+    </div>
   
   <img class="camera-img" src="img/camera.png">
   <img src="img/flash.png" class="camera-flash" id="camFlash">
   </div>
   <script src="config.js"></script>
+  <script src="packages/nouislider.min.js"></script>
   <script src="script.js"></script>
+  
 </body>
 </html>

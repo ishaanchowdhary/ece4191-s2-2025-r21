@@ -17,7 +17,7 @@ import json
 import websockets
 from controllers.motor_control import set_motor_command
 from controllers.velocity_smoother import VelocitySmoother
-from config import WHEEL_BASE, WHEEL_RADIUS
+from config import *
 import asyncio
 import time
 
@@ -64,10 +64,17 @@ async def handle_client(websocket, path):
 
                     # Update target velocities
                     direction_l, direction_r = target["direction_l"], target["direction_r"]
-                    set_motor_command(direction_l, direction_r, 100)
+                    set_motor_command(direction_l, direction_r, MAX_DUTY)
                     # Update command variabl for telemetry 
                     last_command = action
-
+                elif "SET_DUTY" in action:
+                    set_motor_command(0, 0, 0)  # stop motors before changing duty
+                    # Update minimum starting duty cycle
+                    action = str.split(action)
+                    new_duty = [int(action[1]), int(action[2])]
+                    MIN_START_DUTY = min(new_duty)
+                    MAX_DUTY = max(new_duty)
+                    print(f"Updated duty cycle limits: MIN_START_DUTY={MIN_START_DUTY}, MAX_DUTY={MAX_DUTY}")
                 else:
                     print("Unknown command:", action)
                     await websocket.send(json.dumps(

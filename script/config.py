@@ -31,6 +31,7 @@ PWM_FREQ = 50  # Hz
 MEASURED_MAX_WHEEL_SPEED = None  # rad/s, set measured value if available
 FALLBACK_MAX_WHEEL_SPEED = 40.0   # rad/s — conservative starting point
 MIN_START_DUTY = 40.0             # percent, minimum duty to reliably start motor
+MAX_DUTY = 100.0                # percent, maximum duty cycle
 RAMP_TIME = 0.5      # seconds to go from 0 to 100%
 UPDATE_HZ = 50       # update loop frequency
 # Pins

@@ -33,6 +33,27 @@ const VIDEO_PORT = 9002;      // WebSocket Port for vision model feed
 // ---------------------------------
 // On page load
 // ---------------------------------
+var pwm_slider = document.getElementById('pwm-slider');
+noUiSlider.create(pwm_slider, {
+    start: [40, 100],
+    connect: true,
+    step: 1,
+    range: {
+        'min': 0,
+        'max': 100
+    },
+    tooltips: {
+      to: function (value) {
+        return Math.round(value);   // show integer
+      },
+      from: function (value) {
+        return Number(value);       // parse back to number
+      }
+    }
+
+});
+
+
 
 let camImg
 document.addEventListener("DOMContentLoaded", () => {
@@ -49,8 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
     webSocketReconnect()
   }
 });
-
-
 
 
 
@@ -413,3 +432,11 @@ function updateIcon(id, state) {
     case "disconnected": default: icon.textContent = "circle"; break;
   }
 }
+
+
+// PWM Slider
+pwm_slider.noUiSlider.on("change", function (values, handle) {
+  let val = values;
+  console.log("Slider updated to:", val);
+  sendCommand(`SET_DUTY ${Math.round(val[0])} ${Math.round(val[1])}`);
+});
