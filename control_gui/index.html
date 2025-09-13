@@ -23,7 +23,7 @@
     <div id="connection-info" style="grid-column: 1 / span 2; grid-row: 1 / span 1; text-align: left;"></div>
     <!-- Video Stream -->
     <div id="video-container">
-       <img id="video" width="640px" height="480px" alt="Video not available" 
+       <img id="video" width="900px" height="675px" alt="Video not available" 
        src="fallback.png" />
     </div>
     <!-- Command Stream -->
@@ -78,15 +78,16 @@
         <b>home</b><br>Rehome Cam
       </div>
     </div>
-    <div id="button-container">
+    <!-------------- Options -------------------------------->
+    <div id="options-container">
+      <b>Control</b><br>
       <button id="websocket-connect-button" onclick="webSocketReconnect();">Connect to Websockets</button>
       <button onclick="switchVideoFeed();">Switch Video Feed</button>
-    </div>
-    <div id="pwm-container">
-      <div id="pwm-slider"></div>
-      <br>
-      <b>PWM Control</b>
-      
+      <div id="pwm-container">
+        <div id="pwm-slider"></div>
+        <br>
+        <b>PWM Control</b>
+      </div>
     </div>
   
   <img class="camera-img" src="img/camera.png">

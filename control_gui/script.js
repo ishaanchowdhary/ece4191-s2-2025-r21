@@ -44,14 +44,15 @@ noUiSlider.create(pwm_slider, {
     },
     tooltips: {
       to: function (value) {
-        return Math.round(value);   // show integer
+        return `${Math.round(value)}%`;   // show integer
       },
       from: function (value) {
         return Number(value);       // parse back to number
       }
     },
-    keyboardSupport: false
-
+    keyboardSupport: false,
+    orientation: 'vertical',
+    direction: 'rtl',
 });
 
 

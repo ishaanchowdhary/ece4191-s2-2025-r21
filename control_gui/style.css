@@ -18,8 +18,8 @@ body {
 } 
 
 #video-container {
-  grid-row: 3 / span 6;     
-  grid-column: 5 / span 4;  
+  grid-row: 5 / span 6;     
+  grid-column: 4 / span 6;  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -58,6 +58,33 @@ body {
   margin: 4%;
   font-family: monospace;
 }
+/******** Options ********/
+#options-container {
+  grid-row: 2 / span 10;
+  grid-column: 12 / span 1;
+  border-style: inset;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+#pwm-slider {
+  height: 300px; 
+  margin: 0 auto; 
+  border-radius: 0;
+}
+#pwm-slider .noUi-tooltip {
+  background: none;
+  border: 0;
+}
+#pwm-slider .noUi-handle {
+    border-radius: 0;
+
+}
+
+
 
 /******** Connection Status Indicators ********/
 .material-icons.connected {
@@ -80,7 +107,7 @@ body {
 /* *********************************** Log *********************************** */
 #log-container {
   grid-row: 3 / span 3;
-  grid-column: 1 / span 4;
+  grid-column: 1 / span 3;
   border-style: inset;
 }
 
