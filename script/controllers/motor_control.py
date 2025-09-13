@@ -26,6 +26,15 @@ import RPi.GPIO as GPIO
 import threading, time, math
 from config import PWM_FREQ, MEASURED_MAX_WHEEL_SPEED, FALLBACK_MAX_WHEEL_SPEED, MIN_START_DUTY
 from .velocity_smoother import tanh_ramp
+
+import csv
+
+LOG_FILE = "/home/pi/pwm_log.csv"  # adjust path as needed
+# Open CSV and write header
+log_fh = open(LOG_FILE, "w", newline="")
+csv_writer = csv.writer(log_fh)
+csv_writer.writerow(["timestamp", "current_duty", "target_duty"])
+
 # Pins
 LEFT_PWM, LEFT_IN1, LEFT_IN2 = 12, 23, 24
 RIGHT_PWM, RIGHT_IN1, RIGHT_IN2 = 13, 8, 7
@@ -92,12 +101,6 @@ def set_motor_command(direction_l, direction_r, duty):
         GPIO.output(RIGHT_IN1, GPIO.LOW) # right stop
         GPIO.output(RIGHT_IN2, GPIO.LOW)
 
-    # Return duty cycles for testing/verification
-    return duty
-
-    # Debug print (helpful while testing)
-    print(f"[MOTOR] v_l={v_l:.2f} rad/s v_r={v_r:.2f} rad/s -> duty_l={duty_l:.1f}% duty_r={duty_r:.1f}%")
-
 
 
 def pwm_update_loop():
@@ -117,6 +120,9 @@ def pwm_update_loop():
                 current_duty = tanh_ramp(ramp_start_duty, target_duty, elapsed, RAMP_TIME, MIN_DUTY)
                 pwm_left.ChangeDutyCycle(current_duty)
                 pwm_right.ChangeDutyCycle(current_duty)
+                timestamp = time.time()
+                csv_writer.writerow([timestamp, current_duty, target_duty])
+                log_fh.flush()  # make sure it's written to disk
 
                 elapsed += step_time
                 time.sleep(step_time)
@@ -137,6 +143,7 @@ def cleanup():
         pwm_left = None
         pwm_right = None
         GPIO.cleanup()
+        log_fh.close()
         print("GPIO cleanup done.")
     except Exception as e:
         print("Error during GPIO cleanup:", e)
