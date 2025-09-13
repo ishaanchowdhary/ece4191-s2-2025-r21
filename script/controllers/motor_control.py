@@ -114,6 +114,7 @@ def pwm_update_loop():
     elapsed = 0.0
 
     while running:
+        print(current_duty_l)
         # Detect new targets
         if target_duty_l != last_target_l:
             ramp_start_l = current_duty_l
