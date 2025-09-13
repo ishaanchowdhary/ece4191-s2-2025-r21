@@ -94,7 +94,7 @@ def set_motor_command(direction_l, direction_r):
 """
 Background thread to smoothly update PWM duty cycle towards target.
 """
-def pwm_update_loop():
+def pwm_update_loop(min_duty, max_duty):
     global current_duty, target_duty, prev_target_duty
     step_time = 1.0 / UPDATE_HZ
     elapsed = 0.0
@@ -114,7 +114,7 @@ def pwm_update_loop():
             target_duty,
             elapsed,
             RAMP_TIME,
-            servers.command_server.MIN_START_DUTY
+            min_duty
         )
 
         # Apply PWM duty
@@ -134,7 +134,7 @@ def pwm_update_loop():
 
         time.sleep(step_time)
 
-threading.Thread(target=pwm_update_loop, daemon=True).start()
+threading.Thread(target=pwm_update_loop, args=(servers.command_server.MIN_START_DUTY, servers.command_server.MAX_DUTY), daemon=True).start()
 
 
 def cleanup():
