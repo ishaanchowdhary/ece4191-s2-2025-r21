@@ -67,9 +67,13 @@ def set_motor_command(direction_l, direction_r, duty_l=100, duty_r=100):
     """
 
     global target_duty_l, target_duty_r
+
+    if direction_l == 0 and direction_r == 0:
+        duty_l = 0
+        duty_r = 0
+
     target_duty_l = max(0, min(100, duty_l))
     target_duty_r = max(0, min(100, duty_r))
-
 
     # Direction logic (assuming IN1 HIGH, IN2 LOW => forward)
     if direction_l == -1:
