@@ -64,7 +64,7 @@ async def handle_client(websocket, path):
 
                     # Update target velocities
                     direction_l, direction_r = target["direction_l"], target["direction_r"]
-                    set_motor_command(direction_l, direction_r)
+                    set_motor_command(direction_l, direction_r, 100)
                     # Update command variabl for telemetry 
                     last_command = action
 

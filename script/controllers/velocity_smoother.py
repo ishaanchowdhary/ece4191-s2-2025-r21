@@ -37,22 +37,17 @@ class VelocitySmoother:
         return self.v_cur, self.w_cur
     
 
-def tanh_ramp(start, target, elapsed, total_time, min_duty):
+def tanh_ramp(start, target, elapsed, total_time):
     """
     Smooth tanh ramp from start to target, ensuring that
     if starting from 0, it begins at min_duty.
     """
-    # Map elapsed to -1..+1
-    x = (elapsed / total_time) * 2 - 1
-    x = max(-1.0, min(1.0, x))
-    y = (math.tanh(2.5 * x) + 1.0) / 2.0  # 0..1
-
-    # If starting from 0 and target > 0, offset the ramp by min_duty
-    if start == 0 and target > 0:
-        return min_duty + (target - min_duty) * y
-    elif start == 0 and target < 0:  # backward
-        return -min_duty + (target + min_duty) * y
-    else:
-        return start + (target - start) * y
+    # Map elapsed to 0-100
+    # +51 ensures that the tan function will go to 100
+    tuning_param = 7.6
+    duty = start + ((target - start)/2) * (math.tanh((tuning_param/total_time)*(elapsed - total_time/2))+1)
+    if duty > 100:
+        duty = 100
+    return duty
 
 

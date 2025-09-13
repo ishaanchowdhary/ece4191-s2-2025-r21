@@ -41,10 +41,9 @@ pwm_right = GPIO.PWM(RIGHT_PWM, PWM_FREQ)
 pwm_left.start(0)
 pwm_right.start(0)
 # === State variables ===
-current_duty_l = 0.0
-current_duty_r = 0.0
-target_duty_l = 0.0
-target_duty_r = 0.0
+current_duty = 0.0
+target_duty = 0.0
+prev_target_duty = 0
 
 # Ramp parameters
 RAMP_TIME = 2      # seconds to go from 0→100%
@@ -60,20 +59,17 @@ def _get_max_wheel_speed():
         return MEASURED_MAX_WHEEL_SPEED
     return FALLBACK_MAX_WHEEL_SPEED
 
-def set_motor_command(direction_l, direction_r, duty_l=100, duty_r=100):
+def set_motor_command(direction_l, direction_r, duty):
     """
     feed the direction commands for left and right motors. 1 = forward, -1 = backward, 0 = stop
     Converts to PWM duty cycles with minimum start duty and debug prints.
     """
+    global target_duty
 
-    global target_duty_l, target_duty_r
-
+    # Set new target duty cycles
     if direction_l == 0 and direction_r == 0:
-        duty_l = 0
-        duty_r = 0
-
-    target_duty_l = duty_l
-    target_duty_r = duty_r
+        duty = 0
+    target_duty = duty
 
     # Direction logic (assuming IN1 HIGH, IN2 LOW => forward)
     if direction_l == -1:
@@ -97,7 +93,7 @@ def set_motor_command(direction_l, direction_r, duty_l=100, duty_r=100):
         GPIO.output(RIGHT_IN2, GPIO.LOW)
 
     # Return duty cycles for testing/verification
-    return duty_l, duty_r
+    return duty
 
     # Debug print (helpful while testing)
     print(f"[MOTOR] v_l={v_l:.2f} rad/s v_r={v_r:.2f} rad/s -> duty_l={duty_l:.1f}% duty_r={duty_r:.1f}%")
@@ -105,48 +101,26 @@ def set_motor_command(direction_l, direction_r, duty_l=100, duty_r=100):
 
 
 def pwm_update_loop():
-    global current_duty_l, current_duty_r
+    global current_duty, target_duty
     step_time = 1.0 / UPDATE_HZ
-    last_target_l = target_duty_l
-    last_target_r = target_duty_r
-    ramp_start_l = current_duty_l
-    ramp_start_r = current_duty_r
     elapsed = 0.0
 
     while running:
         print(elapsed)
-        # Detect new targets
-        if target_duty_l != last_target_l:
-            ramp_start_l = current_duty_l
+        # Detect change in target duty
+        if target_duty != prev_target_duty:
             elapsed = 0.0
-            last_target_l = target_duty_l
-        if target_duty_r != last_target_r:
-            ramp_start_r = current_duty_r
-            elapsed = 0.0
-            last_target_r = target_duty_r
+            ramp_start_duty = current_duty # capture current duty as start of ramp
+            while elapsed < RAMP_TIME:
+                # Smooth ramping using tanh function
+                current_duty = tanh_ramp(ramp_start_duty, target_duty, elapsed, RAMP_TIME)
+                pwm_left.ChangeDutyCycle(current_duty)
+                pwm_right.ChangeDutyCycle(current_duty)
 
-        elapsed += step_time
-        elapsed = min(elapsed, RAMP_TIME)
-
-        # Compute tanh ramp values
-        new_duty_l = tanh_ramp(ramp_start_l, target_duty_l, elapsed, RAMP_TIME, MIN_DUTY)
-        new_duty_r = tanh_ramp(ramp_start_r, target_duty_r, elapsed, RAMP_TIME, MIN_DUTY)
-
-        # Enforce MIN_DUTY when moving
-        if target_duty_l != 0:
-            current_duty_l = tanh_ramp(ramp_start_l, target_duty_l, elapsed, RAMP_TIME, MIN_DUTY)
-        else:
-            current_duty_l = new_duty_l  # allow 0 when stopping
-
-        if target_duty_r != 0:
-            current_duty_r = tanh_ramp(ramp_start_r, target_duty_r, elapsed, RAMP_TIME, MIN_DUTY)
-        else:
-            current_duty_r = new_duty_r
-
-        pwm_left.ChangeDutyCycle(current_duty_l)
-        pwm_right.ChangeDutyCycle(current_duty_r)
-
-        time.sleep(step_time)
+                elapsed += step_time
+                time.sleep(step_time)
+            current_duty = target_duty # ensure we hit target exactly
+            prev_target_duty = target_duty
 
 threading.Thread(target=pwm_update_loop, daemon=True).start()
 
