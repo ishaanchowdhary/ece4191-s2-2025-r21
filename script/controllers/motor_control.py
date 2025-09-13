@@ -51,7 +51,7 @@ RAMP_TIME = 2      # seconds to go from 0→100%
 UPDATE_HZ = 50       # update loop frequency
 running = True
 
-
+MIN_DUTY = 40
 
 
 def _get_max_wheel_speed():
@@ -105,7 +105,6 @@ def set_motor_command(direction_l, direction_r, duty_l=100, duty_r=100):
 
 
 def pwm_update_loop():
-    """Background thread: ramps duty toward target with tanh smoothing."""
     global current_duty_l, current_duty_r
     step_time = 1.0 / UPDATE_HZ
     last_target_l = target_duty_l
@@ -115,8 +114,7 @@ def pwm_update_loop():
     elapsed = 0.0
 
     while running:
-        print(current_duty_l)
-        # If target changed, restart ramp
+        # Detect new targets
         if target_duty_l != last_target_l:
             ramp_start_l = current_duty_l
             elapsed = 0.0
@@ -126,12 +124,23 @@ def pwm_update_loop():
             elapsed = 0.0
             last_target_r = target_duty_r
 
-        # Update duty based on tanh easing
         elapsed += step_time
         elapsed = min(elapsed, RAMP_TIME)
 
-        current_duty_l = tanh_ramp(ramp_start_l, target_duty_l, elapsed, RAMP_TIME)
-        current_duty_r = tanh_ramp(ramp_start_r, target_duty_r, elapsed, RAMP_TIME)
+        # Compute tanh ramp values
+        new_duty_l = tanh_ramp(ramp_start_l, target_duty_l, elapsed, RAMP_TIME)
+        new_duty_r = tanh_ramp(ramp_start_r, target_duty_r, elapsed, RAMP_TIME)
+
+        # Enforce MIN_DUTY when moving
+        if target_duty_l != 0:
+            current_duty_l = max(MIN_DUTY, new_duty_l)
+        else:
+            current_duty_l = new_duty_l  # allow 0 when stopping
+
+        if target_duty_r != 0:
+            current_duty_r = max(MIN_DUTY, new_duty_r)
+        else:
+            current_duty_r = new_duty_r
 
         pwm_left.ChangeDutyCycle(current_duty_l)
         pwm_right.ChangeDutyCycle(current_duty_r)
