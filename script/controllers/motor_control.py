@@ -106,11 +106,24 @@ def set_motor_command(direction_l, direction_r, duty):
 def pwm_update_loop():
     global current_duty, target_duty, prev_target_duty
     step_time = 1.0 / UPDATE_HZ
+    elapsed = 0.0
+    ramp_start_duty = current_duty
 
     while running:
-        # Smoothly chase target using tanh ramp
-        # Always pass a small "elapsed" increment each cycle
-        current_duty = tanh_ramp(current_duty, target_duty, step_time, RAMP_TIME, MIN_DUTY)
+        # Detect change in target duty → reset ramp
+        if target_duty != prev_target_duty:
+            elapsed = 0.0
+            ramp_start_duty = current_duty
+            prev_target_duty = target_duty
+
+        # Compute smoothed duty based on elapsed time in ramp
+        current_duty = tanh_ramp(
+            ramp_start_duty,
+            target_duty,
+            elapsed,
+            RAMP_TIME,
+            MIN_DUTY
+        )
 
         # Apply PWM duty
         pwm_left.ChangeDutyCycle(current_duty)
@@ -121,8 +134,10 @@ def pwm_update_loop():
         csv_writer.writerow([timestamp, current_duty, target_duty])
         log_fh.flush()
 
-        # Update "prev" tracking (not strictly needed anymore)
-        prev_target_duty = target_duty
+        # Increment elapsed time
+        elapsed += step_time
+        if elapsed > RAMP_TIME:
+            elapsed = RAMP_TIME  # clamp at end of ramp
 
         time.sleep(step_time)
 
