@@ -60,14 +60,14 @@ def set_motor_command(direction_l, direction_r):
     Converts to PWM duty cycles with minimum start duty and debug prints.
     """
     global target_duty
-    MAX_DUTY = servers.command_server.MAX_DUTY
+
     # Set new target duty cycles
     if direction_l == 0 and direction_r == 0:
-        duty = 0
+        target_duty = 0
     else:
-        duty = MAX_DUTY
-    target_duty = duty
-    print(f"Set target duty: {target_duty}% (L: {direction_l}, R: {direction_r}), max: {MAX_DUTY}%")
+        target_duty = servers.command_server.MAX_DUTY
+
+    print(f"Set target duty: {target_duty}% ")
     # Direction logic (assuming IN1 HIGH, IN2 LOW => forward)
     if direction_l == -1:
         GPIO.output(LEFT_IN1, GPIO.HIGH) # left backward
@@ -88,31 +88,25 @@ def set_motor_command(direction_l, direction_r):
     else:
         GPIO.output(RIGHT_IN1, GPIO.LOW) # right stop
         GPIO.output(RIGHT_IN2, GPIO.LOW)
-    
-    return target_duty
+
 
 
 """
 Background thread to smoothly update PWM duty cycle towards target.
 """
 def pwm_update_loop():
-    global current_duty, target_duty, prev_target_duty, MIN_START_DUTY, MAX_DUTY
+    global current_duty, target_duty, prev_target_duty
     step_time = 1.0 / UPDATE_HZ
     elapsed = 0.0
     ramp_start_duty = current_duty
 
-    old_min_duty = MIN_START_DUTY
-    old_max_duty = MAX_DUTY
-
     while running:
         # When there is a change in target duty cycle, reset ramp and set elapsed time to 0
         # Reset ramp if target duty changes or MIN/MAX changes
-        if target_duty != prev_target_duty or MIN_START_DUTY != old_min_duty or MAX_DUTY != old_max_duty:
+        if target_duty != prev_target_duty:
             elapsed = 0.0
             ramp_start_duty = current_duty
             prev_target_duty = target_duty # check this line
-            old_min_duty = MIN_START_DUTY
-            old_max_duty = MAX_DUTY
 
         # Compute smoothed duty based on elapsed time in ramp
         current_duty = tanh_ramp(
@@ -120,7 +114,7 @@ def pwm_update_loop():
             target_duty,
             elapsed,
             RAMP_TIME,
-            MIN_START_DUTY
+            servers.command_server.MIN_START_DUTY
         )
 
         # Apply PWM duty
