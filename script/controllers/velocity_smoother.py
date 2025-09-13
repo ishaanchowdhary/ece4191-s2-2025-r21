@@ -9,7 +9,7 @@ Implements velocity smoothing to prevent abrupt motor commands.
 
 """
 import math
-
+import globals
 
 class VelocitySmoother:
     def __init__(self, max_accel=0.5, max_ang_accel=1.0, rate_hz=50):
@@ -37,14 +37,14 @@ class VelocitySmoother:
         return self.v_cur, self.w_cur
     
 
-def tanh_ramp(start, target, elapsed, total_time, min_duty):
+def tanh_ramp(start, target, elapsed, total_time):
     """
     Smooth tanh ramp from start to target, ensuring that
     if starting from 0, it begins at min_duty.
     """
     # Map elapsed to 0-100
     # +51 ensures that the tan function will go to 100
-    print(f"Ramping from {start} to {target} over {total_time}s, elapsed {elapsed}s")
+    min_duty = globals.min_duty
     if start < min_duty and target != 0:
         start = min_duty
     tuning_param = 7.6

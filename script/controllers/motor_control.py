@@ -112,8 +112,7 @@ def pwm_update_loop(min_duty, max_duty):
             ramp_start_duty,
             target_duty,
             elapsed,
-            RAMP_TIME,
-            min_duty
+            RAMP_TIME
         )
 
         # Apply PWM duty
