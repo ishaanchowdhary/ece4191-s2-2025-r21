@@ -101,10 +101,13 @@ def pwm_update_loop():
 
     while running:
         # When there is a change in target duty cycle, reset ramp and set elapsed time to 0
-        if target_duty != prev_target_duty:
+        # Reset ramp if target duty changes or MIN/MAX changes
+        if target_duty != prev_target_duty or MIN_START_DUTY != old_min_duty or MAX_DUTY != old_max_duty:
             elapsed = 0.0
             ramp_start_duty = current_duty
             prev_target_duty = target_duty
+            old_min_duty = MIN_START_DUTY
+            old_max_duty = MAX_DUTY
 
         # Compute smoothed duty based on elapsed time in ramp
         current_duty = tanh_ramp(
