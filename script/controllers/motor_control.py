@@ -72,8 +72,8 @@ def set_motor_command(direction_l, direction_r, duty_l=100, duty_r=100):
         duty_l = 0
         duty_r = 0
 
-    target_duty_l = max(0, min(100, duty_l))
-    target_duty_r = max(0, min(100, duty_r))
+    target_duty_l = duty_l
+    target_duty_r = duty_r
 
     # Direction logic (assuming IN1 HIGH, IN2 LOW => forward)
     if direction_l == -1:
@@ -114,7 +114,7 @@ def pwm_update_loop():
     elapsed = 0.0
 
     while running:
-        print(current_duty_l)
+        print(elapsed)
         # Detect new targets
         if target_duty_l != last_target_l:
             ramp_start_l = current_duty_l
