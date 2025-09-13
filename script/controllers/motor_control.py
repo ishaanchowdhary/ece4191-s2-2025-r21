@@ -94,10 +94,13 @@ def set_motor_command(direction_l, direction_r, duty):
 Background thread to smoothly update PWM duty cycle towards target.
 """
 def pwm_update_loop():
-    global current_duty, target_duty, prev_target_duty, MIN_START_DUTY
+    global current_duty, target_duty, prev_target_duty, MIN_START_DUTY, MAX_DUTY
     step_time = 1.0 / UPDATE_HZ
     elapsed = 0.0
     ramp_start_duty = current_duty
+
+    old_min_duty = MIN_START_DUTY
+    old_max_duty = MAX_DUTY
 
     while running:
         # When there is a change in target duty cycle, reset ramp and set elapsed time to 0
