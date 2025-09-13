@@ -43,7 +43,7 @@ pwm_right.start(0)
 # === State variables ===
 current_duty = 0.0
 target_duty = 0.0
-prev_target_duty = 0
+prev_target_duty = 0.0
 
 # Ramp parameters
 RAMP_TIME = 2      # seconds to go from 0→100%
@@ -101,7 +101,7 @@ def set_motor_command(direction_l, direction_r, duty):
 
 
 def pwm_update_loop():
-    global current_duty, target_duty
+    global current_duty, target_duty, prev_target_duty
     step_time = 1.0 / UPDATE_HZ
     elapsed = 0.0
 
