@@ -29,7 +29,7 @@ from .velocity_smoother import tanh_ramp
 
 import csv
 
-LOG_FILE = "/home/pi/pwm_log.csv"  # adjust path as needed
+LOG_FILE = "pwm_log.csv"  # adjust path as needed
 # Open CSV and write header
 log_fh = open(LOG_FILE, "w", newline="")
 csv_writer = csv.writer(log_fh)
