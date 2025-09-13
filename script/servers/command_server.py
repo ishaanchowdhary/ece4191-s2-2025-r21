@@ -43,7 +43,8 @@ last_command = "DRIVE_STOP"
 # Websocket
 current_client = None 
 
-
+MIN_START_DUTY = MIN_START_DUTY
+MAX_DUTY = MAX_DUTY 
 
 async def handle_client(websocket, path):
     """Handle a single command WebSocket client (keeps original signature)."""
@@ -65,11 +66,11 @@ async def handle_client(websocket, path):
 
                     # Update target velocities
                     direction_l, direction_r = target["direction_l"], target["direction_r"]
-                    set_motor_command(direction_l, direction_r, MAX_DUTY)
+                    set_motor_command(direction_l, direction_r)
                     # Update command variabl for telemetry 
                     last_command = action
                 elif "SET_DUTY" in action:
-                    set_motor_command(0, 0, 0)  # stop motors before changing duty
+                    set_motor_command(0, 0)  # stop motors before changing duty
                     # Update minimum starting duty cycle
                     action = str.split(action)
                     new_duty = [int(action[1]), int(action[2])]

@@ -26,7 +26,7 @@ import RPi.GPIO as GPIO
 import threading, time
 from config import *
 from .velocity_smoother import tanh_ramp
-
+from servers.command_server import MIN_START_DUTY, MAX_DUTY
 import csv
 
 LOG_FILE = "pwm_log.csv"  # adjust path as needed
@@ -49,13 +49,12 @@ pwm_right.start(0)
 current_duty = 0.0
 target_duty = 0.0
 prev_target_duty = 0.0
-MAX_DUTY = MAX_DUTY  # copy from config for local use
-MIN_START_DUTY = MIN_START_DUTY  # copy from config for local use
 
 running = True
 
 
-def set_motor_command(direction_l, direction_r, duty):
+
+def set_motor_command(direction_l, direction_r):
     """
     feed the direction commands for left and right motors. 1 = forward, -1 = backward, 0 = stop
     Converts to PWM duty cycles with minimum start duty and debug prints.
