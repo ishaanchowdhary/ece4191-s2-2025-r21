@@ -17,7 +17,7 @@ import asyncio
 import websockets
 
 from config import CMD_PORT, VIDEO_PORT
-from servers.command_server import handle_client
+from servers.command_server import handle_client, smoother_loop
 from servers.video_server import handle_video
 from servers.camera_stream import camera_stream
 from controllers.motor_control import cleanup as motor_cleanup
@@ -30,6 +30,8 @@ async def main():
     print(f"Command WebSocket server on port {CMD_PORT}")
     print(f"Video WebSocket server on port {VIDEO_PORT}")
 
+    # Start the smoother loop in the background 
+    asyncio.create_task(smoother_loop())
 
     # Run camera stream forever
     await camera_stream()

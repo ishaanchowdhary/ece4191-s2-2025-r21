@@ -46,15 +46,15 @@ def _get_max_wheel_speed():
         return MEASURED_MAX_WHEEL_SPEED
     return FALLBACK_MAX_WHEEL_SPEED
 
-def set_motor_command(direction_l, direction_r):
+def set_motor_command(v_l, v_r):
     """
-    feed the direction commands for left and right motors. 1 = forward, -1 = backward, 0 = stop
+    v_l, v_r : wheel angular velocities in rad/s (positive = forward)
     Converts to PWM duty cycles with minimum start duty and debug prints.
     """
-
+    max_w = _get_max_wheel_speed()
     # Map angular velocity magnitude to duty % (0..100)
-    duty_l = 100
-    duty_r = 100
+    duty_l = min(abs(v_l) / max_w * 100.0, 100.0) if max_w > 0 else 0.0
+    duty_r = min(abs(v_r) / max_w * 100.0, 100.0) if max_w > 0 else 0.0
 
     # Apply minimum starting duty if nonzero (prevents buzzing)
     if duty_l > 0 and duty_l < MIN_START_DUTY:
@@ -63,25 +63,19 @@ def set_motor_command(direction_l, direction_r):
         duty_r = MIN_START_DUTY
 
     # Direction logic (assuming IN1 HIGH, IN2 LOW => forward)
-    if direction_l == 1:
-        GPIO.output(LEFT_IN1, GPIO.HIGH) # left forward
+    if v_l >= 0:
+        GPIO.output(LEFT_IN1, GPIO.HIGH)
         GPIO.output(LEFT_IN2, GPIO.LOW)
-    elif direction_l == -1:
-        GPIO.output(LEFT_IN1, GPIO.LOW) # left backward
+    else:
+        GPIO.output(LEFT_IN1, GPIO.LOW)
         GPIO.output(LEFT_IN2, GPIO.HIGH)
-    else:
-        GPIO.output(LEFT_IN1, GPIO.LOW) # left stop
-        GPIO.output(LEFT_IN2, GPIO.LOW)
 
-    if direction_r == 1:
-        GPIO.output(RIGHT_IN1, GPIO.HIGH)   # right forward
+    if v_r >= 0:
+        GPIO.output(RIGHT_IN1, GPIO.HIGH)
         GPIO.output(RIGHT_IN2, GPIO.LOW)
-    elif direction_l == -1:
-        GPIO.output(RIGHT_IN1, GPIO.LOW) # right backward
-        GPIO.output(RIGHT_IN2, GPIO.HIGH)
     else:
-        GPIO.output(RIGHT_IN1, GPIO.LOW) # right stop
-        GPIO.output(RIGHT_IN2, GPIO.LOW)
+        GPIO.output(RIGHT_IN1, GPIO.LOW)
+        GPIO.output(RIGHT_IN2, GPIO.HIGH)
 
     pwm_left.ChangeDutyCycle(duty_l)
     pwm_right.ChangeDutyCycle(duty_r)

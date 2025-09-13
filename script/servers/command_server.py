@@ -23,11 +23,11 @@ import time
 
 # Command mapping (adjust speeds as needed)
 COMMAND_MAP = {
-    "FORWARD":    {"direction_l": 1, "direction_r": 1},
-    "REVERSE":    {"direction_l": -1, "direction_r": -1},
-    "LEFT":       {"direction_l": -1, "direction_r": 1},
-    "RIGHT":      {"direction_l": 1, "direction_r": -1},
-    "DRIVE_STOP": {"direction_l": 0, "direction_r": 0}
+    "FORWARD":    {"v": -0.5, "w": 0.0},
+    "REVERSE":    {"v": 0.5, "w": 0.0},
+    "LEFT":       {"v": 0.0, "w": -0.8},
+    "RIGHT":      {"v": 0.0, "w": 0.8},
+    "DRIVE_STOP": {"v": 0.0, "w": 0.0}
 }
 
 # Shared variables
@@ -43,6 +43,46 @@ last_command = "DRIVE_STOP"
 # Websocket
 current_client = None 
 
+async def smoother_loop(): 
+    """
+    Function calls smoother.update() at a fixed rate and sends telemetry
+    """
+    global v_target, w_target, last_command, current_client
+
+    # smoothing rate variables    
+    rate_hz = 50 # to tune
+    dt = 1.0 / rate_hz
+
+    # telemetry rate
+    send_rate_hz = 10 
+    send_dt = 1.0 / send_rate_hz
+    last_send = 0
+
+    while True:
+        v_smooth, w_smooth = smoother.update(v_target, w_target)
+
+        # Differential drive kinematics
+        L = WHEEL_BASE
+        R = WHEEL_RADIUS
+        v_r = (2*v_smooth + w_smooth*L) / (2*R)
+        v_l = (2*v_smooth - w_smooth*L) / (2*R)
+
+        duty_l, duty_r = set_motor_command(v_l, v_r)
+
+        now = time.time()
+
+        if current_client and (now - last_send) >= send_dt and duty_l != 0:
+            await current_client.send(json.dumps({
+                "status": "ok",
+                "command": last_command,
+                "velocities": {"left": v_l, "right": v_r},
+                "duty_cycles": {"left": duty_l, "right": duty_r}
+            }))
+            
+
+            last_send = now
+
+        await asyncio.sleep(dt)
 
 
 async def handle_client(websocket, path):
@@ -63,8 +103,8 @@ async def handle_client(websocket, path):
                     target = COMMAND_MAP[action]
 
                     # Update target velocities
-                    direction_l, direction_r = target["direction_l"], target["direction_r"]
-                    set_motor_command(direction_l, direction_r)
+                    v_target, w_target = target["v"], target["w"]
+
                     # Update command variabl for telemetry 
                     last_command = action
 
