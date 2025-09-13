@@ -369,20 +369,26 @@ document.addEventListener("keydown", (event) => {
     const videoEl = document.getElementById("video");
 
     // Save current frame
-    if (videoEl.src && videoEl.naturalWidth > 0) {
-      const canvas = document.createElement("canvas");
-      canvas.width = videoEl.naturalWidth;
-      canvas.height = videoEl.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(videoEl, 0, 0);
+    try {
+      if (videoEl.src && videoEl.naturalWidth > 0) {
+        const canvas = document.createElement("canvas");
+        canvas.width = videoEl.naturalWidth;
+        canvas.height = videoEl.naturalHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(videoEl, 0, 0);
 
-      // turn into downloadable image
-      const link = document.createElement("a");
-      link.download = `photo_${Date.now()}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    } else {
-      console.warn("No video frame available to save");
+        // turn into downloadable image
+        const link = document.createElement("a");
+        link.download = `photo_${Date.now()}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } else {
+        console.warn("No video frame available to save");
+      }
+    }
+    catch(err) {
+      console.log(err);
+      addLogEntry("Frame capture failed", type = "error")
     }
 
     // Animation

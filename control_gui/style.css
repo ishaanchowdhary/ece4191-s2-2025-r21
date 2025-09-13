@@ -1,8 +1,25 @@
 :root {
   --pink: #f6c0cf;
 }
+button {
+  font-family: "Roboto", sans-serif;
+  position: relative;
+  background: var(--pink);
+  font-size: 14px;
+  font-weight: 400;
+  color: #181818;
+  border: 3px solid var(--pink);
+  border-radius: 8px;
+  box-shadow: 0 0 0 #fec1958c;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
 
-
+button:hover {
+  background: transparent;
+  color: #fec195;
+  box-shadow: 0 0 25px #fec1958c;
+}
 
 body {
   font-family: Arial, sans-serif;
