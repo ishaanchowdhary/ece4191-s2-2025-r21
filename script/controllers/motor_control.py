@@ -114,7 +114,7 @@ def pwm_update_loop():
             while elapsed < RAMP_TIME:
                 print(current_duty)
                 # Smooth ramping using tanh function
-                current_duty = tanh_ramp(ramp_start_duty, target_duty, elapsed, RAMP_TIME)
+                current_duty = tanh_ramp(ramp_start_duty, target_duty, elapsed, RAMP_TIME, MIN_DUTY)
                 pwm_left.ChangeDutyCycle(current_duty)
                 pwm_right.ChangeDutyCycle(current_duty)
 
