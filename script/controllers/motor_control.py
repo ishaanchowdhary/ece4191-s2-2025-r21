@@ -134,12 +134,12 @@ def pwm_update_loop():
 
         # Enforce MIN_DUTY when moving
         if target_duty_l != 0:
-            current_duty_l = max(MIN_DUTY, new_duty_l)
+            current_duty_l = tanh_ramp(ramp_start_l, target_duty_l, elapsed, RAMP_TIME, MIN_DUTY)
         else:
             current_duty_l = new_duty_l  # allow 0 when stopping
 
         if target_duty_r != 0:
-            current_duty_r = max(MIN_DUTY, new_duty_r)
+            current_duty_r = tanh_ramp(ramp_start_r, target_duty_r, elapsed, RAMP_TIME, MIN_DUTY)
         else:
             current_duty_r = new_duty_r
 
