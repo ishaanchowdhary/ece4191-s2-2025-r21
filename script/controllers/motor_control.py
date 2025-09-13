@@ -118,7 +118,6 @@ def pwm_update_loop(min_duty, max_duty):
         # Apply PWM duty
         pwm_left.ChangeDutyCycle(current_duty)
         pwm_right.ChangeDutyCycle(current_duty)
-        print(current_duty)
         # Log for debugging
         if LOGGING:
             timestamp = time.time()
