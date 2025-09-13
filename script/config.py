@@ -17,6 +17,11 @@ Usage:
 CMD_PORT = 9000
 VIDEO_PORT = 9001
 
+# Data logging
+LOGGING = True
+LOG_DIR = "logs"  # directory to save log files
+
+
 # Physics / geometry (used to convert v,w -> wheel velocities)
 WHEEL_BASE = 0.15   # meters (L)
 WHEEL_RADIUS = 0.065  # meters (R)
@@ -25,7 +30,12 @@ WHEEL_RADIUS = 0.065  # meters (R)
 PWM_FREQ = 50  # Hz
 MEASURED_MAX_WHEEL_SPEED = None  # rad/s, set measured value if available
 FALLBACK_MAX_WHEEL_SPEED = 40.0   # rad/s — conservative starting point
-MIN_START_DUTY = 100.0             # percent, minimum duty to reliably start motor
+MIN_START_DUTY = 40.0             # percent, minimum duty to reliably start motor
+RAMP_TIME = 0.5      # seconds to go from 0 to 100%
+UPDATE_HZ = 50       # update loop frequency
+# Pins
+LEFT_PWM, LEFT_IN1, LEFT_IN2 = 12, 23, 24
+RIGHT_PWM, RIGHT_IN1, RIGHT_IN2 = 13, 8, 7
 
 # Camera defaults (used by camera_stream)
 CAM_INDEX = 0

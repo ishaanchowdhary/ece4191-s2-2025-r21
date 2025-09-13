@@ -23,8 +23,8 @@ Usage:
 """
 
 import RPi.GPIO as GPIO
-import threading, time, math
-from config import PWM_FREQ, MEASURED_MAX_WHEEL_SPEED, FALLBACK_MAX_WHEEL_SPEED, MIN_START_DUTY
+import threading, time
+from config import *
 from .velocity_smoother import tanh_ramp
 
 import csv
@@ -34,10 +34,6 @@ LOG_FILE = "pwm_log.csv"  # adjust path as needed
 log_fh = open(LOG_FILE, "w", newline="")
 csv_writer = csv.writer(log_fh)
 csv_writer.writerow(["timestamp", "current_duty", "target_duty"])
-
-# Pins
-LEFT_PWM, LEFT_IN1, LEFT_IN2 = 12, 23, 24
-RIGHT_PWM, RIGHT_IN1, RIGHT_IN2 = 13, 8, 7
 
 # GPIO setup
 GPIO.setmode(GPIO.BCM)
@@ -54,19 +50,9 @@ current_duty = 0.0
 target_duty = 0.0
 prev_target_duty = 0.0
 
-# Ramp parameters
-RAMP_TIME = 0.5      # seconds to go from 0→100%
-UPDATE_HZ = 50       # update loop frequency
+
 running = True
 
-MIN_DUTY = 40
-
-
-def _get_max_wheel_speed():
-    """Return measured max wheel speed or fallback if not set."""
-    if MEASURED_MAX_WHEEL_SPEED is not None:
-        return MEASURED_MAX_WHEEL_SPEED
-    return FALLBACK_MAX_WHEEL_SPEED
 
 def set_motor_command(direction_l, direction_r, duty):
     """
@@ -102,7 +88,9 @@ def set_motor_command(direction_l, direction_r, duty):
         GPIO.output(RIGHT_IN2, GPIO.LOW)
 
 
-
+"""
+Background thread to smoothly update PWM duty cycle towards target.
+"""
 def pwm_update_loop():
     global current_duty, target_duty, prev_target_duty
     step_time = 1.0 / UPDATE_HZ
@@ -110,7 +98,7 @@ def pwm_update_loop():
     ramp_start_duty = current_duty
 
     while running:
-        # Detect change in target duty → reset ramp
+        # When there is a change in target duty cycle, reset ramp and set elapsed time to 0
         if target_duty != prev_target_duty:
             elapsed = 0.0
             ramp_start_duty = current_duty
@@ -122,7 +110,7 @@ def pwm_update_loop():
             target_duty,
             elapsed,
             RAMP_TIME,
-            MIN_DUTY
+            MIN_START_DUTY
         )
 
         # Apply PWM duty
@@ -130,9 +118,10 @@ def pwm_update_loop():
         pwm_right.ChangeDutyCycle(current_duty)
 
         # Log for debugging
-        timestamp = time.time()
-        csv_writer.writerow([timestamp, current_duty, target_duty])
-        log_fh.flush()
+        if LOGGING:
+            timestamp = time.time()
+            csv_writer.writerow([timestamp, current_duty, target_duty])
+            log_fh.flush()
 
         # Increment elapsed time
         elapsed += step_time
