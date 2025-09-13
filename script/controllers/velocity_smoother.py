@@ -37,7 +37,7 @@ class VelocitySmoother:
         return self.v_cur, self.w_cur
     
 
-def tanh_ramp(start, target, elapsed, total_time, min_duty=40):
+def tanh_ramp(start, target, elapsed, total_time, min_duty):
     """
     Smooth tanh ramp from start to target, ensuring that
     if starting from 0, it begins at min_duty.
