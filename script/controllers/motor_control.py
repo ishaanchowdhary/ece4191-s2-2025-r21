@@ -59,13 +59,14 @@ def set_motor_command(direction_l, direction_r, duty):
     feed the direction commands for left and right motors. 1 = forward, -1 = backward, 0 = stop
     Converts to PWM duty cycles with minimum start duty and debug prints.
     """
-    global target_duty, MIN_START_DUTY, MAX_DUTY
+    global target_duty, MAX_DUTY
 
-    duty = min(max(duty, MIN_START_DUTY if duty != 0 else 0), MAX_DUTY)
     # Set new target duty cycles
-    #if direction_l == 0 and direction_r == 0:
-    #    duty = 0
-    #target_duty = duty
+    if direction_l == 0 and direction_r == 0:
+        duty = 0
+    else:
+        duty = MAX_DUTY
+    target_duty = duty
 
     # Direction logic (assuming IN1 HIGH, IN2 LOW => forward)
     if direction_l == -1:
