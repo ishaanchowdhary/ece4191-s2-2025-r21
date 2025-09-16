@@ -448,3 +448,46 @@ pwm_slider.noUiSlider.on("change", function (values, handle) {
   console.log("Slider updated to:", val);
   sendCommand(`SET_DUTY ${Math.round(val[0])} ${Math.round(val[1])}`);
 });
+
+
+// Toggle switch
+const toggle = document.getElementById("display-toggle-switch");
+
+toggle.addEventListener("change", () => {
+  if (toggle.checked) {
+    yassify()
+  } else {
+    deyassify()
+  }
+});
+
+function functionOn() {
+  console.log("Switch turned ON");
+  // your code here
+}
+
+function functionOff() {
+  console.log("Switch turned OFF");
+  // your code here
+}
+
+function deyassify() {
+  document.getElementById("title").innerHTML = `<h1>ECE4191 Robot Control GUI</h1>`;
+  document.getElementById("title").classList.remove("title");
+  document.getElementById("title").classList.add("title-sad");
+
+  document.getElementById("sub-title").style.color = `rgba(255, 0, 0, 0)`;
+
+  document.getElementById("video").src = `img/no-cam-feed.png`
+
+}
+
+function yassify() {
+  document.getElementById("title").innerHTML = `<h1>It's C.U.N.T.I.N.G Season!!!</h1>`;
+  document.getElementById("title").classList.remove("title-sad");
+  document.getElementById("title").classList.add("title");
+
+  document.getElementById("sub-title").style.color = `black`;
+
+  document.getElementById("video").src = `img/fallback.png`
+}
