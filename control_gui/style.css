@@ -5,15 +5,20 @@
 button {
   font-family: "Roboto", sans-serif;
   position: relative;
-  background: var(--pink);
+  background: var(--blue);
   font-size: 14px;
   font-weight: 400;
-  color: #181818;
-  border: 3px solid var(--pink);
+  color: white;
+  border: 3px solid var(--blue);
   border-radius: 8px;
   box-shadow: 0 0 0 #fec1958c;
   transition: all 0.3s ease-in-out;
   cursor: pointer;
+}
+button.yassify {
+  background: var(--pink);
+  border: 3px solid var(--pink);
+  color: #181818;
 }
 
 button:hover {
@@ -125,9 +130,11 @@ body {
     border-radius: 0;
 }
 #pwm-slider .noUi-connect {
+  background: var(--blue);
+}
+#pwm-slider .noUi-connect.yassify {
   background: var(--pink);
 }
-
 
 /******** Connection Status Indicators ********/
 .material-icons.connected {

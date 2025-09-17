@@ -94,9 +94,9 @@
     <!-------------- Options -------------------------------->
     <div id="options-container">
       <div class="options-item"><b>Control</b></div>
-      <div class="options-item"><button class="options-button" id="websocket-connect-button" onclick="webSocketReconnect();">Connect to Websockets</button></div>
-      <div class="options-item"><button class="options-button" onclick="switchVideoFeed();">Switch Video Feed</button></div>
-      <div class="options-item"><button class="options-button" id="open-config-btn">Config</button></div>
+      <div class="options-item"><button class="options-button yassify" id="websocket-connect-button" onclick="webSocketReconnect();">Connect to Websockets</button></div>
+      <div class="options-item"><button class="options-button yassify" onclick="switchVideoFeed();">Switch Video Feed</button></div>
+      <div class="options-item"><button class="options-button yassify" id="open-config-btn">Config</button></div>
       
       <div id="pwm-container">
         <div id="pwm-slider"></div>
@@ -132,6 +132,10 @@
       <div class="config-field">
         <label>Connect on Load:</label>
         <input id="cfg-auto" type="checkbox">
+      </div>
+      <div class="config-field">
+        <label>Default to cute GUI:</label>
+        <input id="cfg-yassify" type="checkbox">
       </div>
       <div class="modal-buttons">
         <button class="options-button" onclick="saveConfig()">Save</button>

@@ -52,6 +52,7 @@ openBtn.addEventListener("click", () => {
   document.getElementById("cfg-raw").value = CONFIG.RAW_VIDEO_PORT;
   document.getElementById("cfg-video").value = CONFIG.VIDEO_PORT;
   document.getElementById("cfg-auto").checked = CONFIG.CONNECT_ON_PAGE_LOAD;
+  document.getElementById("cfg-yassify").checked = CONFIG.DEFAULT_TO_PINK;
 
   modal.style.display = "block";
 });
@@ -78,6 +79,7 @@ function saveConfig() {
   CONFIG.RAW_VIDEO_PORT = parseInt(document.getElementById("cfg-raw").value, 10);
   CONFIG.VIDEO_PORT = parseInt(document.getElementById("cfg-video").value, 10);
   CONFIG.CONNECT_ON_PAGE_LOAD = document.getElementById("cfg-auto").checked;
+  CONFIG.DEFAULT_TO_PINK = document.getElementById("cfg-yassify").checked;
 
   localStorage.setItem("robotConfig", JSON.stringify(CONFIG));
   addLogEntry("Config saved to local storage", "info");
@@ -104,6 +106,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (CONFIG.CONNECT_ON_PAGE_LOAD == true) {
     webSocketReconnect()
   }
+  if (CONFIG.DEFAULT_TO_PINK == true) {
+    yassify()
+  }
+  else
+    deyassify()
 });
 
 
@@ -495,16 +502,41 @@ toggle.addEventListener("change", () => {
 });
 
 function deyassify() {
+  document.getElementById("display-toggle-switch").checked = false;
   document.getElementById("title").innerHTML = `<h1>ECE4191 Robot Control GUI</h1>`;
   document.getElementById("title").classList.remove("yassify");
   document.getElementById("sub-title").classList.remove("yassify");
   document.getElementById("video").src = `img/no-cam-feed.png`
 
+  var elements = document.querySelectorAll(`.${'options-button'}`);
+  // Iterate through the selected elements and add the 'newClass'
+  elements.forEach(element => {
+    element.classList.remove("yassify");
+  });
+
+  var elements = document.querySelectorAll(`.${'noUi-connect'}`);
+  // Iterate through the selected elements and add the 'newClass'
+  elements.forEach(element => {
+    element.classList.remove("yassify");
+  });
 }
 
 function yassify() {
+  document.getElementById("display-toggle-switch").checked = true;
   document.getElementById("title").innerHTML = `<h1>It's C.U.N.T.I.N.G Season!!!</h1>`;
   document.getElementById("title").classList.add("yassify");
   document.getElementById("sub-title").classList.add("yassify");
   document.getElementById("video").src = `img/fallback.png`
+
+  var elements = document.querySelectorAll(`.${'options-button'}`);
+  // Iterate through the selected elements and add the 'newClass'
+  elements.forEach(element => {
+    element.classList.add("yassify");
+  });
+
+  var elements = document.querySelectorAll(`.${'noUi-connect'}`);
+  // Iterate through the selected elements and add the 'newClass'
+  elements.forEach(element => {
+    element.classList.add("yassify");
+  });
 }
