@@ -61,15 +61,20 @@ body {
   margin: 4%;
   font-family: monospace;
 }
-/********* Title **********/
+/********* Title Block **********/
 #title-container {
   grid-row: 1 / span 1;
   grid-column: 1 / span 12;
 }
+
 .title {
   font-family: 'Montserrat', sans-serif;
   font-weight: 900;
-
+  color: var(--blue);
+}
+.title.yassify {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
   /* Camo effect */
   background: url('camo-pattern.png') no-repeat center/cover;
   background-size: 600px 150px;
@@ -78,13 +83,12 @@ body {
   background-clip: text;
 }
 
-.title-sad {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 900;
-  color: var(--pink);
-}
-#sub-title{
+.sub-title{
   font-family: 'Imperial Script', cursive; 
+  color: rgba(255, 0, 0, 0);
+}
+.sub-title.yassify {
+  color: black;
 }
 
 
