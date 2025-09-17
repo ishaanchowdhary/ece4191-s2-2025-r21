@@ -96,6 +96,7 @@
       <div class="options-item"><b>Control</b></div>
       <div class="options-item"><button class="options-button" id="websocket-connect-button" onclick="webSocketReconnect();">Connect to Websockets</button></div>
       <div class="options-item"><button class="options-button" onclick="switchVideoFeed();">Switch Video Feed</button></div>
+      <div class="options-item"><button class="options-button" id="open-config-btn">Config</button></div>
       
       <div id="pwm-container">
         <div id="pwm-slider"></div>
@@ -107,6 +108,40 @@
   <img class="camera-img" src="img/camera.png">
   <img src="img/flash.png" class="camera-flash" id="camFlash">
   </div>
+  <!-- Config Modal -->
+  <div id="config-modal" class="modal yassify">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Robot Config</h3>
+      <div class="config-field">
+        <label>RPI IP:</label>
+        <input id="cfg-ip" type="text">
+      </div>
+      <div class="config-field">
+        <label>CMD Port:</label>
+        <input id="cfg-cmd" type="number">
+      </div>
+      <div class="config-field">
+        <label>Raw Video Port:</label>
+        <input id="cfg-raw" type="number">
+      </div>
+      <div class="config-field">
+        <label>YOLO Port:</label>
+        <input id="cfg-video" type="number">
+      </div>
+      <div class="config-field">
+        <label>Connect on Load:</label>
+        <input id="cfg-auto" type="checkbox">
+      </div>
+      <div class="modal-buttons">
+        <button class="options-button" onclick="saveConfig()">Save</button>
+        <button class="options-button" onclick="resetConfig()">Reset</button>
+        <button class="options-button" onclick="closeConfigModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
   <script src="config.js"></script>
   <script src="packages/nouislider.min.js"></script>
   <script src="script.js"></script>

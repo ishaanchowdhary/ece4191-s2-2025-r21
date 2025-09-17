@@ -16,23 +16,8 @@
 
 // -------------------------------------------
 
-// IP Address: Switch / change as required
-//const RPI_IP = "172.20.10.2"; // Pi's LAN IP (or hostname): Ishaan's iPhone
-// const RPI_IP = "192.168.4.110"; // Pi's LAN IP (or hostname): Ishaan's house wifi (i think)
-const RPI_IP = "192.168.20.9"; // Pi's LAN IP (or hostname): Jaiden and Liv's house wifi (i think)
-//const RPI_IP = "172.20.10.3"; // Pi's LAN IP (or hostname): Jaiden's iPhone
-//const RPI_IP = "192.168.20.50"; // Pi's LAN IP (or hostname): Michael's house wifi
-//const RPI_IP = "172.20.10.4"; // Pi's LAN IP (or hostname): Michael's iPhone pi 3
 
-// Websocket Ports
-const CMD_PORT = 9000;        // WebSocket Port for commands
-const RAW_VIDEO_PORT = 9001;   // WebSocket Port for raw camera feed
-const VIDEO_PORT = 9002;      // WebSocket Port for vision model feed
-
-
-// ---------------------------------
-// On page load
-// ---------------------------------
+// Setting up the PWM slider (noUISLider)
 var pwm_slider = document.getElementById('pwm-slider');
 noUiSlider.create(pwm_slider, {
     start: [40, 100],
@@ -56,16 +41,64 @@ noUiSlider.create(pwm_slider, {
 });
 
 
+const modal = document.getElementById("config-modal");
+const openBtn = document.getElementById("open-config-btn");
+const closeBtn = modal.querySelector(".close");
 
-let camImg
+openBtn.addEventListener("click", () => {
+  // Load current config values into form
+  document.getElementById("cfg-ip").value = CONFIG.RPI_IP;
+  document.getElementById("cfg-cmd").value = CONFIG.CMD_PORT;
+  document.getElementById("cfg-raw").value = CONFIG.RAW_VIDEO_PORT;
+  document.getElementById("cfg-video").value = CONFIG.VIDEO_PORT;
+  document.getElementById("cfg-auto").checked = CONFIG.CONNECT_ON_PAGE_LOAD;
+
+  modal.style.display = "block";
+});
+
+closeBtn.addEventListener("click", () => {
+  closeConfigModal();
+});
+
+function closeConfigModal() {
+  modal.style.display = "none";
+}
+
+// Close modal if user clicks outside of it
+window.addEventListener("click", (event) => {
+  if (event.target === modal) {
+    closeConfigModal();
+  }
+});
+
+// Save config
+function saveConfig() {
+  CONFIG.RPI_IP = document.getElementById("cfg-ip").value;
+  CONFIG.CMD_PORT = parseInt(document.getElementById("cfg-cmd").value, 10);
+  CONFIG.RAW_VIDEO_PORT = parseInt(document.getElementById("cfg-raw").value, 10);
+  CONFIG.VIDEO_PORT = parseInt(document.getElementById("cfg-video").value, 10);
+  CONFIG.CONNECT_ON_PAGE_LOAD = document.getElementById("cfg-auto").checked;
+
+  localStorage.setItem("robotConfig", JSON.stringify(CONFIG));
+  addLogEntry("Config saved to local storage", "info");
+  closeConfigModal();
+}
+function resetConfig() {
+  localStorage.removeItem("robotConfig");
+  location.reload(); // reloads with defaults
+}
+// ---------------------------------
+// ON PAGE LOAD
+// ---------------------------------
+let camImg;
 document.addEventListener("DOMContentLoaded", () => {
   camImg = document.querySelector(".camera-img");
   // Setup connection status icons
   let connection_info = document.getElementById('connection-info');
   connection_info.innerHTML += `
-    CMD: ws://${RPI_IP}:${CMD_PORT} <span id="CMD-icon" class='material-icons disconnected'>circle</span><br>
-    CAM: ws://${RPI_IP}:${RAW_VIDEO_PORT} <span id="CAM-icon" class='material-icons disconnected'>circle</span><br>                              
-    DET: ws://localhost:${VIDEO_PORT}<span>&nbsp;&nbsp;&nbsp;</span><span id="DET-icon" class='material-icons disconnected'>circle</span>`;
+    CMD: ws://${CONFIG.RPI_IP}:${CONFIG.CMD_PORT} <span id="CMD-icon" class='material-icons disconnected'>circle</span><br>
+    CAM: ws://${CONFIG.RPI_IP}:${CONFIG.RAW_VIDEO_PORT} <span id="CAM-icon" class='material-icons disconnected'>circle</span><br>                              
+    DET: ws://localhost:${CONFIG.VIDEO_PORT}<span>&nbsp;&nbsp;&nbsp;</span><span id="DET-icon" class='material-icons disconnected'>circle</span>`;
 
   // If config set to connect on page load, do so
   if (CONFIG.CONNECT_ON_PAGE_LOAD == true) {
@@ -164,14 +197,14 @@ function webSocketReconnect() {
   addLogEntry("Connecting WebSockets...", "info");
 
   cmdManager = new WebSocketManager({
-    url: `ws://${RPI_IP}:${CMD_PORT}`,
+    url: `ws://${CONFIG.RPI_IP}:${CONFIG.CMD_PORT}`,
     iconId: "CMD-icon",
     label: "Command",
     onMessage: handleCommandMessage
   });
 
   videoManager = new WebSocketManager({
-    url: `ws://localhost:${VIDEO_PORT}`,
+    url: `ws://localhost:${CONFIG.VIDEO_PORT}`,
     iconId: "DET-icon",
     label: "YOLO",
     onMessage: handleVideoMessage
@@ -180,12 +213,12 @@ function webSocketReconnect() {
 
 
 function switchVideoFeed() {
-  if (videoManager.url.includes(RAW_VIDEO_PORT)) {
-    videoManager.switchURL(`ws://localhost:${VIDEO_PORT}`);
+  if (videoManager.url.includes(CONFIG.RAW_VIDEO_PORT)) {
+    videoManager.switchURL(`ws://localhost:${CONFIG.VIDEO_PORT}`);
     videoManager.iconId = "DET-icon";
     videoManager.label = "YOLO";
   } else {
-    videoManager.switchURL(`ws://${RPI_IP}:${RAW_VIDEO_PORT}`);
+    videoManager.switchURL(`ws://${CONFIG.RPI_IP}:${CONFIG.RAW_VIDEO_PORT}`);
     videoManager.iconId = "CAM-icon";
     videoManager.label = "Camera";
   }
