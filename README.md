@@ -1,43 +1,23 @@
 # ECE4191 S2-25 Group R21
 Github Repository for Team R21 in ECE4191 S2 2025
 
-## SSH into pi
-Open command prompt on laptop.
+## Setup Steps
+Before startup, you must know the IP address of the Raspberry Pi
 
-If Pi3:<br>
-```
-ssh admin@(ip address)
-```
-<b>password:</b> admin<br>
-```
-cd ece4191-s2-2025-r21
-git pull
-python script/main.py
-```
+**SSH into Raspberry Pi & Run Script**
+Open command prompt on laptop. 
+| RPi 3  |  RPi 4 |
+|---|---|
+| `ssh admin@<IP address>`  |  `ssh master@<IP address>` |
+| `pw: admin`  |  `pw: shreklovers` |
+| `cd ece4191-s2-2025-r21`<br>`git pull`<br>`python script/main.py`  |  `cd ece4191-s2-2025-r21`<br>`git pull`<br>`python script/main.py` |
 
-If Pi4<br>
-```
-ssh master@(ip address)<br>
-```
-<b>password:</b> shreklovers<br>
-```
-cd ece4191-s2-2025-r21
-git pull
-python3 script/main.py
-```
-
-## Configuration
-
-execute the following:
-```
-cd object_detection
+**Start Object Detection**
+In a new command prompt window, navigate to the local github repo.
+`
+cd object_detection`<br>`
 python3 camera_processing.py
-```
-then do: <br>
-**control_gui/config.js:**
-|  |  |  |
-|--|--|--|
-| CONNECT_ON_PAGE_LOAD | true | Connect to WebSockets automatically on page load |
+`
 
 **drive/script/config.py:**
 |  |  |  |
