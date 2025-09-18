@@ -42,7 +42,7 @@ python3 camera_processing.py
 
 ## Authors
 
-- [@octokatherine](https://github.com/JaidenMcD)
+- [@JaidenMcD](https://github.com/JaidenMcD)
 - [@ishaanchowdhary](https://github.com/ishaanchowdhary)
 - [@eeenr](https://github.com/eeenr)
 - [@mgil-0015](https://github.com/mgil-0015)
