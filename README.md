@@ -1,3 +1,4 @@
+
 # ECE4191 S2-25 Group R21
 Github Repository for Team R21 in ECE4191 S2 2025
 
@@ -5,6 +6,7 @@ Github Repository for Team R21 in ECE4191 S2 2025
 Before startup, you must know the IP address of the Raspberry Pi
 
 **SSH into Raspberry Pi & Run Script**
+
 Open command prompt on laptop. 
 | RPi 3  |  RPi 4 |
 |---|---|
@@ -13,6 +15,7 @@ Open command prompt on laptop.
 | `cd ece4191-s2-2025-r21`<br>`git pull`<br>`python script/main.py`  |  `cd ece4191-s2-2025-r21`<br>`git pull`<br>`python script/main.py` |
 
 **Start Object Detection**
+
 In a new command prompt window, navigate to the local github repo.
 `
 cd object_detection`<br>`
@@ -35,3 +38,17 @@ python3 camera_processing.py
 | CAM_WIDTH | 640 |  |
 | CAM_HEIGHT | 480 |  |
 | CAM_FPS | 20 |  |
+
+
+## Authors
+
+- [@octokatherine](https://github.com/JaidenMcD)
+- [@ishaanchowdhary](https://github.com/ishaanchowdhary)
+- [@eeenr](https://github.com/eeenr)
+- [@mgil-0015](https://github.com/mgil-0015)
+- [@livg000](https://github.com/livg000)
+- [@ahay0015](https://github.com/ahay0015)
+
+
+
+
