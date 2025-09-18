@@ -93,6 +93,8 @@ function resetConfig() {
 // ON PAGE LOAD
 // ---------------------------------
 let camImg;
+let cmdManager;
+let videoManager;
 document.addEventListener("DOMContentLoaded", () => {
   camImg = document.querySelector(".camera-img");
   // Setup connection status icons
@@ -178,15 +180,6 @@ class WebSocketManager {
   }
 
 }
-
-let cmdManager;
-let videoManager;
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (CONFIG.CONNECT_ON_PAGE_LOAD == true) {
-    webSocketReconnect()
-  }
-});
 
 
 function sendCommand(cmd) {
