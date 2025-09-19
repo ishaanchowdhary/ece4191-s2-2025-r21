@@ -27,7 +27,7 @@ WHEEL_BASE = 0.15   # meters (L)
 WHEEL_RADIUS = 0.065  # meters (R)
 
 # PWM & motor tuning
-PWM_FREQ = 50  # Hz
+PWM_FREQ = 200  # Hz
 RAMP_TIME = 0.5      # seconds to go from 0 to 100%
 UPDATE_HZ = 50       # update loop frequency
 # Pins
