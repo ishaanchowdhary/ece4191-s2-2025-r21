@@ -1,19 +1,11 @@
 
 // -------------------------------------------
-// Config
-// TODO: Add real values - everything here is a placeholder
-// TODO: Auto-reconnect on disconnect - Jaiden
+// TODO: Auto-reconnect on disconnect
 // TODO: add checlist for landmarks + animals for each stage
-// TODO: Camera stream overlay with yolo  - Liv
-// TODO: make it look pretty - Liv
-// TODO: add connect after testing
-// TODO: add info on connection status
-// TODO: documentation to use the gui - Liv
-
-//------------------------
-// TODO: Track camera position and not allow it to go out of bounds. Can be done in JS or on the Pi side.
-
-
+// TODO: documentation to use the gui
+// TODO: Log rework?
+//        - applyLogFilter() is unfinished
+//        - Logs grow indefinitely, should have a max length and remove old ones
 // -------------------------------------------
 
 
