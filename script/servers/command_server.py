@@ -38,9 +38,6 @@ COMMAND_MAP = {
 }
 
 
-# Last command variable for telemetry
-last_command = "DRIVE_STOP"
-
 # Websocket
 current_client = None 
 
@@ -48,7 +45,7 @@ async def handle_client(websocket, path):
     """Handle a single command WebSocket client (keeps original signature)."""
     print("Command client connected")
 
-    global last_command, current_client # so variables can be modified
+    global current_client # so variables can be modified
 
     current_client = websocket
     
@@ -64,8 +61,6 @@ async def handle_client(websocket, path):
                     # Extract directions and set motor command
                     direction_l, direction_r = target["direction_l"], target["direction_r"]
                     set_motor_command(direction_l, direction_r)
-                    # Update command variable for telemetry 
-                    last_command = action
 
                 # If action is to set new duty cycle limits:
                 elif "SET_DUTY" in action:
