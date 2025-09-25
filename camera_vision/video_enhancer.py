@@ -10,6 +10,9 @@ Takes video frame and allows manipulation of:
 To call externally:
     enhance_frame(frame, mode=1, brightness=50, contrast=50, gamma_val=100)
 
+Best values in the dark:
+    enhance_frame(frame, mode=1, brightness=_, contrast=_, gamma_val=300)
+
 Dependencies:
 - cv2
 - numpy
