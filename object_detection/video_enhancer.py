@@ -57,12 +57,13 @@ def nothing(x):
 
 '''   CALLER FUNCTION   '''
 
-def enhance_frame(frame, mode:int=1, brightness:int=50, contrast:int=50, gamma_val:int=100):
+def enhance_frame(frame, mode:int=2, brightness:int=50, contrast:int=50, gamma_val:int=100):
     '''
     Modes:
-        0:  MANUAL : Manual Adjustment (modify input parameters brightness, contrast, gamma_val)
-        1:  HISTOGRAM EQUALIZATION : Enhances global brightness/contrast (good for underexposed frames).
-        2:  CLACHE : Enhances contrast locally while avoiding over-saturation (best for uneven lighting)
+        0:  OFF : No image enhancements applied
+        1:  MANUAL : Manual Adjustment (modify input parameters brightness, contrast, gamma_val)
+        2:  HISTOGRAM EQUALIZATION : Enhances global brightness/contrast (good for underexposed frames).
+        3:  CLACHE : Enhances contrast locally while avoiding over-saturation (best for uneven lighting)
     Parameter Scales:
         int brightness  :   [0,100]
         int contrast    :   [0,100]
@@ -76,7 +77,10 @@ def enhance_frame(frame, mode:int=1, brightness:int=50, contrast:int=50, gamma_v
     returns:
         -> enhanced_frame
     '''
-    if mode == 0:  # Manual
+    if mode == 0:   # OFF
+        return frame
+    
+    elif mode == 1: # Manual
         brightness -= 50
         contrast -= 50
         gamma_val /= 100.0
@@ -84,10 +88,10 @@ def enhance_frame(frame, mode:int=1, brightness:int=50, contrast:int=50, gamma_v
 
         enhanced = adjust_brightness_contrast_gamma(frame, brightness, contrast, gamma_val)
 
-    elif mode == 1:  # Histogram Equalization
+    elif mode == 2: # Histogram Equalization
         enhanced = auto_histogram_equalization(frame)
 
-    elif mode == 2:  # CLAHE
+    elif mode == 3: # CLAHE
         enhanced = auto_clahe(frame)
 
     # Resize both frames for consistency
