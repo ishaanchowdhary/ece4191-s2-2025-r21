@@ -20,3 +20,6 @@ min_duty = 40
 
 # Maximum PWM duty cycle
 max_duty = 100
+
+# For camera vision
+night_vision = False

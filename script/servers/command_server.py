@@ -34,7 +34,9 @@ COMMAND_MAP = {
     "REVERSE":    {"direction_l": -1, "direction_r": -1},
     "LEFT":       {"direction_l": -1, "direction_r": 1},
     "RIGHT":      {"direction_l": 1, "direction_r": -1},
-    "DRIVE_STOP": {"direction_l": 0, "direction_r": 0}
+    "DRIVE_STOP": {"direction_l": 0, "direction_r": 0},
+    "NIGHT_MODE_ON": True,
+    "NIGHT_MODE_OFF": False
 }
 
 
@@ -55,12 +57,20 @@ async def handle_client(websocket, path):
                 data = json.loads(message)
                 action = data.get("action", "").upper()
                 
-                # If action is a motor command:
+                # If action is a command:
                 if action in COMMAND_MAP:
                     target = COMMAND_MAP[action]
-                    # Extract directions and set motor command
-                    direction_l, direction_r = target["direction_l"], target["direction_r"]
-                    set_motor_command(direction_l, direction_r)
+
+                    # If action is a vision command
+                    if action=="NIGHT_MODE_ON" or action=="NIGHT_MODE_OFF":
+                        globals.night_vision = target[action]
+
+                    # If action is a motor command
+                    else:
+                        target = COMMAND_MAP[action]
+                        # Extract directions and set motor command
+                        direction_l, direction_r = target["direction_l"], target["direction_r"]
+                        set_motor_command(direction_l, direction_r)
 
                 # If action is to set new duty cycle limits:
                 elif "SET_DUTY" in action:

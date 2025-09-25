@@ -11,7 +11,7 @@ To call externally:
     enhance_frame(frame, mode=1, brightness=50, contrast=50, gamma_val=100)
 
 Best values in the dark:
-    enhance_frame(frame, mode=1, brightness=_, contrast=_, gamma_val=300)
+    enhance_frame(frame, mode=1, brightness=50, contrast=50, gamma_val=300)
 
 Dependencies:
 - cv2
@@ -62,22 +62,22 @@ def nothing(x):
 
 def enhance_frame(frame, mode:int=2, brightness:int=50, contrast:int=50, gamma_val:int=100):
     '''
-    Modes:
-        0:  OFF : No image enhancements applied
-        1:  MANUAL : Manual Adjustment (modify input parameters brightness, contrast, gamma_val)
-        2:  HISTOGRAM EQUALIZATION : Enhances global brightness/contrast (good for underexposed frames).
-        3:  CLACHE : Enhances contrast locally while avoiding over-saturation (best for uneven lighting)
-    Parameter Scales:
-        int brightness  :   [0,100]
-        int contrast    :   [0,100]
-        int gamma_val   :   [0,300]
-    input:
-        -> frame
-        -> mode
-        -> brightness
-        -> contrast
-        -> gamma_val
-    returns:
+    Modes:\n
+        0:  OFF : No image enhancements applied\n
+        1:  MANUAL : Manual Adjustment (modify input parameters brightness, contrast, gamma_val)\n
+        2:  HISTOGRAM EQUALIZATION : Enhances global brightness/contrast (good for underexposed frames).\n
+        3:  CLACHE : Enhances contrast locally while avoiding over-saturation (best for uneven lighting)\n
+    Parameter Scales:\n
+        int brightness  :   [0,100]\n
+        int contrast    :   [0,100]\n
+        int gamma_val   :   [0,300]\n
+    input:\n
+        -> frame\n
+        -> mode\n
+        -> brightness\n
+        -> contrast\n
+        -> gamma_val\n
+    returns:\n
         -> enhanced_frame
     '''
     if mode == 0:   # OFF

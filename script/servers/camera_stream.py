@@ -23,6 +23,8 @@ import asyncio
 import cv2
 from servers.video_server import video_clients
 from config import CAM_INDEX, CAM_WIDTH, CAM_HEIGHT, CAM_FPS
+import camera_vision.video_enhancer as enhance
+import globals
 
 async def camera_stream():
     """Continuously capture and broadcast frames."""
@@ -43,6 +45,9 @@ async def camera_stream():
             # don't spam, short pause and continue
             await asyncio.sleep(0.1)
             continue
+        # Apply image enhancer
+        if globals.night_vision:
+            frame = enhance.enhance_frame(frame, mode=1, brightness=50, contrast=50, gamma_val=300)
 
         # Encode to JPEG
         ret_enc, buffer = cv2.imencode(".jpg", frame)

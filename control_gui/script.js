@@ -437,15 +437,21 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-//Turn on IR LED 
+//Turn on Night Vision 
 document.addEventListener("keydown", (event) => {
   if (["i"].includes(event.key)){
     event.preventDefault();
-    sendCommand("IR_ON");
+    sendCommand("NIGHT_MODE_ON");
   }
 });
 
-
+//Turn off Night Vision 
+document.addEventListener("keydown", (event) => {
+  if (["p"].includes(event.key)){
+    event.preventDefault();
+    sendCommand("NIGHT_MODE_OFF");
+  }
+});
 
 
 // Update connection status icons
