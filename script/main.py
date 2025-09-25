@@ -16,17 +16,11 @@ Usage:
 import asyncio
 import websockets
 
-import sys
-import os
-
 from config import CMD_PORT, VIDEO_PORT
 from servers.command_server import handle_client
 from servers.video_server import handle_video
 from servers.camera_stream import camera_stream
 from controllers.motor_control import cleanup as motor_cleanup
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 
 async def main():
     # Start both servers

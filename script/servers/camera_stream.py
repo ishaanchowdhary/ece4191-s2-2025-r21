@@ -21,10 +21,15 @@ Usage:
 
 import asyncio
 import cv2
+import sys
+import os
+
 from servers.video_server import video_clients
 from config import CAM_INDEX, CAM_WIDTH, CAM_HEIGHT, CAM_FPS
 import camera_vision.video_enhancer as enhance
 import globals
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 async def camera_stream():
     """Continuously capture and broadcast frames."""
