@@ -63,7 +63,7 @@ async def handle_client(websocket, path):
 
                     # If action is a vision command
                     if action=="NIGHT_MODE_ON" or action=="NIGHT_MODE_OFF":
-                        globals.night_vision = target[action]
+                        globals.night_vision = target
 
                     # If action is a motor command
                     else:
