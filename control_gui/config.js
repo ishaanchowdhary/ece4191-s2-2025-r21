@@ -16,6 +16,7 @@ window.CONFIG = {
 // 172.20.10.3      Jaiden's iPhone
 // 192.168.20.50    Michael's house wifi
 // 172.20.10.4      Michael's iPhone pi 3
+// 192.168.20.15    Liv & Jaidens Apartment wifi - Raspberry Pi 4
 
 
 // Try to load saved config from localStorage
