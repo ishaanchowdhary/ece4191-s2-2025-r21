@@ -49,7 +49,7 @@ async def camera_stream():
         # Apply image enhancer
         if globals.night_vision:
             # Reset to default parameters
-            if globals.change_cam_mode:
+            if globals.reset_cam_config:
                 globals.brightness = globals.BRIGHTNESS
                 globals.contrast = globals.CONTRAST
                 globals.gamma_val = globals.GAMMA_VAL
