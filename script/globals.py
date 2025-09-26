@@ -21,5 +21,14 @@ min_duty = 40
 # Maximum PWM duty cycle
 max_duty = 100
 
-# For camera vision
+# ---For camera vision---
 night_vision = False
+reset_cam_config = False
+cam_mode = 1 # Default [0,4]
+brightness = 50
+contrast = 50
+gamma_val = 300
+# Default values
+BRIGHTNESS = 50
+CONTRAST = 50
+GAMMA_VAL = 300

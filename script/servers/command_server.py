@@ -30,13 +30,22 @@ import globals
 
 # Command mapping (adjust speeds as needed)
 COMMAND_MAP = {
-    "FORWARD":    {"direction_l": 1, "direction_r": 1},
-    "REVERSE":    {"direction_l": -1, "direction_r": -1},
-    "LEFT":       {"direction_l": -1, "direction_r": 1},
-    "RIGHT":      {"direction_l": 1, "direction_r": -1},
-    "DRIVE_STOP": {"direction_l": 0, "direction_r": 0},
-    "NIGHT_MODE_ON": True,
-    "NIGHT_MODE_OFF": False
+    "FORWARD":              {"direction_l": 1, "direction_r": 1},
+    "REVERSE":              {"direction_l": -1, "direction_r": -1},
+    "LEFT":                 {"direction_l": -1, "direction_r": 1},
+    "RIGHT":                {"direction_l": 1, "direction_r": -1},
+    "DRIVE_STOP":           {"direction_l": 0, "direction_r": 0},
+    "NIGHT_MODE_ON":        True,
+    "NIGHT_MODE_OFF":       False,
+    "INCREASE_BRIGHTNESS":  1,
+    "DECREASE_BRIGHTNESS":  -1,
+    "INCREASE_CONTRAST":    1,
+    "DECREASE_CONTRAST":    -1,
+    "INCREASE_GAMMA":       1,
+    "DECREASE_GAMMA":       -1,
+    "CAM_MODE_1":           1,
+    "CAM_MODE_2":           2,
+    "CAM_MODE_3":           3,
 }
 
 
@@ -64,7 +73,22 @@ async def handle_client(websocket, path):
                     # If action is a vision command
                     if action=="NIGHT_MODE_ON" or action=="NIGHT_MODE_OFF":
                         globals.night_vision = target
-
+                        globals.reset_cam_config = True
+                    elif action=="INCREASE_BRIGHTNESS" or action=="DECREASE_BRIGHTNESS":
+                        globals.brightness += target
+                        globals.brightness = max(globals.brightness,0)
+                        globals.brightness = min(globals.brightness,100)
+                    elif action=="INCREASE_CONTRAST" or action=="DECREASE_CONTRAST":
+                        globals.contrast += target
+                        globals.contrast = max(globals.contrast,0)
+                        globals.contrast = min(globals.contrast,100)
+                    elif action=="INCREASE_GAMMA" or action=="DECREASE_GAMMA":
+                        globals.gamma_val += target
+                        globals.gamma_val = max(globals.gamma_val,0)
+                        globals.gamma_val = min(globals.gamma_val,300)
+                    elif action=="CAM_MODE_1" or action=="CAM_MODE_2" or action=="CAM_MODE_3":
+                        globals.cam_mode = target
+                    
                     # If action is a motor command
                     else:
                         target = COMMAND_MAP[action]
