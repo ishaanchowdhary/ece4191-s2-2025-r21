@@ -453,6 +453,60 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+// Change Camera Modes
+document.addEventListener("keydown", (event) => {
+  if (["1"].includes(event.key)){
+    event.preventDefault();
+    sendCommand("CAM_MODE_1");
+  }
+});
+document.addEventListener("keydown", (event) => {
+  if (["2"].includes(event.key)){
+    event.preventDefault();
+    sendCommand("CAM_MODE_2");
+  }
+});
+document.addEventListener("keydown", (event) => {
+  if (["3"].includes(event.key)){
+    event.preventDefault();
+    sendCommand("CAM_MODE_3");
+  }
+});
+
+// Increase/Decrease Camera Parameter Values
+// BRIGHTNESS
+document.addEventListener("keydown", (event) => {
+  if (event.key === "b") {
+    event.preventDefault();
+    sendCommand("INCREASE_BRIGHTNESS");
+  }
+  if (event.key === "B") {
+    event.preventDefault();
+    sendCommand("DECREASE_BRIGHTNESS");
+  }
+});
+// CONTRAST
+document.addEventListener("keydown", (event) => {
+  if (event.key === "n") {
+    event.preventDefault();
+    sendCommand("INCREASE_CONTRAST");
+  }
+  if (event.key === "N") {
+    event.preventDefault();
+    sendCommand("DECREASE_CONTRAST");
+  }
+});
+// GAMMA
+document.addEventListener("keydown", (event) => {
+  if (event.key === "m") {
+    event.preventDefault();
+    sendCommand("INCREASE_GAMMA");
+  }
+  if (event.key === "M") {
+    event.preventDefault();
+    sendCommand("DECREASE_GAMMA");
+  }
+});
 
 // Update connection status icons
 function updateIcon(id, state) {
