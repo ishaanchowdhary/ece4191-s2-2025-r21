@@ -23,7 +23,7 @@ max_duty = 100
 
 # ---For camera vision---
 night_vision = False
-change_cam_mode = False
+reset_cam_config = False
 cam_mode = 1 # Default [0,4]
 brightness = 50
 contrast = 50
