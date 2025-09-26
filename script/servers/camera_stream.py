@@ -21,8 +21,11 @@ Usage:
 
 import asyncio
 import cv2
+
 from servers.video_server import video_clients
 from config import CAM_INDEX, CAM_WIDTH, CAM_HEIGHT, CAM_FPS
+import utils.video_enhancer as enhance
+import globals
 
 async def camera_stream():
     """Continuously capture and broadcast frames."""
@@ -43,6 +46,17 @@ async def camera_stream():
             # don't spam, short pause and continue
             await asyncio.sleep(0.1)
             continue
+        # Apply image enhancer
+        if globals.night_vision:
+            # Reset to default parameters
+            if globals.reset_cam_config:
+                globals.brightness = globals.BRIGHTNESS
+                globals.contrast = globals.CONTRAST
+                globals.gamma_val = globals.GAMMA_VAL
+                globals.reset_cam_config = False
+                globals.cam_mode = 1
+            # Enhance frame
+            frame = enhance.enhance_frame(frame, mode=globals.cam_mode, brightness=globals.brightness, contrast=globals.contrast, gamma_val=globals.gamma_val)
 
         # Encode to JPEG
         ret_enc, buffer = cv2.imencode(".jpg", frame)
