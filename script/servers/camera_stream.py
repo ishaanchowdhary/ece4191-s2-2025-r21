@@ -48,7 +48,15 @@ async def camera_stream():
             continue
         # Apply image enhancer
         if globals.night_vision:
-            frame = enhance.enhance_frame(frame, mode=1, brightness=50, contrast=50, gamma_val=300)
+            # Reset to default parameters
+            if globals.change_cam_mode:
+                globals.brightness = globals.BRIGHTNESS
+                globals.contrast = globals.CONTRAST
+                globals.gamma_val = globals.GAMMA_VAL
+                globals.change_cam_mode = False
+                globals.cam_mode = 1
+            # Enhance frame
+            frame = enhance.enhance_frame(frame, mode=globals.cam_mode, brightness=globals.brightness, contrast=globals.contrast, gamma_val=globals.gamma_val)
 
         # Encode to JPEG
         ret_enc, buffer = cv2.imencode(".jpg", frame)
