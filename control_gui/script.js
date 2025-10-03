@@ -85,8 +85,6 @@ function resetConfig() {
 // ON PAGE LOAD
 // ---------------------------------
 let camImg;
-let cmdManager;
-let videoManager;
 document.addEventListener("DOMContentLoaded", () => {
   camImg = document.querySelector(".camera-img");
   // Setup connection status icons
@@ -112,6 +110,11 @@ document.addEventListener("DOMContentLoaded", () => {
 // -------------------------------------------
 // Websocket Setup
 // -------------------------------------------
+// Defining variables to hold WebSocket managers - class is setup on reconnect
+let cmdManager;             // Command WebSocket manager
+let rawVideoManager;        // Video WebSocket manager
+let processedVideoManager;  // Processed Video WebSocket manager
+
 class WebSocketManager {
   constructor({url, label, onMessage, iconId}) {
     this.url = url;              // WebSocket URL
@@ -119,7 +122,6 @@ class WebSocketManager {
     this.label = label;         // Shown in logs, e.g., "CMD" or "DET"
     this.onMessage = onMessage; // Message handler function
     this.socket = null;         // Create WebSocket instance
-    this.connect();             // Initiate connection
   }
 
   // Establish WebSocket connection
@@ -163,13 +165,6 @@ class WebSocketManager {
       this.socket.close();
     }
   }
-  
-  // Switch to a new WebSocket URL
-  switchURL(newUrl) {
-    this.url = newUrl;
-    this.close();
-    this.connect();
-  }
 
 }
 
@@ -177,7 +172,7 @@ class WebSocketManager {
 function sendCommand(cmd) {
   addLogEntry(cmd);
   const payload = JSON.stringify({ action: cmd });
-  cmdManager.send(payload);
+  out = cmdManager.send(payload);
   addLogEntry(payload, "transmission");
 }
 
@@ -188,31 +183,51 @@ function sendCommand(cmd) {
 function webSocketReconnect() {
   addLogEntry("Connecting WebSockets...", "info");
 
+   // Initialize WebSocket managers
   cmdManager = new WebSocketManager({
     url: `ws://${CONFIG.RPI_IP}:${CONFIG.CMD_PORT}`,
     iconId: "CMD-icon",
     label: "Command",
     onMessage: handleCommandMessage
   });
-
-  videoManager = new WebSocketManager({
+  rawVideoManager = new WebSocketManager({
+    url: `ws://${CONFIG.RPI_IP}:${CONFIG.RAW_VIDEO_PORT}`,
+    iconId: "CAM-icon",
+    label: "Camera",
+    onMessage: handleVideoMessage
+  });
+  processedVideoManager = new WebSocketManager({
     url: `ws://localhost:${CONFIG.VIDEO_PORT}`,
     iconId: "DET-icon",
     label: "YOLO",
     onMessage: handleVideoMessage
   });
+
+  // Connect cmd and raw video websockets
+  cmdManager.connect();
+  rawVideoManager.connect();
 }
 
 
 function switchVideoFeed() {
-  if (videoManager.url.includes(CONFIG.RAW_VIDEO_PORT)) {
-    videoManager.switchURL(`ws://localhost:${CONFIG.VIDEO_PORT}`);
-    videoManager.iconId = "DET-icon";
-    videoManager.label = "YOLO";
-  } else {
-    videoManager.switchURL(`ws://${CONFIG.RPI_IP}:${CONFIG.RAW_VIDEO_PORT}`);
-    videoManager.iconId = "CAM-icon";
-    videoManager.label = "Camera";
+  try {
+    // If raw video is active, switch to processed, and vice versa
+    if (rawVideoManager.socket.readyState == 1) {
+      rawVideoManager.close();
+      processedVideoManager.connect();
+    }
+    else if (processedVideoManager.socket.readyState == 1) {
+      processedVideoManager.close();
+      rawVideoManager.connect();
+    }
+    else {
+      addLogEntry("No video feed active to switch, defaulting to raw feed", "warn");
+      rawVideoManager.connect();
+    }
+  } catch (e) {
+    addLogEntry("Error switching video feed, defaulting to raw feed", "error");
+    rawVideoManager.connect();
+    console.error(e);
   }
 }
 
