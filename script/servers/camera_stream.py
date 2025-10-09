@@ -31,11 +31,11 @@ import globals
 async def camera_stream():
     """Continuously capture and broadcast frames."""
     # Use V4L2 backend if available (keeps your original intent)
-    cap = cv2.VideoCapture(CAM_INDEX, cv2.CAP_V4L2)
+    cap = cv2.VideoCapture(CAM_INDEX, cv2.CAP_GSTREAMER)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT)
     cap.set(cv2.CAP_PROP_FPS, CAM_FPS)
-    cap.set(cv2.CAP_PROP_BUFFERSIZE, 0)  # minimize latency
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # minimize latency
 
     # Sleep interval approximate to CAM_FPS
     sleep_dt = 1.0 / CAM_FPS if CAM_FPS > 0 else 0.05
