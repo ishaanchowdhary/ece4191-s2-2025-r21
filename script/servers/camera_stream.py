@@ -60,7 +60,7 @@ async def camera_stream():
             frame = enhance.enhance_frame(frame, mode=globals.cam_mode, brightness=globals.brightness, contrast=globals.contrast, gamma_val=globals.gamma_val)
 
         # Encode to JPEG
-        ret_enc, buffer = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 75])
+        ret_enc, buffer = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 20])
         if not ret_enc:
             continue
         frame_bytes = buffer.tobytes()

@@ -260,6 +260,18 @@ function handleCommandMessage(event) {
     } 
     else if (msg.status === "error") {
       addLogEntry(`${msg.msg}`, "error");
+    }
+    else if (msg.status_update) {
+      // Handle Pi under-voltage / throttled status
+      const s = msg.status_update;
+      console.log(s)
+      if (s.freq_capped_now) {
+          document.getElementById("currently-throttled").innerText = 'Currently Throttled? YES';
+      } else {
+          document.getElementById("currently-throttled").innerText = 'Currently Throttled? NO';
+      }
+
+      addLogEntry(`Pi Status: ${statusText.join(", ")}`, "status");
     } 
     else {
       console.warn("Unknown command message type:", msg);
