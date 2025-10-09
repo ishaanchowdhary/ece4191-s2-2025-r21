@@ -1,10 +1,10 @@
 import asyncio
 import socket
-
+from config import SOCKET_PORT
 # Track raw socket clients
 socket_clients = set()
 
-async def start_socket_server(host='0.0.0.0', port=9001):
+async def start_socket_server(host='0.0.0.0', port=SOCKET_PORT):
     server = await asyncio.start_server(handle_raw_client, host, port)
     print(f"[Socket] Server running on {host}:{port}")
     async with server:
