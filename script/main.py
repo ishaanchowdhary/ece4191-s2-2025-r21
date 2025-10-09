@@ -34,7 +34,9 @@ async def main():
 
     # Run camera stream forever
     await camera_stream()
-    if RUN_SOCKET_SERVER : await start_socket_server(port=SOCKET_PORT)
+    if RUN_SOCKET_SERVER:
+        print('socket true')
+        await start_socket_server(port=SOCKET_PORT)
 
     
 
