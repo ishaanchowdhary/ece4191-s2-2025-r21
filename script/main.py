@@ -31,12 +31,16 @@ async def main():
     print(f"Command WebSocket server on port {CMD_PORT}")
     print(f"Video WebSocket server on port {VIDEO_PORT}")
 
+    stream_tasks = []
 
-    # Run camera stream forever
-    await camera_stream()
-    if RUN_SOCKET_SERVER:
-        print('socket true')
-        await start_socket_server(port=SOCKET_PORT)
+    # Start camera stream as a background task
+    stream_tasks.append(asyncio.create_task(camera_stream()))
+
+    # Optionally start socket server
+    if RUN_SOCKET_SERVER : stream_tasks.append(asyncio.create_task(start_socket_server(port=SOCKET_PORT)))
+
+    # Wait for all tasks to run (typically forever unless one crashes)
+    await asyncio.gather(*stream_tasks)
 
     
 
