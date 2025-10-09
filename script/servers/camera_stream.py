@@ -24,7 +24,7 @@ import cv2
 
 from servers.video_server import video_clients
 from servers.socket_server import socket_clients
-from config import CAM_INDEX, CAM_WIDTH, CAM_HEIGHT, CAM_FPS, RUN_SOCKET_SERVER
+from config import CAM_INDEX, CAM_WIDTH, CAM_HEIGHT, CAM_FPS, RUN_SOCKET_SERVER, JPEG_QUALITY
 import utils.video_enhancer as enhance
 import globals
 
@@ -60,7 +60,7 @@ async def camera_stream():
             frame = enhance.enhance_frame(frame, mode=globals.cam_mode, brightness=globals.brightness, contrast=globals.contrast, gamma_val=globals.gamma_val)
 
         # Encode to JPEG
-        ret_enc, buffer = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 20])
+        ret_enc, buffer = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY])
         if not ret_enc:
             continue
         frame_bytes = buffer.tobytes()
