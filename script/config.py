@@ -16,7 +16,7 @@ Usage:
 # Networking
 CMD_PORT = 9000
 VIDEO_PORT = 9001
-SOCKET_PORT = 9003
+SOCKET_PORT = 5002
 RUN_SOCKET_SERVER = True
 
 # Data logging
