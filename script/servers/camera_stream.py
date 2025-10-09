@@ -23,7 +23,8 @@ import asyncio
 import cv2
 
 from servers.video_server import video_clients
-from config import CAM_INDEX, CAM_WIDTH, CAM_HEIGHT, CAM_FPS
+from servers.socket_server import socket_clients
+from config import CAM_INDEX, CAM_WIDTH, CAM_HEIGHT, CAM_FPS, RUN_SOCKET_SERVER
 import utils.video_enhancer as enhance
 import globals
 
@@ -70,3 +71,14 @@ async def camera_stream():
             await asyncio.gather(*[
                 ws.send(frame_bytes) for ws in list(video_clients)
             ])
+        
+        # Broadcast to raw socket clients
+        if socket_clients and RUN_SOCKET_SERVER:
+            for client in list(socket_clients):
+                try:
+                    # Prefix the frame with 4-byte length header
+                    client.write(len(frame_bytes).to_bytes(4, byteorder='big') + frame_bytes)
+                    await client.drain()
+                except Exception as e:
+                    print(f"[Raw Socket] Failed to send to client: {e}")
+                    socket_clients.remove(client)

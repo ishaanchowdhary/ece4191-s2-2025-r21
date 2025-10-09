@@ -16,11 +16,12 @@ Usage:
 import asyncio
 import websockets
 
-from config import CMD_PORT, VIDEO_PORT
+from config import CMD_PORT, VIDEO_PORT, RUN_SOCKET_SERVER, SOCKET_PORT
 from servers.command_server import handle_client
 from servers.video_server import handle_video
 from servers.camera_stream import camera_stream
 from controllers.motor_control import cleanup as motor_cleanup
+from servers.socket_server import start_socket_server
 
 async def main():
     # Start both servers
@@ -33,8 +34,9 @@ async def main():
 
     # Run camera stream forever
     await camera_stream()
-    
+    if RUN_SOCKET_SERVER : await start_socket_server(port=SOCKET_PORT)
 
+    
 
 if __name__ == "__main__": 
     try:
