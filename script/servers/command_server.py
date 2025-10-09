@@ -26,7 +26,9 @@ import json
 import websockets
 from config import *
 from controllers.motor_control import set_motor_command
+from utils.processes import send_status_periodically
 import globals
+import asyncio
 
 # Command mapping (adjust speeds as needed)
 COMMAND_MAP = {
@@ -59,6 +61,8 @@ async def handle_client(websocket, path):
     global current_client # so variables can be modified
 
     current_client = websocket
+    # Start background task
+    status_task = asyncio.create_task(send_status_periodically(websocket))
     
     try:
         async for message in websocket:
@@ -121,3 +125,5 @@ async def handle_client(websocket, path):
     except websockets.exceptions.ConnectionClosed:
         print("Command client disconnected")
         set_motor_command(0, 0)  # stop motors on disconnect
+    finally:
+        status_task.cancel()  # stop background task when client disconnects
