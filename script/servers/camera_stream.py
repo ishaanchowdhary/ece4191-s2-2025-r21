@@ -31,8 +31,8 @@ import globals
 async def camera_stream():
     """Continuously capture and broadcast frames."""
     # Use V4L2 backend if available (keeps your original intent)
-    cap = cv2.VideoCapture(0)
-    #cap = cv2.VideoCapture(CAM_INDEX, cv2.CAP_V4L2)
+    #cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(CAM_INDEX, cv2.CAP_V4L2)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT)
     cap.set(cv2.CAP_PROP_FPS, CAM_FPS)
