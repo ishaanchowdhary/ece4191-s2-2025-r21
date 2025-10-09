@@ -35,7 +35,7 @@ async def camera_stream():
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT)
     cap.set(cv2.CAP_PROP_FPS, CAM_FPS)
-    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # minimize latency
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 0)  # minimize latency
 
     # Sleep interval approximate to CAM_FPS
     sleep_dt = 1.0 / CAM_FPS if CAM_FPS > 0 else 0.05
