@@ -38,7 +38,7 @@ RIGHT_PWM, RIGHT_IN1, RIGHT_IN2 = 13, 8, 7
 
 # Camera defaults (used by camera_stream)
 CAM_INDEX = 0
-CAM_WIDTH = 1280
-CAM_HEIGHT = 720
+CAM_WIDTH = 640
+CAM_HEIGHT = 640
 CAM_FPS = 25
 JPEG_QUALITY = 50
