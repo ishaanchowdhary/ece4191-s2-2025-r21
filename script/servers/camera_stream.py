@@ -19,46 +19,64 @@ Usage:
     await camera_stream()
 """
 
+"""TESTING """
+
 import asyncio
 import cv2
+import numpy as np
+from picamera2 import Picamera2
 
 from servers.video_server import video_clients
 from servers.socket_server import socket_clients
-from config import CAM_INDEX, CAM_WIDTH, CAM_HEIGHT, CAM_FPS, RUN_SOCKET_SERVER, JPEG_QUALITY
+from config import CAM_WIDTH, CAM_HEIGHT, CAM_FPS, RUN_SOCKET_SERVER, JPEG_QUALITY
 import utils.video_enhancer as enhance
 import globals
 
-async def camera_stream():
-    """Continuously capture and broadcast frames."""
-    # Use V4L2 backend if available (keeps your original intent)
-    #cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture(CAM_INDEX, cv2.CAP_V4L2)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_WIDTH)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT)
-    cap.set(cv2.CAP_PROP_FPS, CAM_FPS)
-    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # minimize latency
 
-    # Sleep interval approximate to CAM_FPS
+async def camera_stream():
+    """Continuously capture and broadcast frames using Picamera2."""
+    picam2 = Picamera2()
+
+    # Configure camera for video
+    config = picam2.create_video_configuration(
+        main={"size": (CAM_WIDTH, CAM_HEIGHT), "format": "RGB888"},
+        controls={
+            "FrameDurationLimits": (int(1e6 / CAM_FPS), int(1e6 / CAM_FPS))
+        }
+    )
+    picam2.configure(config)
+    picam2.start()
+
     sleep_dt = 1.0 / CAM_FPS if CAM_FPS > 0 else 0.05
+
+    print("[Camera] PiCam3 NoIR initialized via Picamera2")
 
     while True:
         await asyncio.sleep(sleep_dt)
-        ret, frame = cap.read()
-        if not ret:
-            # don't spam, short pause and continue
+
+        # Capture frame from PiCam
+        frame = picam2.capture_array()
+
+        if frame is None or frame.size == 0:
             await asyncio.sleep(0.1)
             continue
-        # Apply image enhancer
+
+        # Apply night vision enhancement if enabled
         if globals.night_vision:
-            # Reset to default parameters
             if globals.reset_cam_config:
                 globals.brightness = globals.BRIGHTNESS
                 globals.contrast = globals.CONTRAST
                 globals.gamma_val = globals.GAMMA_VAL
                 globals.reset_cam_config = False
                 globals.cam_mode = 1
-            # Enhance frame
-            frame = enhance.enhance_frame(frame, mode=globals.cam_mode, brightness=globals.brightness, contrast=globals.contrast, gamma_val=globals.gamma_val)
+
+            frame = enhance.enhance_frame(
+                frame,
+                mode=globals.cam_mode,
+                brightness=globals.brightness,
+                contrast=globals.contrast,
+                gamma_val=globals.gamma_val
+            )
 
         # Encode to JPEG
         ret_enc, buffer = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY])
@@ -66,18 +84,16 @@ async def camera_stream():
             continue
         frame_bytes = buffer.tobytes()
 
-        # Broadcast to all connected clients
+        # Send to WebSocket video clients
         if video_clients:
-            # gather ensures concurrent sends; preserve original behavior
             await asyncio.gather(*[
                 ws.send(frame_bytes) for ws in list(video_clients)
             ])
-        
-        # Broadcast to raw socket clients
+
+        # Send to raw socket clients (if enabled)
         if socket_clients and RUN_SOCKET_SERVER:
             for client in list(socket_clients):
                 try:
-                    # Prefix the frame with 4-byte length header
                     client.write(len(frame_bytes).to_bytes(4, byteorder='big') + frame_bytes)
                     await client.drain()
                 except Exception as e:
