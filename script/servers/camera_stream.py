@@ -79,10 +79,10 @@ async def camera_stream():
                 contrast=globals.contrast,
                 gamma_val=globals.gamma_val
             )
-        #frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
         # Encode to JPEG
-        ret_enc, buffer = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY])
+        ret_enc, buffer = cv2.imencode(".jpg", frame_bgr, [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY])
         if not ret_enc:
             continue
         frame_bytes = buffer.tobytes()
