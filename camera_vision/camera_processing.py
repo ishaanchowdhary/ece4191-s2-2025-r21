@@ -23,7 +23,7 @@ from ultralytics import YOLO
 # ----------------------------
 # Config
 # ----------------------------
-RPI_IP = "172.20.10.7" #"172.20.10.2" #"192.168.4.110"
+RPI_IP = "172.20.10.2" #"172.20.10.2" #"192.168.4.110"
 IN_URI = f"ws://{RPI_IP}:9001"  # raw frames from camera_stream.py
 OUT_PORT = 9002                 # serve processed frames here
 MODEL_PATH = "models/best_NoIR_v1.pt"
