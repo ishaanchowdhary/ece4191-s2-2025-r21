@@ -38,7 +38,7 @@ start cmd /k ssh -t %USER%@%HOST% "cd %REMOTE_DIR% && python3 %REMOTE_SCRIPT%"
 :: -------------------------------
 :: Run local script in new terminal using virtual environment
 :: -------------------------------
-start cmd /k "call %FOUND_VENV% && python %LOCAL_SCRIPT%"
+start cmd /k "set RPI_IP=%HOST% && call %FOUND_VENV% && python %LOCAL_SCRIPT%"
 
 echo --- Both scripts started ---
 pause

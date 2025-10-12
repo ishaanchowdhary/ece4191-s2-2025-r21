@@ -16,6 +16,7 @@ Dependencies:
 
 import asyncio
 import cv2
+import os
 import numpy as np
 import websockets
 from ultralytics import YOLO
@@ -23,7 +24,7 @@ from ultralytics import YOLO
 # ----------------------------
 # Config
 # ----------------------------
-RPI_IP = "172.20.10.2" #"172.20.10.2" #"192.168.4.110"
+RPI_IP = os.environ.get("RPI_IP", "172.20.10.2").strip()  # fallback default
 IN_URI = f"ws://{RPI_IP}:9001"  # raw frames from camera_stream.py
 OUT_PORT = 9002                 # serve processed frames here
 MODEL_PATH = "models/best_NoIR_v1.pt"
