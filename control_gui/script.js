@@ -368,7 +368,7 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault(); // Needed to stops browser from thinking the arrow keys are to scroll
     arrowKeyPressed = true; // Flag that a key has been pressed
 
-    console.log("Key pressed : ", event.key); // debug log
+    //console.log("Key pressed : ", event.key); // debug log
 
     switch (event.key) {
       case "ArrowUp": sendCommand("FORWARD"); break;

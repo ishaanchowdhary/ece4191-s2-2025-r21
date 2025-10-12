@@ -24,10 +24,12 @@ Usage:
 import asyncio
 import cv2
 import numpy as np
+import json
 from picamera2 import Picamera2
 
 from servers.video_server import video_clients
 from servers.socket_server import socket_clients
+from command_server import current_client
 from config import CAM_WIDTH, CAM_HEIGHT, CAM_FPS, RUN_SOCKET_SERVER, JPEG_QUALITY
 import utils.video_enhancer as enhance
 import globals
@@ -41,7 +43,10 @@ async def camera_stream():
     try:
         cam_info = Picamera2().global_camera_info()
         if not cam_info:
-            print("[Camera] No camera found. Ensure the camera is connected and enabled.")
+            current_client.send(json.dumps(
+                    {"status": "error", "msg": "No camera found."}
+                ))
+            print("[Camera]  Ensure the camera is connected and enabled.")
             return
         picam2 = Picamera2()
         # Configure camera for video
