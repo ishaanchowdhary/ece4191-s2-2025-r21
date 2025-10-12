@@ -36,14 +36,14 @@ import globals
 
 async def camera_stream():
     """Continuously capture and broadcast frames using Picamera2."""   
-    # Initialize picam2 variable    
+    # Initialize picam2 and cap variables
     picam2 = None
-    # Initialize camera
+    cap = None
+
+    # Attempt to Initialize picamera
     try:
         picam2 = Picamera2()
-        print(picam2)
         cam_info = Picamera2().global_camera_info()
-        print(cam_info)
         if not cam_info:
             print("[Camera]  Ensure the camera is connected and enabled.")
             return
@@ -59,17 +59,32 @@ async def camera_stream():
         print("[Camera] Camera started successfully.")
     except Exception as e:
         print(f"[Camera] Failed to initialize camera: {e}")
-        return
+        picam2 = None
     
+    # Fallback to OpenCV if picamera fails
+    if picam2 is None:
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            print("[Camera] No USB camera found. Exiting camera stream.")
+            return
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_WIDTH)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT)
+        cap.set(cv2.CAP_PROP_FPS, CAM_FPS)
+        print("[Camera] USB camera started successfully.")
+
     sleep_dt = 1.0 / CAM_FPS if CAM_FPS > 0 else 0.05
 
     while True:
         await asyncio.sleep(sleep_dt)
 
-        # Capture frame from PiCam
-        frame = picam2.capture_array()
-        
-
+        # Capture frame
+        if picam2:
+            frame = picam2.capture_array()
+        elif cap:
+            ret, frame = cap.read()
+            if not ret:
+                continue
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         if frame is None or frame.size == 0:
             await asyncio.sleep(0.1)
