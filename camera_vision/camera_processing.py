@@ -66,27 +66,31 @@ async def process_stream():
                         frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
                         if frame is None:
                             continue
-
-                        # Run YOLO inference
-                        results = model.predict(frame, verbose=False)
-                        annotated = results[0].plot()
-
-                        # Encode back to JPEG
-                        ret_enc, buffer = cv2.imencode(".jpg", annotated)
-                        if not ret_enc:
-                            continue
-                        frame_bytes = buffer.tobytes()
-
-                        # Broadcast to connected output clients
-                        dead = []
-                        for client in list(output_clients):
+                        if output_clients:
                             try:
-                                await client.send(frame_bytes)
-                            except:
-                                dead.append(client)
-                        for d in dead:
-                            output_clients.discard(d)
+                                # Run YOLO inference
+                                results = model.predict(frame, verbose=False)
+                                annotated = results[0].plot()
 
+                                # Encode back to JPEG
+                                ret_enc, buffer = cv2.imencode(".jpg", annotated)
+                                if not ret_enc:
+                                    continue
+                                frame_bytes = buffer.tobytes()
+
+                                # Broadcast to connected output clients
+                                dead = []
+                                for client in list(output_clients):
+                                    try:
+                                        await client.send(frame_bytes)
+                                    except:
+                                        dead.append(client)
+                                for d in dead:
+                                    output_clients.discard(d)
+                            except Exception as e:
+                                print(f"[ERROR] YOLO processing failed: {e}")
+                            else:
+                                pass
                     except Exception as e:
                         print(f"[ERROR] Processing frame failed: {e}")
         except Exception as e:
