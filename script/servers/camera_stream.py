@@ -34,22 +34,31 @@ import globals
 
 
 async def camera_stream():
-    """Continuously capture and broadcast frames using Picamera2."""
-    picam2 = Picamera2()
+    """Continuously capture and broadcast frames using Picamera2."""   
+    # Initialize picam2 variable    
+    picam2 = None
 
-    # Configure camera for video
-    config = picam2.create_video_configuration(
-        main={"size": (CAM_WIDTH, CAM_HEIGHT), "format": "RGB888"},
-        controls={
-            "FrameDurationLimits": (int(1e6 / CAM_FPS), int(1e6 / CAM_FPS))
-        }
-    )
-    picam2.configure(config)
-    picam2.start()
-
+    try:
+        cam_info = Picamera2().global_camera_info()
+        if not cam_info:
+            print("[Camera] No camera found. Ensure the camera is connected and enabled.")
+            return
+        picam2 = Picamera2()
+        # Configure camera for video
+        config = picam2.create_video_configuration(
+            main={"size": (CAM_WIDTH, CAM_HEIGHT), "format": "RGB888"},
+            controls={
+                "FrameDurationLimits": (int(1e6 / CAM_FPS), int(1e6 / CAM_FPS))
+            }
+        )
+        picam2.configure(config)
+        picam2.start()
+        print("[Camera] Camera started successfully.")
+    except Exception as e:
+        print(f"[Camera] Failed to initialize camera: {e}")
+        return
+    
     sleep_dt = 1.0 / CAM_FPS if CAM_FPS > 0 else 0.05
-
-    print("[Camera] PiCam3 NoIR initialized via Picamera2")
 
     while True:
         await asyncio.sleep(sleep_dt)
