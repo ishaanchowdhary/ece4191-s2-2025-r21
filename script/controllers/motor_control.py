@@ -144,6 +144,14 @@ def pwm_update_loop():
 threading.Thread(target=pwm_update_loop, daemon=True).start()
 
 
+def duty_to_velocity(duty):
+    """Convert PWM duty cycle to linear velocity (m/s) using wheel radius."""
+    if duty == 0:
+        return 0.0
+    
+    # calculated function here
+    return (duty / 100.0) * 0.65 
+
 def cleanup():
     """Stop PWM and clean up GPIO. Safe to call multiple times."""
     global running, pwm_left, pwm_right
