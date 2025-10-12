@@ -154,6 +154,7 @@ class WebSocketManager {
   send(data) {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(data);
+      addLogEntry(data, "transmission");
     } else {
       addLogEntry(`${this.label} WebSocket not connected`, "error");
     }
@@ -172,8 +173,18 @@ class WebSocketManager {
 function sendCommand(cmd) {
   addLogEntry(cmd);
   const payload = JSON.stringify({ action: cmd });
-  out = cmdManager.send(payload);
-  addLogEntry(payload, "transmission");
+  try {
+    cmdManager.send(payload);
+  } 
+  catch (e) {
+    if (e.message == "Cannot read properties of undefined (reading 'send')") {
+      addLogEntry("cmdManager not defined yet", "error");
+    }
+    else {
+      console.error(e);
+      addLogEntry("Failed to send command, see console for details", "error");
+    }
+  }
 }
 
 // --------------------------------------------
