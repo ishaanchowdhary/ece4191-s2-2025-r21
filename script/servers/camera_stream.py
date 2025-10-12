@@ -58,7 +58,7 @@ async def camera_stream():
         picam2.start()
         print("[Camera] Camera started successfully.")
     except Exception as e:
-        print(f"[Camera] Failed to initialize camera: {e}")
+        print(f"[Camera] Failed to initialize PiCam: {e}")
         picam2 = None
     
     # Fallback to OpenCV if picamera fails
