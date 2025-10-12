@@ -254,7 +254,6 @@ function handleVideoMessage(event) {
 function handleCommandMessage(event) {
   try {
     const msg = JSON.parse(event.data);
-    console.log("Command message:", msg);
     if (msg.status === "ok") {
       addLogEntry(`${msg.command}, Velocities: ${msg.velocities.left.toFixed(2)}, ${msg.velocities.right.toFixed(2)}, Duty: ${msg.duty_cycles.left}`, "reception");
     } 
@@ -262,23 +261,32 @@ function handleCommandMessage(event) {
       addLogEntry(`${msg.msg}`, "error");
     }
     else if (msg.status_update) {
-      // Handle Pi under-voltage / throttled status
       const s = msg.status_update;
-      console.log(s)
-      if (s.freq_capped_now) {
-          document.getElementById("currently-throttled").innerText = 'Currently Throttled? YES';
-      } else {
-          document.getElementById("currently-throttled").innerText = 'Currently Throttled? NO';
-      }
-
-      addLogEntry(`Pi Status: ${statusText.join(", ")}`, "status");
-    } 
+      updateThrottleStatus(s);
+    }
     else {
       console.warn("Unknown command message type:", msg);
     }
   } catch (e) {
     console.error("Failed to parse command message:", e);
   }
+}
+
+
+function updateThrottleStatus(s) {
+  const uv = document.getElementById('uv-icon');
+  const fr = document.getElementById('freq-icon');
+  const th = document.getElementById('thr-icon');
+
+  if (!uv || !fr || !th) return; // safety check
+
+  uv.className = 'material-icons ' + (s.under_voltage_now ? 'err' : 'ok');
+  fr.className = 'material-icons ' + (s.freq_capped_now ? 'warn' : 'ok');
+  th.className = 'material-icons ' + (s.throttled_now ? 'err' : 'ok');
+
+  uv.title = s.under_voltage_occurred ? 'Undervoltage occurred before' : 'Stable';
+  fr.title = s.freq_capped_occurred ? 'Frequency was capped before' : 'Stable';
+  th.title = s.throttled_occurred ? 'Throttling occurred before' : 'Stable';
 }
 
 // ------------------------------------------

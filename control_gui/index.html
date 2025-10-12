@@ -26,10 +26,22 @@
     </div>
     
     <!-- Connection Info  -->
-    <div id="connection-div" style="grid-column: 1 / span 2; grid-row: 1 / span 1; text-align: left;">
+    <div id="connection-div">
       <div id="connection-info" ></div>
-      <div id="cpu_status">
-        <span id="currently-throttled">Currently Throttled? NO</span>
+    </div>
+    <!-- System Health Status -->
+    <div id="system-health">
+      <div class="health-item">
+        <span class="material-icons" id="uv-icon">bolt</span>
+        <span>Under-voltage</span>
+      </div>
+      <div class="health-item">
+        <span class="material-icons" id="freq-icon">speed</span>
+        <span>Freq Capped</span>
+      </div>
+      <div class="health-item">
+        <span class="material-icons" id="thr-icon">thermostat</span>
+        <span>Throttled</span>
       </div>
     </div>
     

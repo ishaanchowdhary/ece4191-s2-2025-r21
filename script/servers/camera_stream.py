@@ -37,7 +37,7 @@ async def camera_stream():
     """Continuously capture and broadcast frames using Picamera2."""   
     # Initialize picam2 variable    
     picam2 = None
-
+    # Initialize camera
     try:
         cam_info = Picamera2().global_camera_info()
         if not cam_info:

@@ -42,3 +42,6 @@ CAM_WIDTH = 640
 CAM_HEIGHT = 480
 CAM_FPS = 30 #25
 JPEG_QUALITY = 50
+
+# Telemetry
+HEALTH_CHECK_INTERVAL = 5  # seconds between health checks

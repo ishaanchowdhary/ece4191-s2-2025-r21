@@ -1,6 +1,9 @@
 :root {
   --pink: #f6c0cf;
   --blue: #006dae;
+  --error: red;
+  --warn: orange;
+  --ok: green;
 }
 button {
   font-family: "Roboto", sans-serif;
@@ -59,13 +62,42 @@ body {
   height: auto;
   border-radius: 10px;
 }
-
-#connection-info {
-  font-size: small;
-  color: gray;
-  margin: 4%;
+#connection-div {
+  grid-column: 1 / span 2;
+  grid-row: 1 / span 1;
+  text-align: left;
   font-family: monospace;
+  color: gray;
+  font-size: small;
+  padding: 4%;
 }
+
+#system-health {
+  grid-column: 3 / span 2;
+  grid-row: 1 / span 1;
+  text-align: left;
+  font-family: monospace;
+  color: gray;
+  font-size: small;
+  padding: 4%;
+  display: flex;
+  align-items: flex-start;
+}
+
+.health-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.health-item .material-icons {
+  margin-right: 8px;
+  transition: color 0.3s ease;
+}
+.ok   { color: var(--ok); } 
+.warn { color: var(--warn); } 
+.err  { color: var(--error); } 
+
 /********* Title Block **********/
 #title-container {
   grid-row: 1 / span 1;

@@ -1,7 +1,7 @@
 import subprocess
 import asyncio
 import json 
-
+from config import *
 def get_throttle_status():
     """Return Raspberry Pi under-voltage and throttled status."""
     try:
@@ -27,4 +27,4 @@ async def send_status_periodically(websocket):
             break
         status = get_throttle_status()
         await websocket.send(json.dumps({"status_update": status}))
-        await asyncio.sleep(10)  # 10-second interval
+        await asyncio.sleep(HEALTH_CHECK_INTERVAL)  # 10-second interval
