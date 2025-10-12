@@ -45,3 +45,4 @@ JPEG_QUALITY = 50
 
 # Telemetry
 HEALTH_CHECK_INTERVAL = 5  # seconds between health checks
+CPU_USAGE_INTERVAL = 2   # seconds between CPU usage checks
