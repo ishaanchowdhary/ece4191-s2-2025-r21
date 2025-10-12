@@ -29,7 +29,7 @@ from picamera2 import Picamera2
 
 from servers.video_server import video_clients
 from servers.socket_server import socket_clients
-from config import CAM_WIDTH, CAM_HEIGHT, CAM_FPS, RUN_SOCKET_SERVER, JPEG_QUALITY
+from config import *
 import utils.video_enhancer as enhance
 import globals
 
@@ -93,9 +93,9 @@ async def camera_stream():
         # Apply night vision enhancement if enabled
         if globals.night_vision:
             if globals.reset_cam_config:
-                globals.brightness = globals.BRIGHTNESS
-                globals.contrast = globals.CONTRAST
-                globals.gamma_val = globals.GAMMA_VAL
+                globals.brightness = DEFAULT_BRIGHTNESS
+                globals.contrast = DEFAULT_CONTRAST
+                globals.gamma_val = DEFAULT_GAMMA_VAL
                 globals.reset_cam_config = False
                 globals.cam_mode = 1
 
