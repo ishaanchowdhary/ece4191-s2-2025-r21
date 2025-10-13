@@ -31,17 +31,12 @@ async def send_status_periodically(websocket):
         await asyncio.sleep(HEALTH_CHECK_INTERVAL)  # 10-second interval
 
 
-async def send_velocity_periodically(websocket, interval=0.3):
+async def send_velocity_periodically(websocket, interval=0.1):
     """Send current velocity to GUI at faster rate (default: 0.3 s)."""
-    last_velocity = None
     while True:
         if websocket.closed:
             break
-
         velocity = round(globals.current_velocity, 4)
-        # only send if velocity changed meaningfully (to save bandwidth)
-        if last_velocity is None or abs(velocity - last_velocity) > 0.005:
+        if velocity > 0.0001:
             await websocket.send(json.dumps({"velocity_update": velocity}))
-            last_velocity = velocity
-
         await asyncio.sleep(interval)

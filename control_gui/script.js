@@ -275,6 +275,10 @@ function handleCommandMessage(event) {
       const s = msg.status_update;
       updateThrottleStatus(s);
     }
+    else if (msg.velocity_update !== undefined) {
+      console.log(msg.velocity_update);
+      updateVelocity(msg.velocity_update);
+    }
     else {
       console.warn("Unknown command message type:", msg);
     }
@@ -300,6 +304,16 @@ function updateThrottleStatus(s) {
   th.title = s.throttled_occurred ? 'Throttling occurred before' : 'Stable';
 }
 
+function updateVelocity(v) {
+  const MAX_VELOCITY = 0.12;  // adjust based on your robot’s actual top speed
+
+  // Update text
+  document.getElementById("velocity-text").textContent = v.toFixed(3) + " m/s";
+
+  // Update bar fill
+  const percent = Math.min((v / MAX_VELOCITY) * 100, 100);
+  document.getElementById("velocity-bar-fill").style.width = percent + "%";
+}
 // ------------------------------------------
 // Log Handling
 // ------------------------------------------
