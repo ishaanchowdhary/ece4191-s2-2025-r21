@@ -45,6 +45,7 @@ openBtn.addEventListener("click", () => {
   document.getElementById("cfg-video").value = CONFIG.VIDEO_PORT;
   document.getElementById("cfg-auto").checked = CONFIG.CONNECT_ON_PAGE_LOAD;
   document.getElementById("cfg-yassify").checked = CONFIG.DEFAULT_TO_PINK;
+  document.getElementById("cfg-FPSinterval").value = CONFIG.FPS_UPDATE_INTERVAL;
 
   modal.style.display = "block";
 });
@@ -70,6 +71,7 @@ function saveConfig() {
   CONFIG.CMD_PORT = parseInt(document.getElementById("cfg-cmd").value, 10);
   CONFIG.RAW_VIDEO_PORT = parseInt(document.getElementById("cfg-raw").value, 10);
   CONFIG.VIDEO_PORT = parseInt(document.getElementById("cfg-video").value, 10);
+  CONFIG.FPS_UPDATE_INTERVAL = parseFloat(document.getElementById("cfg-FPSinterval").value);
   CONFIG.CONNECT_ON_PAGE_LOAD = document.getElementById("cfg-auto").checked;
   CONFIG.DEFAULT_TO_PINK = document.getElementById("cfg-yassify").checked;
 
@@ -265,7 +267,7 @@ function handleVideoMessage(event) {
     const now = performance.now();
     const delta = (now - lastFpsUpdate) / 1000; // seconds since last FPS update
 
-    if (delta >= 2.0) { // update FPS every 2 second
+    if (delta >= CONFIG.FPS_UPDATE_INTERVAL) { // update FPS every 2 second
       fps = fpsFrameCount / delta;
       fpsFrameCount = 0;
       lastFpsUpdate = now;

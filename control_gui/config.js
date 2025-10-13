@@ -5,7 +5,8 @@ window.CONFIG = {
   RAW_VIDEO_PORT: 9001,     // WebSocket Port for raw camera feed
   VIDEO_PORT: 9002,         // WebSocket Port for vision model feed
   CONNECT_ON_PAGE_LOAD: false,
-  DEFAULT_TO_PINK: false    // default to cute layout
+  DEFAULT_TO_PINK: false,    // default to cute layout
+  FPS_UPDATE_INTERVAL: 2   // seconds between FPS updates
 };
 
 
