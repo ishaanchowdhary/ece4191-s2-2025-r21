@@ -249,6 +249,9 @@ function switchVideoFeed() {
 // -------------------------------------------
 // Websocket Listening
 // -------------------------------------------
+let fpsFrameCount = 0;
+let fps = 0;
+let lastFpsUpdate = performance.now();
 function handleVideoMessage(event) {
   if (event.data instanceof Blob) {
     const url = URL.createObjectURL(event.data);
@@ -257,9 +260,23 @@ function handleVideoMessage(event) {
 
     // Revoke old object URLs to save memory
     videoEl.onload = () => URL.revokeObjectURL(videoEl.src);
+    // ----- FPS calculation -----
+    fpsFrameCount++;
+    const now = performance.now();
+    const delta = (now - lastFpsUpdate) / 1000; // seconds since last FPS update
+
+    if (delta >= 2.0) { // update FPS every 2 second
+      fps = fpsFrameCount / delta;
+      fpsFrameCount = 0;
+      lastFpsUpdate = now;
+      document.getElementById("fps-readout").textContent = `FPS: ${fps.toFixed(1)}`;}
+
   } else {
     console.warn("Unexpected video message type:", event.data);
   }
+
+  
+
 }
 
 function handleCommandMessage(event) {
