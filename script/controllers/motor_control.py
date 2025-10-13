@@ -35,7 +35,6 @@ from .velocity_smoother import tanh_ramp
 import csv
 import math
 import globals
-
 # ------- CSV Logging setup -------
 path = "pwm_log.csv"
 # Open CSV and write header
@@ -137,12 +136,17 @@ def pwm_update_loop():
 
         pwm_left.ChangeDutyCycle(corrected_left_duty)
         pwm_right.ChangeDutyCycle(corrected_right_duty)
+
+        # --- Compute and store velocity (mean of both wheels) ---
+        v_left = duty_to_velocity(corrected_left_duty)
+        v_right = duty_to_velocity(corrected_right_duty)
+        globals.current_velocity = (v_left + v_right) / 2.0
+
         # Log for debugging
         if LOGGING:
             timestamp = time.time()
             csv_writer.writerow([timestamp, corrected_left_duty, corrected_right_duty, target_duty, globals.min_duty])
             log_fh.flush()
-        print(duty_to_velocity(corrected_left_duty))
         # Increment elapsed time
         elapsed += step_time
         if elapsed > RAMP_TIME:

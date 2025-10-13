@@ -29,6 +29,8 @@ min_duty = 40
 # Maximum PWM duty cycle
 max_duty = 100
 
+current_velocity = 0.0
+
 # ---For camera vision---
 night_vision = False
 reset_cam_config = False
