@@ -157,13 +157,15 @@ def duty_to_velocity(duty):
     # For PWM frequency of 1kHz
     if duty <= 31: 
         return 0.0
-    a = -0.0000334276
-    b = 0.0055758
-    c = -0.125407
+    a = 0.0000009296
+    b = -0.0002161507
+    c = 0.0167116226
+    d = 0.3320669772
 
     
     # calculated function here
-    return a*math.pow(duty,2)+b*duty+c
+    
+    return a*math.pow(duty,3) + b*math.pow(duty,2) +c*duty+d
 
 def cleanup():
     """Stop PWM and clean up GPIO. Safe to call multiple times."""
