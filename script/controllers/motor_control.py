@@ -60,6 +60,14 @@ target_duty = 0.0
 prev_target_duty = 0.0
 running = True
 
+def duty_to_velocity(duty):
+    """Convert PWM duty cycle to linear velocity (m/s) using wheel radius."""
+    # For PWM frequency of 1kHz
+    if duty <= 31: 
+        return 0.0
+    
+    # calculated function here
+    return 0.00859 * (duty ** 0.555)
 
 
 def set_motor_command(direction_l, direction_r):
@@ -156,14 +164,7 @@ def pwm_update_loop():
 threading.Thread(target=pwm_update_loop, daemon=True).start()
 
 
-def duty_to_velocity(duty):
-    """Convert PWM duty cycle to linear velocity (m/s) using wheel radius."""
-    # For PWM frequency of 1kHz
-    if duty <= 31: 
-        return 0.0
-    
-    # calculated function here
-    return 0.00859 * (duty ** 0.555)
+
 
 def cleanup():
     """Stop PWM and clean up GPIO. Safe to call multiple times."""
