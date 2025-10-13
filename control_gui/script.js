@@ -275,9 +275,9 @@ function handleCommandMessage(event) {
       const s = msg.status_update;
       updateThrottleStatus(s);
     }
-    else if (msg.velocity_update !== undefined) {
-      console.log(msg.velocity_update);
-      updateVelocity(msg.velocity_update);
+    else if (msg.head == 'velocity_update') {
+      console.log(msg);
+      updateVelocity(msg.vel, msg.l, msg.r);
     }
     else {
       console.warn("Unknown command message type:", msg);
@@ -304,15 +304,36 @@ function updateThrottleStatus(s) {
   th.title = s.throttled_occurred ? 'Throttling occurred before' : 'Stable';
 }
 
-function updateVelocity(v) {
+function updateVelocity(v, l, r) {
   const MAX_VELOCITY = 0.1082;  // adjust based on your robot’s actual top speed
-
+  l = l * v
+  r = r * v
   // Update text
-  document.getElementById("velocity-text").textContent = v.toFixed(3) + " m/s";
+  document.getElementById("left-wheel-text").textContent = l.toFixed(3) + " m/s";
+  document.getElementById("right-wheel-text").textContent = r.toFixed(3) + " m/s";
 
-  // Update bar fill
-  const percent = Math.min((v / MAX_VELOCITY) * 100, 100);
-  document.getElementById("velocity-bar-fill").style.width = percent + "%";
+  // Update bars
+  const leftBar = document.getElementById("left-wheel-bar");
+  const rightBar = document.getElementById("right-wheel-bar");
+
+  // Compute percent of max, clamp -100% to 100%
+  const leftPercent = Math.min(Math.abs(l / MAX_WHEEL_VELOCITY) * 50, 50);
+  const rightPercent = Math.min(Math.abs(r / MAX_WHEEL_VELOCITY) * 50, 50);
+  if (l >= 0) {
+    leftBar.style.left = "50%";
+    leftBar.style.width = leftPercent + "%";
+  } else {
+    leftBar.style.left = 50 - leftPercent + "%";
+    leftBar.style.width = leftPercent + "%";
+  }
+
+if (r >= 0) {
+    rightBar.style.left = "50%";
+    rightBar.style.width = rightPercent + "%";
+  } else {
+    rightBar.style.left = 50 - rightPercent + "%";
+    rightBar.style.width = rightPercent + "%";
+  }
 }
 // ------------------------------------------
 // Log Handling

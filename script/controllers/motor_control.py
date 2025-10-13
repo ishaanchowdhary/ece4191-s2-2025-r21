@@ -77,6 +77,9 @@ def set_motor_command(direction_l, direction_r):
     """
     global target_duty
 
+    globals.left_direction = direction_l
+    globals.right_direction = direction_r
+
     # If both directions are 0, set target duty to 0 (stop)
     if direction_l == 0 and direction_r == 0:
         target_duty = 0

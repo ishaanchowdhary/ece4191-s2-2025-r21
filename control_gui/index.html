@@ -48,11 +48,23 @@
     
     <!-- Velocity -->
     <div id="velocity-container">
-      <label for="velocity-bar">Velocity</label>
-      <div id="velocity-bar-bg">
-        <div id="velocity-bar-fill"></div>
+      <label>Wheel Velocities</label>
+      
+      <div class="wheel-bar-wrapper">
+        <span class="wheel-label">Left:</span>
+        <div class="wheel-bar-bg">
+          <div id="left-wheel-bar" class="wheel-bar-fill"></div>
+        </div>
+        <span id="left-wheel-text">0.000 m/s</span>
       </div>
-      <div id="velocity-text">0.000 m/s</div>
+
+      <div class="wheel-bar-wrapper">
+        <span class="wheel-label">Right:</span>
+        <div class="wheel-bar-bg">
+          <div id="right-wheel-bar" class="wheel-bar-fill"></div>
+        </div>
+        <span id="right-wheel-text">0.000 m/s</span>
+      </div>
     </div>
 
     <!-- Video Stream -->

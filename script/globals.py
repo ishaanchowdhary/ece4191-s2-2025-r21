@@ -30,6 +30,8 @@ min_duty = 40
 max_duty = 100
 
 current_velocity = 0.0
+left_direction = 0
+right_direction = 0
 
 # ---For camera vision---
 night_vision = False

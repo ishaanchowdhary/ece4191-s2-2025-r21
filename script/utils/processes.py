@@ -39,6 +39,6 @@ async def send_velocity_periodically(websocket, interval=0.1):
             break
         velocity = round(globals.current_velocity, 4)
         if last_velocity != 0.0:
-            await websocket.send(json.dumps({"velocity_update": velocity}))
+            await websocket.send(json.dumps({"head": 'velocity_update', "vel":velocity, "l": globals.left_direction, "r":globals.right_direction}))
         last_velocity = velocity
         await asyncio.sleep(interval)
