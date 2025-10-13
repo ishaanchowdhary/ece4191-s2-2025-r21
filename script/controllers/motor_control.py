@@ -33,6 +33,7 @@ import threading, time
 from config import *
 from .velocity_smoother import tanh_ramp
 import csv
+import math
 import globals
 
 # ------- CSV Logging setup -------
@@ -162,7 +163,7 @@ def duty_to_velocity(duty):
 
     
     # calculated function here
-    return a*duty^2+b*duty+c
+    return a*math.pow(duty,2)+b*duty+c
 
 def cleanup():
     """Stop PWM and clean up GPIO. Safe to call multiple times."""
