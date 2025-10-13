@@ -276,7 +276,6 @@ function handleCommandMessage(event) {
       updateThrottleStatus(s);
     }
     else if (msg.head == 'velocity_update') {
-      console.log(msg);
       updateVelocity(msg.vel, msg.l, msg.r);
     }
     else {
@@ -304,10 +303,42 @@ function updateThrottleStatus(s) {
   th.title = s.throttled_occurred ? 'Throttling occurred before' : 'Stable';
 }
 
+let lastLeftVel = 0;
+let lastRightVel = 0;
+let lastTimestamp = performance.now();
+let maxLeftAccel = 0;
+let maxRightAccel = 0;
 function updateVelocity(v, l, r) {
-  const MAX_VELOCITY = 0.1082;  // adjust based on your robot’s actual top speed
-  l = l * v
-  r = r * v
+  const MAX_VELOCITY = 0.1082;  // adjust based on your robot’s top speed
+  l = l * v;
+  r = r * v;
+
+  const now = performance.now();
+  const dt = (now - lastTimestamp) / 1000.0; // seconds
+  console.log(dt);
+
+  if (dt > 0) {
+    const aLeft = (l - lastLeftVel) / dt;
+    const aRight = (r - lastRightVel) / dt;
+    if (Math.abs(aLeft) > 0.3 || Math.abs(aRight) > 0.3) {
+      // Ignore unrealistic spikes
+      console.warn("Ignoring unrealistic acceleration spike:", aLeft, aRight);
+    }
+    else {
+      // Update max acceleration
+      maxLeftAccel = Math.max(maxLeftAccel, Math.abs(aLeft));
+      maxRightAccel = Math.max(maxRightAccel, Math.abs(aRight));
+
+      //Display max acceleration
+      document.getElementById("left-accel-text").textContent = maxLeftAccel.toFixed(3);
+      document.getElementById("right-accel-text").textContent = maxRightAccel.toFixed(3);
+    }
+  }
+
+  lastLeftVel = l;
+  lastRightVel = r;
+  lastTimestamp = now;
+
   // Update text
   document.getElementById("left-wheel-text").textContent = l.toFixed(3) + " m/s";
   document.getElementById("right-wheel-text").textContent = r.toFixed(3) + " m/s";
@@ -316,9 +347,9 @@ function updateVelocity(v, l, r) {
   const leftBar = document.getElementById("left-wheel-bar");
   const rightBar = document.getElementById("right-wheel-bar");
 
-  // Compute percent of max, clamp -100% to 100%
   const leftPercent = Math.min(Math.abs(l / MAX_VELOCITY) * 50, 50);
   const rightPercent = Math.min(Math.abs(r / MAX_VELOCITY) * 50, 50);
+
   if (l >= 0) {
     leftBar.style.left = "50%";
     leftBar.style.width = leftPercent + "%";
@@ -327,7 +358,7 @@ function updateVelocity(v, l, r) {
     leftBar.style.width = leftPercent + "%";
   }
 
-if (r >= 0) {
+  if (r >= 0) {
     rightBar.style.left = "50%";
     rightBar.style.width = rightPercent + "%";
   } else {
