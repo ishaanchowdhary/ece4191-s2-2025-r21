@@ -317,8 +317,8 @@ function updateVelocity(v, l, r) {
   const rightBar = document.getElementById("right-wheel-bar");
 
   // Compute percent of max, clamp -100% to 100%
-  const leftPercent = Math.min(Math.abs(l / MAX_WHEEL_VELOCITY) * 50, 50);
-  const rightPercent = Math.min(Math.abs(r / MAX_WHEEL_VELOCITY) * 50, 50);
+  const leftPercent = Math.min(Math.abs(l / MAX_VELOCITY) * 50, 50);
+  const rightPercent = Math.min(Math.abs(r / MAX_VELOCITY) * 50, 50);
   if (l >= 0) {
     leftBar.style.left = "50%";
     leftBar.style.width = leftPercent + "%";

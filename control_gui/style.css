@@ -445,7 +445,7 @@ input:checked + .slider:before {
   margin: 10px auto;
   text-align: center;
   font-family: monospace;
-  color: #0f0;
+  color: rgb(34, 37, 34);
   grid-row: 7 / span 3;
   grid-column: 1 / span 3;
 }
@@ -463,7 +463,7 @@ input:checked + .slider:before {
 .wheel-bar-bg {
   flex: 1;
   height: 18px;
-  background-color: #333;
+  background-color: gray;
   border-radius: 10px;
   overflow: hidden;
   position: relative;
@@ -476,7 +476,7 @@ input:checked + .slider:before {
   height: 100%;
   left: 50%; /* start in middle for negative/positive */
   width: 0%;
-  background: linear-gradient(90deg, #0f0, #00f);
+  background: var(--pink);
   transition: width 0.2s ease-out, left 0.2s ease-out;
 }
 
