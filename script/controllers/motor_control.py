@@ -126,13 +126,20 @@ def pwm_update_loop():
             RAMP_TIME
         )
 
-        # Apply PWM duty
-        pwm_left.ChangeDutyCycle(current_duty)
-        pwm_right.ChangeDutyCycle(current_duty)
+        # Apply correction factors
+        corrected_left_duty = current_duty * LEFT_CORRECTION
+        corrected_right_duty = current_duty * RIGHT_CORRECTION
+
+        # Clamp to valid range (0–100)
+        corrected_left_duty = max(0, min(100, corrected_left_duty))
+        corrected_right_duty = max(0, min(100, corrected_right_duty))
+
+        pwm_left.ChangeDutyCycle(corrected_left_duty)
+        pwm_right.ChangeDutyCycle(corrected_right_duty)
         # Log for debugging
         if LOGGING:
             timestamp = time.time()
-            csv_writer.writerow([timestamp, current_duty, target_duty, globals.min_duty])
+            csv_writer.writerow([timestamp, corrected_left_duty, corrected_right_duty, target_duty, globals.min_duty])
             log_fh.flush()
 
         # Increment elapsed time
