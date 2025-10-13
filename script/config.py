@@ -41,8 +41,8 @@ RIGHT_PWM, RIGHT_IN1, RIGHT_IN2 = 13, 8, 7
 
 # Camera defaults (used by camera_stream)
 CAM_INDEX = 0
-CAM_WIDTH = 1280
-CAM_HEIGHT = 720
+CAM_WIDTH = 640
+CAM_HEIGHT = 480
 CAM_FPS = 30 #25
 JPEG_QUALITY = 50
 DEFAULT_BRIGHTNESS = 50
@@ -51,4 +51,4 @@ DEFAULT_GAMMA_VAL = 300
 
 # Telemetry
 HEALTH_CHECK_INTERVAL = 5  # seconds between health checks
-SEND_VELOCITY_INTERVAL = 0.3 # seconds between velocity being sent to GUI
+SEND_VELOCITY_INTERVAL = 0.1 # seconds between velocity being sent to GUI
