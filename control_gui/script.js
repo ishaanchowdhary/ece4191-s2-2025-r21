@@ -305,7 +305,7 @@ function updateThrottleStatus(s) {
 }
 
 function updateVelocity(v) {
-  const MAX_VELOCITY = 0.12;  // adjust based on your robot’s actual top speed
+  const MAX_VELOCITY = 0.1082;  // adjust based on your robot’s actual top speed
 
   // Update text
   document.getElementById("velocity-text").textContent = v.toFixed(3) + " m/s";
