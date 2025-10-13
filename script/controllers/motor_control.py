@@ -141,7 +141,7 @@ def pwm_update_loop():
             timestamp = time.time()
             csv_writer.writerow([timestamp, corrected_left_duty, corrected_right_duty, target_duty, globals.min_duty])
             log_fh.flush()
-
+        print(duty_to_velocity(corrected_left_duty))
         # Increment elapsed time
         elapsed += step_time
         if elapsed > RAMP_TIME:
@@ -153,11 +153,16 @@ threading.Thread(target=pwm_update_loop, daemon=True).start()
 
 def duty_to_velocity(duty):
     """Convert PWM duty cycle to linear velocity (m/s) using wheel radius."""
-    if duty == 0:
+    # For PWM frequency of 1kHz
+    if duty <= 31: 
         return 0.0
+    a = -0.0000334276
+    b = 0.0055758
+    c = -0.125407
+
     
     # calculated function here
-    return (duty / 100.0) * 0.65 
+    return a*duty^2+b*duty+c
 
 def cleanup():
     """Stop PWM and clean up GPIO. Safe to call multiple times."""
