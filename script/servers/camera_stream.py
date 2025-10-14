@@ -76,7 +76,7 @@ async def camera_stream():
         # Capture frame
         if picam2:
             frame = picam2.capture_array()
-            frame = cv2.flip(frame, 0)
+            frame = cv2.flip(frame, -1)
         elif cap:
             ret, frame = cap.read()
             if not ret:
@@ -104,10 +104,10 @@ async def camera_stream():
                 gamma_val=globals.gamma_val
             )
         
-        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        
 
         # Encode to JPEG
-        ret_enc, buffer = cv2.imencode(".jpg", frame_bgr, [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY])
+        ret_enc, buffer = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY])
         if not ret_enc:
             continue
         frame_bytes = buffer.tobytes()

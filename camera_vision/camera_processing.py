@@ -24,7 +24,7 @@ from ultralytics import YOLO
 # ----------------------------
 # Config
 # ----------------------------
-RPI_IP = os.environ.get("RPI_IP", "172.20.10.2").strip()  # fallback default
+RPI_IP = os.environ.get("RPI_IP", "172.20.10.7").strip()  # fallback default
 IN_URI = f"ws://{RPI_IP}:9001"  # raw frames from camera_stream.py
 OUT_PORT = 9002                 # serve processed frames here
 MODEL_PATHS = ["models/NoIR/Archive/best_NoIR_v1_sq.pt",
@@ -68,13 +68,14 @@ async def process_stream():
                         # Convert bytes -> numpy -> BGR frame
                         img_array = np.frombuffer(message, np.uint8)
                         frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+                        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
                         if frame is None:
                             continue
                         if output_clients:
                             try:
                                 # Run YOLO inference
-                                results = model.predict(frame, verbose=False)
-                                annotated = results[0].plot()
+                                results = model.predict(frame_bgr, verbose=False)
+                                annotated = results[0].plot(img=frame)
 
                                 # Encode back to JPEG
                                 ret_enc, buffer = cv2.imencode(".jpg", annotated)
