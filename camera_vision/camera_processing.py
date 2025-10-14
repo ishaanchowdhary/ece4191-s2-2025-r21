@@ -27,13 +27,17 @@ from ultralytics import YOLO
 RPI_IP = os.environ.get("RPI_IP", "172.20.10.2").strip()  # fallback default
 IN_URI = f"ws://{RPI_IP}:9001"  # raw frames from camera_stream.py
 OUT_PORT = 9002                 # serve processed frames here
-MODEL_PATH = "models/best_NoIR_v1.pt"
+MODEL_PATHS = ["models/NoIR/Archive/best_NoIR_v1_sq.pt",
+               "models/NoIR/square/best_v5_sq_NoIR.pt",
+               "models/NoIR/rectangle/best_v5_rt_NoIR.pt",
+               "models/NoIR/rectangle/best_v9_rt_NoIR.pt"]
+MODEL_PATH_IDX = 1
 
 # Track connected output clients
 output_clients = set()
 
 # Load YOLO model once
-model = YOLO(MODEL_PATH)
+model = YOLO(MODEL_PATHS[MODEL_PATH_IDX])
 
 
 # ----------------------------
