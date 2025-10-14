@@ -1,0 +1,22 @@
+home/master/ece4191-s2-2025-r21/script/main.py", line 49, in <module>
+    asyncio.run(main())
+    ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/master/ece4191-s2-2025-r21/script/main.py", line 43, in main
+    await asyncio.gather(*stream_tasks)
+  File "/home/master/ece4191-s2-2025-r21/script/servers/camera_stream.py", line 117, in camera_stream
+    await asyncio.gather(*[
+  File "/usr/lib/python3/dist-packages/websockets/legacy/protocol.py", line 635, in send
+    await self.ensure_open()
+  File "/usr/lib/python3/dist-packages/websockets/legacy/protocol.py", line 953, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: received 1000 (OK); then sent 1000 (OK)
+master@r21pi:~/ece4191-s2-2025-r21 $ python3 script/main.py
