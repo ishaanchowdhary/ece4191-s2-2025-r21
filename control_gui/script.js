@@ -135,6 +135,11 @@ class WebSocketManager {
       addLogEntry(`${this.label} WebSocket connected`, "info");
       document.getElementById("websocket-connect-button").disabled = true;
       updateIcon(this.iconId, "connected");
+
+      // Latency checks for COMMAND websocket
+      if (this.label == "Command"){
+        startLatencyChecks(this.socket);
+      }
     };
 
     this.socket.onerror = () => {
@@ -171,6 +176,16 @@ class WebSocketManager {
 
 }
 
+function startLatencyChecks(socket) {
+  // Checks latency every 5 seconds
+  setInterval(() => {
+    if (socket.readyState == WebSocket.OPEN){
+      const timestamp = Date.now();
+      const payload = JSON.stringify({ action: "PING", timestamp});
+      socket.send(payload);
+    }
+  }, 5000);
+}
 
 function sendCommand(cmd) {
   addLogEntry(cmd);
@@ -284,6 +299,13 @@ function handleVideoMessage(event) {
 function handleCommandMessage(event) {
   try {
     const msg = JSON.parse(event.data);
+    // Handle PONG message from server for latency checks
+    if (msg.action == "PONG" && msg.timestamp){
+      const latency = Date.now() - msg.timestamp;
+      document.getElementById("latency-display").textContent = `Latency: ${latency.toFixed(1)} ms`;
+      addLogEntry(`WebSocket latency: ${latency.toFixed(1)} ms`, "info")
+      return;
+    }
     if (msg.status === "ok") {
       addLogEntry(`${msg.command}, Velocities: ${msg.velocities.left.toFixed(2)}, ${msg.velocities.right.toFixed(2)}, Duty: ${msg.duty_cycles.left}`, "reception");
     } 
