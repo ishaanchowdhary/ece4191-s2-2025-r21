@@ -43,10 +43,6 @@ async def camera_stream():
     # Attempt to Initialize picamera
     try:
         picam2 = Picamera2()
-        cam_info = Picamera2().global_camera_info()
-        if not cam_info:
-            print("[Camera]  Ensure the camera is connected and enabled.")
-            return
         # Configure camera for video
         config = picam2.create_video_configuration(
             main={"size": (CAM_WIDTH, CAM_HEIGHT), "format": "RGB888"},
