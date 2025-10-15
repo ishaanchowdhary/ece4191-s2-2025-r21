@@ -113,10 +113,25 @@ async def camera_stream():
         frame_bytes = buffer.tobytes()
 
         # Send to WebSocket video clients
+                # Send to WebSocket video clients (with disconnect handling)
         if video_clients:
-            await asyncio.gather(*[
-                ws.send(frame_bytes) for ws in list(video_clients)
-            ])
+            disconnected = []
+            for ws in list(video_clients):
+                try:
+                    await ws.send(frame_bytes)
+                except Exception as e:
+                    # Catch normal disconnects and remove dead clients
+                    if isinstance(e, Exception):
+                        print(f"[Video Stream] Client disconnected: {e}")
+                    disconnected.append(ws)
+
+            # Clean up disconnected clients
+            for ws in disconnected:
+                try:
+                    video_clients.remove(ws)
+                except KeyError:
+                    pass
+
 
         # Send to raw socket clients (if enabled)
         if socket_clients and RUN_SOCKET_SERVER:
