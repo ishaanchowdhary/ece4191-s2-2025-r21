@@ -26,6 +26,7 @@ import json
 import websockets
 from config import *
 from controllers.motor_control import set_motor_command
+from controllers.ir_control import ir_on, ir_off
 from utils.processes import send_status_periodically, send_velocity_periodically, handle_ping
 import globals
 import asyncio
@@ -48,6 +49,8 @@ COMMAND_MAP = {
     "CAM_MODE_1":           1,
     "CAM_MODE_2":           2,
     "CAM_MODE_3":           3,
+    "IR_ON":                True,
+    "IR_OFF":               False,
 }
 
 
@@ -80,6 +83,12 @@ async def handle_client(websocket, path):
                 # If action is a command:
                 if action in COMMAND_MAP:
                     target = COMMAND_MAP[action]
+
+                    # If action is IR LED control
+                    if action == "IR_ON":
+                        ir_on()
+                    elif action == "IR_OFF":
+                        ir_off()
 
                     # If action is a vision command
                     if action=="NIGHT_MODE_ON" or action=="NIGHT_MODE_OFF":

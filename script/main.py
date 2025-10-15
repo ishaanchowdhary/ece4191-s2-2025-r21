@@ -21,6 +21,7 @@ from servers.command_server import handle_client
 from servers.video_server import handle_video
 from servers.camera_stream import camera_stream
 from controllers.motor_control import cleanup as motor_cleanup
+from controllers.ir_control import cleanup as ir_cleanup
 from servers.socket_server import start_socket_server
 
 async def main():
@@ -50,4 +51,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Server stopped")
     finally: # Runs on exit
+        ir_cleanup()
         motor_cleanup()

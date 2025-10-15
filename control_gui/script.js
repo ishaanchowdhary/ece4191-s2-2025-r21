@@ -606,6 +606,22 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+//Turn on IR emitter 
+document.addEventListener("keydown", (event) => {
+  if (["r"].includes(event.key)){
+    event.preventDefault();
+    sendCommand("IR_ON");
+  }
+});
+
+//Turn off IR emitter
+document.addEventListener("keydown", (event) => {
+  if (["t"].includes(event.key)){
+    event.preventDefault();
+    sendCommand("IR_OFF");
+  }
+});
+
 // Change Camera Modes
 document.addEventListener("keydown", (event) => {
   if (["1"].includes(event.key)){
