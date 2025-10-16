@@ -103,6 +103,14 @@ async def camera_stream():
                 contrast=globals.contrast,
                 gamma_val=globals.gamma_val
             )
+        elif globals.cam_mode == 2:
+            frame = enhance.enhance_frame(
+                frame,
+                mode=globals.cam_mode,
+                brightness=globals.brightness,
+                contrast=globals.contrast,
+                gamma_val=globals.gamma_val
+            )
         
         
 
