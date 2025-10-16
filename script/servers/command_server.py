@@ -84,10 +84,10 @@ async def handle_client(websocket, path):
                     globals.brightness = int(action[1])
                 elif "SET_GAMMA" in action:
                     action = str.split(action)
-                    globals.brightness = int(action[1])
+                    globals.gamma_val = int(action[1])
                 elif "SET_CONTRAST" in action:
                     action = str.split(action)
-                    globals.brightness = int(action[1])
+                    globals.contrast = int(action[1])
                 elif "NIGHT_MODE_ON" in action:
                     globals.night_vision = True
                     globals.reset_cam_config = True
