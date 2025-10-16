@@ -26,28 +26,18 @@ import json
 import websockets
 from config import *
 from controllers.motor_control import set_motor_command
+from controllers.ir_control import ir_on, ir_off
 from utils.processes import send_status_periodically, send_velocity_periodically
 import globals
 import asyncio
 
-# Command mapping (adjust speeds as needed)
+# Command mapping (motor directions)
 COMMAND_MAP = {
     "FORWARD":              {"direction_l": 1, "direction_r": 1},
     "REVERSE":              {"direction_l": -1, "direction_r": -1},
     "LEFT":                 {"direction_l": -1, "direction_r": 1},
     "RIGHT":                {"direction_l": 1, "direction_r": -1},
     "DRIVE_STOP":           {"direction_l": 0, "direction_r": 0},
-    "NIGHT_MODE_ON":        True,
-    "NIGHT_MODE_OFF":       False,
-    "INCREASE_BRIGHTNESS":  1,
-    "DECREASE_BRIGHTNESS":  -1,
-    "INCREASE_CONTRAST":    1,
-    "DECREASE_CONTRAST":    -1,
-    "INCREASE_GAMMA":       1,
-    "DECREASE_GAMMA":       -1,
-    "CAM_MODE_1":           1,
-    "CAM_MODE_2":           2,
-    "CAM_MODE_3":           3,
 }
 
 
@@ -75,32 +65,9 @@ async def handle_client(websocket, path):
                 # If action is a command:
                 if action in COMMAND_MAP:
                     target = COMMAND_MAP[action]
-
-                    # If action is a vision command
-                    if action=="NIGHT_MODE_ON" or action=="NIGHT_MODE_OFF":
-                        globals.night_vision = target
-                        globals.reset_cam_config = True
-                    elif action=="INCREASE_BRIGHTNESS" or action=="DECREASE_BRIGHTNESS":
-                        globals.brightness += target
-                        globals.brightness = max(globals.brightness,0)
-                        globals.brightness = min(globals.brightness,100)
-                    elif action=="INCREASE_CONTRAST" or action=="DECREASE_CONTRAST":
-                        globals.contrast += target
-                        globals.contrast = max(globals.contrast,0)
-                        globals.contrast = min(globals.contrast,100)
-                    elif action=="INCREASE_GAMMA" or action=="DECREASE_GAMMA":
-                        globals.gamma_val += target
-                        globals.gamma_val = max(globals.gamma_val,0)
-                        globals.gamma_val = min(globals.gamma_val,300)
-                    elif action=="CAM_MODE_1" or action=="CAM_MODE_2" or action=="CAM_MODE_3":
-                        globals.cam_mode = target
-                    
-                    # If action is a motor command
-                    else:
-                        target = COMMAND_MAP[action]
-                        # Extract directions and set motor command
-                        direction_l, direction_r = target["direction_l"], target["direction_r"]
-                        set_motor_command(direction_l, direction_r)
+                    # Extract directions and set motor command
+                    direction_l, direction_r = target["direction_l"], target["direction_r"]
+                    set_motor_command(direction_l, direction_r)
 
                 # If action is to set new duty cycle limits:
                 elif "SET_DUTY" in action:
@@ -112,6 +79,10 @@ async def handle_client(websocket, path):
                     globals.min_duty = min(new_duty)
                     globals.max_duty= max(new_duty)
                     print(f"Updated duty cycle limits: MIN_START_DUTY={globals.min_duty}, MAX_DUTY={globals.max_duty}")
+                elif "IR_ON" in action:
+                    ir_on()
+                elif "IR_OFF" in action:
+                    ir_off()
                 else:
                     print("Unknown command:", action)
                     await websocket.send(json.dumps(

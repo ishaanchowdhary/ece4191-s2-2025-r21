@@ -639,6 +639,23 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+//Turn on IR emitter 
+document.addEventListener("keydown", (event) => {
+  if (["r"].includes(event.key)){
+    event.preventDefault();
+    sendCommand("IR_ON");
+  }
+});
+
+//Turn off IR emitter
+document.addEventListener("keydown", (event) => {
+  if (["t"].includes(event.key)){
+    event.preventDefault();
+    sendCommand("IR_OFF");
+  }
+});
+
+
 // Update connection status icons
 function updateIcon(id, state) {
   const icon = document.getElementById(id);
