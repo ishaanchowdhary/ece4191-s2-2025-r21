@@ -79,9 +79,28 @@ async def handle_client(websocket, path):
                     globals.min_duty = min(new_duty)
                     globals.max_duty= max(new_duty)
                     print(f"Updated duty cycle limits: MIN_START_DUTY={globals.min_duty}, MAX_DUTY={globals.max_duty}")
-                elif "IR_ON" in action:
+                elif "SET_BRIGHTNESS" in action:
+                    action = str.split(action)
+                    globals.brightness = int(action[1])
+                elif "SET_GAMMA" in action:
+                    action = str.split(action)
+                    globals.brightness = int(action[1])
+                elif "SET_CONTRAST" in action:
+                    action = str.split(action)
+                    globals.brightness = int(action[1])
+                elif "NIGHT_MODE_ON" in action:
+                    globals.night_vision = True
+                    globals.reset_cam_config = True
+                elif "NIGHT_MODE_OFF" in action:
+                    globals.night_vision = False
+                    globals.reset_cam_config = True
+                elif action=="CAM_MODE_1":
+                        globals.cam_mode = 1
+                elif action=="CAM_MODE_2":
+                        globals.cam_mode = 2
+                elif action == "IR_ON":
                     ir_on()
-                elif "IR_OFF" in action:
+                elif action == "IR_OFF":
                     ir_off()
                 else:
                     print("Unknown command:", action)

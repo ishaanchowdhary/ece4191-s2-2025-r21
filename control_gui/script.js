@@ -568,77 +568,6 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-//Turn on Night Vision 
-document.addEventListener("keydown", (event) => {
-  if (["i"].includes(event.key)){
-    event.preventDefault();
-    sendCommand("NIGHT_MODE_ON");
-  }
-});
-
-//Turn off Night Vision 
-document.addEventListener("keydown", (event) => {
-  if (["p"].includes(event.key)){
-    event.preventDefault();
-    sendCommand("NIGHT_MODE_OFF");
-  }
-});
-
-// Change Camera Modes
-document.addEventListener("keydown", (event) => {
-  if (["1"].includes(event.key)){
-    event.preventDefault();
-    sendCommand("CAM_MODE_1");
-  }
-});
-document.addEventListener("keydown", (event) => {
-  if (["2"].includes(event.key)){
-    event.preventDefault();
-    sendCommand("CAM_MODE_2");
-  }
-});
-document.addEventListener("keydown", (event) => {
-  if (["3"].includes(event.key)){
-    event.preventDefault();
-    sendCommand("CAM_MODE_3");
-  }
-});
-
-// Increase/Decrease Camera Parameter Values
-// BRIGHTNESS
-document.addEventListener("keydown", (event) => {
-  if (event.key === "b") {
-    event.preventDefault();
-    sendCommand("INCREASE_BRIGHTNESS");
-  }
-  if (event.key === "B") {
-    event.preventDefault();
-    sendCommand("DECREASE_BRIGHTNESS");
-  }
-});
-// CONTRAST
-document.addEventListener("keydown", (event) => {
-  if (event.key === "n") {
-    event.preventDefault();
-    sendCommand("INCREASE_CONTRAST");
-  }
-  if (event.key === "N") {
-    event.preventDefault();
-    sendCommand("DECREASE_CONTRAST");
-  }
-});
-// GAMMA
-document.addEventListener("keydown", (event) => {
-  if (event.key === "m") {
-    event.preventDefault();
-    sendCommand("INCREASE_GAMMA");
-  }
-  if (event.key === "M") {
-    event.preventDefault();
-    sendCommand("DECREASE_GAMMA");
-  }
-});
-
 //Turn on IR emitter 
 document.addEventListener("keydown", (event) => {
   if (["r"].includes(event.key)){
@@ -654,6 +583,24 @@ document.addEventListener("keydown", (event) => {
     sendCommand("IR_OFF");
   }
 });
+
+// CONTRAST Slider
+document.getElementById("contrast-slider").onchange = function() {
+  sendCommand(`SET_CONTRAST ${document.getElementById("contrast-slider").value}`);
+  document.getElementById("contrast-slider-val").innerHTML = this.value;
+}
+
+// BRIGHTNESS Slider
+document.getElementById("brightness-slider").onchange = function() {
+  sendCommand(`SET_BRIGHTNESS ${document.getElementById("brightness-slider").value}`);
+  document.getElementById("brightness-slider-val").innerHTML = this.value;
+}
+
+// GAMMA Slider
+document.getElementById("gamma-slider").onchange = function() {
+  sendCommand(`SET_GAMMA ${this.value}`);
+  document.getElementById("gamma-slider-val").innerHTML = this.value;
+}
 
 
 // Update connection status icons
@@ -733,3 +680,25 @@ function yassify() {
     element.classList.add("yassify");
   });
 }
+
+// night mode/day mode
+const day_night_toggle = document.getElementById("night-day-toggle-switch");
+
+day_night_toggle.addEventListener("change", () => {
+  if (day_night_toggle.checked) {
+    sendCommand("NIGHT_MODE_OFF")
+  } else {
+    sendCommand("NIGHT_MODE_ON")
+  }
+});
+
+// manual mode/auto mode
+const manual_auto_toggle = document.getElementById("manual-auto-toggle-switch");
+
+manual_auto_toggle.addEventListener("change", () => {
+  if (manual_auto_toggle.checked) {
+    sendCommand("CAM_MODE_1");
+  } else {
+    sendCommand("CAM_MODE_2");
+  }
+});

@@ -83,7 +83,7 @@
       <div id="log">
       </div>
     </div>
-    <div id="controls-container" style="grid-column: 10 / span 2; grid-row: 9 / span 3;">
+    <div id="controls-container" style="grid-column: 1 / span 2; grid-row: 9 / span 3;">
       <div style="grid-column: 2; grid-row: 2;">
         <b>Drive</b>
       </div>
@@ -144,7 +144,47 @@
         <b>PWM Control</b>
       </div>
     </div>
-  
+  <!-------------- Camera Options -------------------------------->
+    <div id="camera-options-container">
+      <div class="options-item"><b>Camera Control</b></div>
+      <div id="display-toggle">
+      <label class="switch">
+      <input type="checkbox" id="night-day-toggle-switch" checked>
+      <span class="slider round"></span>
+      </label>
+      <br>
+        <b>Night Mode / Day Mode</b>
+        <div id="display-toggle">
+      <label class="switch">
+      <input type="checkbox" id="manual-auto-toggle-switch" checked>
+      <span class="slider round"></span>
+      </label>
+      <br>
+        <b>Manual Mode / Auto Mode</b>
+      <div class="options-item"><button class="options-button yassify" onclick="switchVideoFeed();">Switch Video Feed</button></div>
+      
+
+<div id="pwm-container">
+  <b>Image Controls</b>
+  <div class="slider-row">
+    <div class="slidecontainer">
+      <label for="brightness-slider"><b>Brightness</b></label>
+      <input type="range" min="0" max="100" value="50" id="brightness-slider">
+      <span class="value-label" id="brightness-slider-val">50</span>
+    </div>
+    <div class="slidecontainer">
+      <label for="contrast-slider"><b>Contrast</b></label>
+      <input type="range" min="0" max="100" value="50" id="contrast-slider">
+      <span class="value-label" id="contrast-slider-val">50</span>
+    </div>
+    <div class="slidecontainer">
+      <label for="gamma-slider"><b>Gamma</b></label>
+      <input type="range" min="0" max="300" value="300" id="gamma-slider">
+      <span class="value-label" id="gamma-slider-val">300</span>
+    </div>
+  </div>
+</div>
+
   <img class="camera-img" src="img/camera.png">
   <img src="img/flash.png" class="camera-flash" id="camFlash">
   </div>

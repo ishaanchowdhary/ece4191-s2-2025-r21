@@ -132,7 +132,7 @@ body {
 /******** Options ********/
 #options-container {
   grid-row: 2 / span 10;
-  grid-column: 12 / span 1;
+  grid-column: 10 / span 1;
   border-style: inset;
   display: flex;
   flex-direction: column;
@@ -494,4 +494,77 @@ input:checked + .slider:before {
   justify-content: center;
   font-family: monospace;
   font-size: large;
+}
+
+/**** Camera Options ******/
+#camera-options-container {
+  grid-row: 2 / span 10;
+  grid-column: 11 / span 2;
+  border-style: inset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+/* Row of sliders */
+.slider-row {
+  display: flex;
+  flex-direction: column; /* stack sliders vertically */
+  gap: 25px;              /* space between sliders */
+  margin-top: 15px;
+  width: 100%;
+  max-width: 500px;       /* limit total width */
+}
+
+/* Each slider container */
+.slidecontainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Label text (Brightness, Contrast, Gamma) */
+.slidecontainer label {
+  flex: 1;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+/* The range slider itself */
+.slidecontainer input[type=range] {
+  flex: 4;                /* slider takes most of row */
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 5px;
+  background: #ddd;
+  outline: none;
+}
+
+/* Chrome/Safari thumb */
+.slidecontainer input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+}
+
+/* Firefox thumb */
+.slidecontainer input[type=range]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+}
+
+/* Value label (number) */
+.value-label {
+  flex: 0.6;
+  text-align: right;
+  font-weight: bold;
+  margin-left: 10px;
 }
