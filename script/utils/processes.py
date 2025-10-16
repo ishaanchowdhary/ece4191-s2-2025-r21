@@ -42,3 +42,20 @@ async def send_velocity_periodically(websocket):
             await websocket.send(json.dumps({"head": 'velocity_update', "vel":velocity, "l": globals.left_direction, "r":globals.right_direction}))
         last_velocity = velocity
         await asyncio.sleep(SEND_VELOCITY_INTERVAL)
+
+async def handle_ping(websocket, data):
+    """Handle ping messages from client to measure latency"""
+    try:
+        ts = data.get("timestamp")
+        if ts is not None:
+            await websocket.send(json.dumps({
+                "action": "PONG",
+                "timestamp": ts
+            }))
+        else:
+            await websocket.send(json.dumps({
+                "status": "error",
+                "msg": "Missing timestamp in PING"
+            }))
+    except Exception as e:
+        print(f"Error in handle_ping: {e}")

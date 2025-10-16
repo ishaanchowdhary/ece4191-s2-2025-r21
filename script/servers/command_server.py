@@ -27,7 +27,7 @@ import websockets
 from config import *
 from controllers.motor_control import set_motor_command
 from controllers.ir_control import ir_on, ir_off
-from utils.processes import send_status_periodically, send_velocity_periodically
+from utils.processes import send_status_periodically, send_velocity_periodically, handle_ping
 import globals
 import asyncio
 
@@ -61,6 +61,11 @@ async def handle_client(websocket, path):
             try:
                 data = json.loads(message)
                 action = data.get("action", "").upper()
+
+                # If client sends ping (for latency measurements)
+                if action == "PING":
+                    await handle_ping(websocket,data)
+                    continue
                 
                 # If action is a command:
                 if action in COMMAND_MAP:
