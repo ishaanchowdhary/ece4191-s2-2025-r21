@@ -6,6 +6,7 @@ Provides function to set IR GPIO logic input to low (OFF) or high (ON)
 """
 import RPi.GPIO as GPIO
 from config import *
+import time
 
 # GPIO setup
 GPIO.setmode(GPIO.BCM)
