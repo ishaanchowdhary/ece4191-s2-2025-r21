@@ -8,47 +8,63 @@ import RPi.GPIO as GPIO
 from config import *
 import time
 
-# GPIO setup
+# =========================================================
+# GPIO and PWM setup
+# =========================================================
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(SERVO_PIN, GPIO.OUT)
 
-# Create a software PWM instance at 50Hz
+# Create software PWM at 50Hz
 servo_pwm = GPIO.PWM(SERVO_PIN, 50)
-servo_pwm.start(0)  # initial duty 0
+servo_pwm.start(0)
 
+# =========================================================
+# Servo duty cycle configuration
+# =========================================================
+DUTY_MIN = 2.5     # physical lower limit (~0°)
+DUTY_MAX = 12.5    # physical upper limit (~180°)
+DUTY_REHOME = 7.5  # center (~90°)
+STEP = 0.5         # size of each small movement (adjust as needed)
 
-# The MGM90S typically expects:
-# 0°  -> ~2.5% duty
-# 90° -> ~7.5% duty
-# 180°-> ~12.5% duty
-# You can adjust these below for calibration.
-DUTY_DOWN = 2.5     # Servo fully down
-DUTY_REHOME = 7.5   # Center (straight ahead)
-DUTY_UP = 12.0      # Servo fully up
+# Keep track of current servo duty
+current_duty = DUTY_REHOME
 
+# =========================================================
+# Helper functions
+# =========================================================
 def set_servo_position(duty):
-    """Move the servo to a specific position via software PWM."""
+    """Low-level helper to move the servo to a specific duty cycle."""
+    global current_duty
+    # Clamp within physical range
+    duty = max(DUTY_MIN, min(DUTY_MAX, duty))
     servo_pwm.ChangeDutyCycle(duty)
-    time.sleep(0.5)  # give servo time to reach position
-    servo_pwm.ChangeDutyCycle(0)  # stop sending pulses to reduce jitter
+    time.sleep(0.4)
+    servo_pwm.ChangeDutyCycle(0)
+    current_duty = duty
 
+# =========================================================
+# Public functions
+# =========================================================
 def servo_up():
-    """Rotate servo to UP position."""
-    set_servo_position(DUTY_UP)
-    print("Servo moved UP")
+    """Move the servo slightly upward."""
+    global current_duty
+    new_duty = current_duty + STEP
+    set_servo_position(new_duty)
+    print(f"Servo nudged UP (duty={new_duty:.2f}%)")
 
 def servo_down():
-    """Rotate servo to DOWN position."""
-    set_servo_position(DUTY_DOWN)
-    print("Servo moved DOWN")
+    """Move the servo slightly downward."""
+    global current_duty
+    new_duty = current_duty - STEP
+    set_servo_position(new_duty)
+    print(f"Servo nudged DOWN (duty={new_duty:.2f}%)")
 
 def servo_rehome():
-    """Rehome servo to neutral (straight ahead) position."""
+    """Rehome servo to center (straight ahead)."""
     set_servo_position(DUTY_REHOME)
     print("Servo rehomed (centered)")
 
 def cleanup():
     """Stop PWM safely."""
     servo_pwm.stop()
-    # Leave GPIO cleanup to global motor control cleanup
     print("Servo cleanup complete")
