@@ -39,6 +39,7 @@ RIGHT_CORRECTION = 0.92  # slightly slower motor, reduce PWM by 8%
 LEFT_PWM, LEFT_IN1, LEFT_IN2 = 12, 23, 24
 RIGHT_PWM, RIGHT_IN1, RIGHT_IN2 = 13, 8, 7
 IR_PIN = 17
+SERVO_PIN = 27
 
 # Camera defaults (used by camera_stream)
 CAM_INDEX = 0
