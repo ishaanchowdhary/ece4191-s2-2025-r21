@@ -1,3 +1,35 @@
+:root {
+  --pink: #f6c0cf;
+  --blue: #006dae;
+  --error: red;
+  --warn: orange;
+  --ok: green;
+}
+button {
+  font-family: "Roboto", sans-serif;
+  position: relative;
+  background: var(--blue);
+  font-size: 14px;
+  font-weight: 400;
+  color: white;
+  border: 3px solid var(--blue);
+  border-radius: 8px;
+  box-shadow: 0 0 0 #fec1958c;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+button.yassify {
+  background: var(--pink);
+  border: 3px solid var(--pink);
+  color: #181818;
+}
+
+button:hover {
+  background: transparent;
+  color: #fec195;
+  box-shadow: 0 0 25px #fec1958c;
+}
+
 body {
   font-family: Arial, sans-serif;
   text-align: center;
@@ -18,20 +50,68 @@ body {
 } 
 
 #video-container {
-  grid-row: 3 / span 6;     
-  grid-column: 5 / span 4;  
+  grid-row: 4 / span 6;     
+  grid-column: 4 / span 6;  
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid black;
 }
 
-#title {
+#cam-stream {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+#connection-div {
+  grid-column: 1 / span 2;
+  grid-row: 1 / span 1;
+  text-align: left;
+  font-family: monospace;
+  color: gray;
+  font-size: small;
+  padding: 4%;
+}
+
+#system-health {
+  grid-column: 3 / span 2;
+  grid-row: 1 / span 1;
+  text-align: left;
+  font-family: monospace;
+  color: gray;
+  font-size: small;
+  padding: 4%;
+  display: flex;
+  align-items: flex-start;
+}
+
+.health-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.health-item .material-icons {
+  margin-right: 8px;
+  transition: color 0.3s ease;
+}
+.ok   { color: var(--ok); } 
+.warn { color: var(--warn); } 
+.err  { color: var(--error); } 
+
+/********* Title Block **********/
+#title-container {
   grid-row: 1 / span 1;
   grid-column: 1 / span 12;
+}
+
+.title {
   font-family: 'Montserrat', sans-serif;
   font-weight: 900;
-
+  color: var(--blue);
+}
+.title.yassify {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
   /* Camo effect */
   background: url('camo-pattern.png') no-repeat center/cover;
   background-size: 600px 150px;
@@ -40,23 +120,52 @@ body {
   background-clip: text;
 }
 
-#sub-title{
-  grid-row: 2 / span 1;
-  grid-column: 1 / span 12;
+.sub-title{
   font-family: 'Imperial Script', cursive; 
+  color: rgba(255, 0, 0, 0);
+}
+.sub-title.yassify {
+  color: black;
 }
 
-#cam-stream {
+
+/******** Options ********/
+#options-container {
+  grid-row: 2 / span 10;
+  grid-column: 10 / span 1;
+  border-style: inset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.options-item {
   width: 100%;
-  height: auto;
-  border-radius: 10px;
 }
-
-#connection-info {
-  font-size: small;
-  color: gray;
-  margin: 4%;
-  font-family: monospace;
+.options-button {
+  margin: 5%;
+  height: 50px;
+}
+#pwm-container {
+  margin-top: auto;
+}
+#pwm-slider {
+  height: 300px; 
+  margin: 0 auto; 
+  border-radius: 0;
+}
+#pwm-slider .noUi-tooltip {
+  background: none;
+  border: 0;
+}
+#pwm-slider .noUi-handle {
+    border-radius: 0;
+}
+#pwm-slider .noUi-connect {
+  background: var(--blue);
+}
+#pwm-slider .noUi-connect.yassify {
+  background: var(--pink);
 }
 
 /******** Connection Status Indicators ********/
@@ -80,7 +189,7 @@ body {
 /* *********************************** Log *********************************** */
 #log-container {
   grid-row: 3 / span 3;
-  grid-column: 1 / span 4;
+  grid-column: 1 / span 3;
   border-style: inset;
 }
 
@@ -188,4 +297,274 @@ body {
   height: auto;
   z-index: 10000;
   transition: opacity 0.2s ease-out;
+}
+
+/********** Toggle Switch **********/
+#display-toggle {
+  grid-row: 1;
+  grid-column: 12;
+  align-content: center;
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--blue);
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: var(--pink);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--pink);
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Modal backdrop */
+.modal {
+  display: none; /* hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.6);
+  animation: fadeIn 0.3s;
+}
+
+/* Modal box */
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 16px;
+  width: 320px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  animation: slideIn 0.3s;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Close X */
+.modal .close {
+  float: right;
+  font-size: 26px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.2s;
+}
+.modal .close:hover {
+  color: #ff4081;
+}
+
+/* Config fields */
+.config-field {
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.config-field input[type="text"],
+.config-field input[type="number"] {
+  width: 140px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Buttons container */
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes slideIn {
+  from {transform: translateY(-50px); opacity:0;}
+  to {transform: translateY(0); opacity:1;}
+}
+
+#velocity-container {
+  width: 300px;
+  margin: 10px auto;
+  text-align: center;
+  font-family: monospace;
+  color: rgb(34, 37, 34);
+  grid-row: 7 / span 3;
+  grid-column: 1 / span 3;
+}
+
+.wheel-bar-wrapper {
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.wheel-label {
+  width: 40px;
+}
+
+.wheel-bar-bg {
+  flex: 1;
+  height: 18px;
+  background-color: gray;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  margin: 0 8px;
+  box-shadow: inset 0 0 4px #000;
+}
+
+.wheel-bar-fill {
+  position: absolute;
+  height: 100%;
+  left: 50%; /* start in middle for negative/positive */
+  width: 0%;
+  background: var(--pink);
+  transition: width 0.2s ease-out, left 0.2s ease-out;
+}
+
+#left-wheel-text, #right-wheel-text {
+  width: 60px;
+  text-align: right;
+  font-size: 0.9em;
+}
+
+#fps-container {
+  grid-row: 2 / span 1;
+  grid-column: 9 / span 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-size: large;
+}
+
+/**** Camera Options ******/
+#camera-options-container {
+  grid-row: 2 / span 10;
+  grid-column: 11 / span 2;
+  border-style: inset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+/* Row of sliders */
+.slider-row {
+  display: flex;
+  flex-direction: column; /* stack sliders vertically */
+  gap: 25px;              /* space between sliders */
+  margin-top: 15px;
+  width: 100%;
+  max-width: 500px;       /* limit total width */
+}
+
+/* Each slider container */
+.slidecontainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Label text (Brightness, Contrast, Gamma) */
+.slidecontainer label {
+  flex: 1;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+/* The range slider itself */
+.slidecontainer input[type=range] {
+  flex: 4;                /* slider takes most of row */
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 5px;
+  background: #ddd;
+  outline: none;
+}
+
+/* Chrome/Safari thumb */
+.slidecontainer input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+}
+
+/* Firefox thumb */
+.slidecontainer input[type=range]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+}
+
+/* Value label (number) */
+.value-label {
+  flex: 0.6;
+  text-align: right;
+  font-weight: bold;
+  margin-left: 10px;
 }

@@ -6,37 +6,88 @@
   <title>C.U.N.T.I.N.G Season!!!</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Imperial+Script&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="packages/nouislider.min.css" rel="stylesheet">
 </head>
 <body>
   <div class="container">
-    <div id="title">
-      <h1>It's C.U.N.T.I.N.G Season!!!</h1>
+    <!-- Title -->
+    <div id="title-container">
+      <div id="title" class="title yassify">
+        <h1>It's C.U.N.T.I.N.G Season!!!</h1>
+      </div>
+      <div id="sub-title" class="sub-title yassify">
+        <h2>Cunningly Understanding Nature Then Investigating Native Genomes</h2>
+      </div>
     </div>
-    <div id="sub-title">
-      <h2>Cunningly Understanding Nature Then Investigating Native Genomes</h2>
-    </div>
+    
     <!-- Connection Info  -->
-    <div id="connection-info" style="grid-column: 1 / span 2; grid-row: 1 / span 1; text-align: left;"></div>
+    <div id="connection-div">
+      <div id="connection-info" ></div>
+    </div>
+    <!-- System Health Status -->
+    <div id="system-health">
+      <div class="health-item">
+        <span class="material-icons" id="uv-icon">bolt</span>
+        <span>Under-voltage</span>
+      </div>
+      <div class="health-item">
+        <span class="material-icons" id="freq-icon">speed</span>
+        <span>Freq Capped</span>
+      </div>
+      <div class="health-item">
+        <span class="material-icons" id="thr-icon">thermostat</span>
+        <span>Throttled</span>
+      </div>
+      <div class="health-item">
+        <span class="material-icons" id="latency-icon">NetworkCheck</span>
+        <span id="latency-display">Latency: -- ms</span>
+      </div>
+    </div>
+    
+    <!-- Velocity -->
+    <div id="velocity-container">
+      <label>Wheel Velocities</label>
+      
+      <div class="wheel-bar-wrapper">
+        <span class="wheel-label">Left:</span>
+        <div class="wheel-bar-bg">
+          <div id="left-wheel-bar" class="wheel-bar-fill"></div>
+        </div>
+        <span id="left-wheel-text">0.000 m/s</span>
+      </div>
+
+      <div class="wheel-bar-wrapper">
+        <span class="wheel-label">Right:</span>
+        <div class="wheel-bar-bg">
+          <div id="right-wheel-bar" class="wheel-bar-fill"></div>
+        </div>
+        <span id="right-wheel-text">0.000 m/s</span>
+      </div>
+      <div>Left Max Accel: <span id="left-accel-text">0.000</span> m/s²</div>
+      <div>Right Max Accel: <span id="right-accel-text">0.000</span> m/s²</div>
+    </div>
+
     <!-- Video Stream -->
     <div id="video-container">
-       <img id="video" width="640px" height="480px" alt="Video not available" 
-       src="fallback.png" />
+       <img id="video" width="900px" height="675px" alt="Video not available" 
+       src="img/fallback.png" />
+    </div>
+    <div id="fps-container">
+      <span id="fps-readout"></span>
     </div>
     <!-- Command Stream -->
     <div id="log-container">
       <b>log</b>
-      <div id="log-filter">
-        <label><input type="checkbox" class="log-filter-checkbox" value="info" checked> Info</label>
-        <label><input type="checkbox" class="log-filter-checkbox" value="warn" checked> Warnings</label>
-        <label><input type="checkbox" class="log-filter-checkbox" value="error" checked> Errors</label>
-      </div>
       <div id="log">
       </div>
     </div>
-    <div id="controls-container" style="grid-column: 10 / span 2; grid-row: 9 / span 3;">
+    <div id="controls-container" style="grid-column: 1 / span 2; grid-row: 9 / span 3;">
       <div style="grid-column: 2; grid-row: 2;">
         <b>Drive</b>
       </div>
@@ -77,15 +128,115 @@
         <b>home</b><br>Rehome Cam
       </div>
     </div>
-    <div id="button-container">
-      <button id="websocket-connect-button" onclick="webSocketReconnect();">Connect to Websockets</button>
-      <button onclick="switchVideoFeed();">Switch Video Feed</button>
+    <!-- Professional switch -->
+    <div id="display-toggle">
+      <label class="switch">
+      <input type="checkbox" id="display-toggle-switch" checked>
+      <span class="slider round"></span>
+      </label>
     </div>
-  
+    <!-------------- Options -------------------------------->
+    <div id="options-container">
+      <div class="options-item"><b>Control</b></div>
+      <div class="options-item"><button class="options-button yassify" id="websocket-connect-button" onclick="webSocketReconnect();">Connect to Websockets</button></div>
+      <div class="options-item"><button class="options-button yassify" onclick="switchVideoFeed();">Switch Video Feed</button></div>
+      <div class="options-item"><button class="options-button yassify" id="open-config-btn">Config</button></div>
+      
+      <div id="pwm-container">
+        <div id="pwm-slider"></div>
+        <br>
+        <b>PWM Control</b>
+      </div>
+    </div>
+  <!-------------- Camera Options -------------------------------->
+    <div id="camera-options-container">
+      <div class="options-item"><b>Camera Control</b></div>
+      <div id="display-toggle">
+      <label class="switch">
+      <input type="checkbox" id="night-day-toggle-switch" checked>
+      <span class="slider round"></span>
+      </label>
+      <br>
+        <b>Night Mode / Day Mode</b>
+        <div id="display-toggle">
+      <label class="switch">
+      <input type="checkbox" id="manual-auto-toggle-switch" checked>
+      <span class="slider round"></span>
+      </label>
+      <br>
+        <b>Manual Mode / Auto Mode</b>
+      <div class="options-item"><button class="options-button yassify" onclick="switchVideoFeed();">Switch Video Feed</button></div>
+      
+
+<div id="pwm-container">
+  <b>Image Controls</b>
+  <div class="slider-row">
+    <div class="slidecontainer">
+      <label for="brightness-slider"><b>Brightness</b></label>
+      <input type="range" min="0" max="100" value="50" id="brightness-slider">
+      <span class="value-label" id="brightness-slider-val">50</span>
+    </div>
+    <div class="slidecontainer">
+      <label for="contrast-slider"><b>Contrast</b></label>
+      <input type="range" min="0" max="100" value="50" id="contrast-slider">
+      <span class="value-label" id="contrast-slider-val">50</span>
+    </div>
+    <div class="slidecontainer">
+      <label for="gamma-slider"><b>Gamma</b></label>
+      <input type="range" min="0" max="300" value="300" id="gamma-slider">
+      <span class="value-label" id="gamma-slider-val">300</span>
+    </div>
+  </div>
+</div>
+
   <img class="camera-img" src="img/camera.png">
   <img src="img/flash.png" class="camera-flash" id="camFlash">
   </div>
+  <!-- Config Modal -->
+  <div id="config-modal" class="modal yassify">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Robot Config</h3>
+      <div class="config-field">
+        <label>RPI IP:</label>
+        <input id="cfg-ip" type="text">
+      </div>
+      <div class="config-field">
+        <label>CMD Port:</label>
+        <input id="cfg-cmd" type="number">
+      </div>
+      <div class="config-field">
+        <label>Raw Video Port:</label>
+        <input id="cfg-raw" type="number">
+      </div>
+      <div class="config-field">
+        <label>YOLO Port:</label>
+        <input id="cfg-video" type="number">
+      </div>
+      <div class="config-field">
+        <label>FPS Interval:</label>
+        <input id="cfg-FPSinterval" type="number">
+      </div>
+      <div class="config-field">
+        <label>Connect on Load:</label>
+        <input id="cfg-auto" type="checkbox">
+      </div>
+      <div class="config-field">
+        <label>Default to cute GUI:</label>
+        <input id="cfg-yassify" type="checkbox">
+      </div>
+      <div class="modal-buttons">
+        <button class="options-button" onclick="saveConfig()">Save</button>
+        <button class="options-button" onclick="resetConfig()">Reset</button>
+        <button class="options-button" onclick="closeConfigModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
   <script src="config.js"></script>
+  <script src="packages/nouislider.min.js"></script>
   <script src="script.js"></script>
+  
 </body>
 </html>

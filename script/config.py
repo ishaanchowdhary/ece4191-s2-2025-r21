@@ -16,19 +16,41 @@ Usage:
 # Networking
 CMD_PORT = 9000
 VIDEO_PORT = 9001
+SOCKET_PORT = 5001
+RUN_SOCKET_SERVER = False
+
+# Data logging
+LOGGING = True
+LOG_DIR = "logs"  # directory to save log files
+
 
 # Physics / geometry (used to convert v,w -> wheel velocities)
 WHEEL_BASE = 0.15   # meters (L)
 WHEEL_RADIUS = 0.065  # meters (R)
 
 # PWM & motor tuning
-PWM_FREQ = 50  # Hz
-MEASURED_MAX_WHEEL_SPEED = None  # rad/s, set measured value if available
-FALLBACK_MAX_WHEEL_SPEED = 40.0   # rad/s — conservative starting point
-MIN_START_DUTY = 100.0             # percent, minimum duty to reliably start motor
+PWM_FREQ = 1000  # Hz
+RAMP_TIME = 0.5      # seconds to go from 0 to 100%
+UPDATE_HZ = 50       # update loop frequency
+LEFT_CORRECTION = 1.00   # no change
+RIGHT_CORRECTION = 0.92  # slightly slower motor, reduce PWM by 8%
+
+# Pins
+LEFT_PWM, LEFT_IN1, LEFT_IN2 = 12, 23, 24
+RIGHT_PWM, RIGHT_IN1, RIGHT_IN2 = 13, 8, 7
+IR_PIN = 17
+SERVO_PIN = 27
 
 # Camera defaults (used by camera_stream)
 CAM_INDEX = 0
-CAM_WIDTH = 1920
-CAM_HEIGHT = 1080
-CAM_FPS = 30
+CAM_WIDTH = 640
+CAM_HEIGHT = 480
+CAM_FPS = 30 #25
+JPEG_QUALITY = 50
+DEFAULT_BRIGHTNESS = 50
+DEFAULT_CONTRAST = 50
+DEFAULT_GAMMA_VAL = 300
+
+# Telemetry
+HEALTH_CHECK_INTERVAL = 5  # seconds between health checks
+SEND_VELOCITY_INTERVAL = 0.1 # seconds between velocity being sent to GUI

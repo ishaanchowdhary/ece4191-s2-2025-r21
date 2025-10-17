@@ -1,97 +1,61 @@
 """
 command_server.py
--------------------
-WebSocket server for handling motion commands from remote clients.
--------------------
+-----------------
+WebSocket server for handling commands.
 
-- Receive JSON-encoded commands via WebSocket.
-- Map actions (FORWARD, REVERSE, LEFT, RIGHT, DRIVE_STOP) to target velocities.
-- Use VelocitySmoother to limit acceleration.
-- Convert velocities to wheel commands and call motor controller.
+This module:
+- Accepts JSON-encoded commands over WebSocket from remote clients.
+- Maps high-level actions (FORWARD, REVERSE, LEFT, RIGHT, DRIVE_STOP) to left/right motor directions.
+- Updates motor commands via the motor_control module.
+- Supports dynamic adjustment of minimum and maximum PWM duty cycles via "SET_DUTY" commands.
+- Maintains the last received command for telemetry or logging purposes.
 
-Usage:
-    await websockets.serve(handle_client, "0.0.0.0", CMD_PORT)
+Main Functions:
+- handle_client(websocket, path)
+    Asynchronous function to handle a single WebSocket client connection.
+    Processes incoming JSON commands and updates motor directions or PWM limits.
+
+Dependencies:
+- websockets: For asynchronous WebSocket communication.
+- json: For decoding/encoding JSON messages.
+- controllers.motor_control: To send motor direction commands.
+- globals: For runtime configuration (e.g., min/max duty cycles).
 """
 
 import json
 import websockets
+from config import *
 from controllers.motor_control import set_motor_command
-from controllers.velocity_smoother import VelocitySmoother
-from config import WHEEL_BASE, WHEEL_RADIUS
+from controllers.ir_control import ir_on, ir_off
+from controllers.servo_control import servo_up, servo_down, servo_rehome
+from utils.processes import send_status_periodically, send_velocity_periodically, handle_ping
+import globals
 import asyncio
-import time
 
-# Command mapping (adjust speeds as needed)
+# Command mapping (motor directions)
 COMMAND_MAP = {
-    "FORWARD":    {"v": -0.5, "w": 0.0},
-    "REVERSE":    {"v": 0.5, "w": 0.0},
-    "LEFT":       {"v": 0.0, "w": -0.8},
-    "RIGHT":      {"v": 0.0, "w": 0.8},
-    "DRIVE_STOP": {"v": 0.0, "w": 0.0}
+    "FORWARD":              {"direction_l": 1, "direction_r": 1},
+    "REVERSE":              {"direction_l": -1, "direction_r": -1},
+    "LEFT":                 {"direction_l": -1, "direction_r": 1},
+    "RIGHT":                {"direction_l": 1, "direction_r": -1},
+    "DRIVE_STOP":           {"direction_l": 0, "direction_r": 0},
 }
 
-# Shared variables
-# Velocity smoother instance
-smoother = VelocitySmoother(max_accel=5, max_ang_accel=10.0, rate_hz=50)
-
-# Target velocity variables
-v_target, w_target = 0.0, 0.0
-
-# Last command variable for telemetry
-last_command = "DRIVE_STOP"
 
 # Websocket
 current_client = None 
-
-async def smoother_loop(): 
-    """
-    Function calls smoother.update() at a fixed rate and sends telemetry
-    """
-    global v_target, w_target, last_command, current_client
-
-    # smoothing rate variables    
-    rate_hz = 50 # to tune
-    dt = 1.0 / rate_hz
-
-    # telemetry rate
-    send_rate_hz = 10 
-    send_dt = 1.0 / send_rate_hz
-    last_send = 0
-
-    while True:
-        v_smooth, w_smooth = smoother.update(v_target, w_target)
-
-        # Differential drive kinematics
-        L = WHEEL_BASE
-        R = WHEEL_RADIUS
-        v_r = (2*v_smooth + w_smooth*L) / (2*R)
-        v_l = (2*v_smooth - w_smooth*L) / (2*R)
-
-        duty_l, duty_r = set_motor_command(v_l, v_r)
-
-        now = time.time()
-
-        if current_client and (now - last_send) >= send_dt and duty_l != 0:
-            await current_client.send(json.dumps({
-                "status": "ok",
-                "command": last_command,
-                "velocities": {"left": v_l, "right": v_r},
-                "duty_cycles": {"left": duty_l, "right": duty_r}
-            }))
-            
-
-            last_send = now
-
-        await asyncio.sleep(dt)
-
 
 async def handle_client(websocket, path):
     """Handle a single command WebSocket client (keeps original signature)."""
     print("Command client connected")
 
-    global v_target, w_target, last_command, current_client # so variables can be modified
+    global current_client # so variables can be modified
 
     current_client = websocket
+    # Start background task
+    status_task = asyncio.create_task(send_status_periodically(websocket))
+    velocity_task = asyncio.create_task(send_velocity_periodically(websocket))
+
     
     try:
         async for message in websocket:
@@ -99,15 +63,57 @@ async def handle_client(websocket, path):
                 data = json.loads(message)
                 action = data.get("action", "").upper()
 
+                # If client sends ping (for latency measurements)
+                if action == "PING":
+                    await handle_ping(websocket,data)
+                    continue
+                
+                # If action is a command:
                 if action in COMMAND_MAP:
                     target = COMMAND_MAP[action]
+                    # Extract directions and set motor command
+                    direction_l, direction_r = target["direction_l"], target["direction_r"]
+                    set_motor_command(direction_l, direction_r)
 
-                    # Update target velocities
-                    v_target, w_target = target["v"], target["w"]
-
-                    # Update command variabl for telemetry 
-                    last_command = action
-
+                # If action is to set new duty cycle limits:
+                elif "SET_DUTY" in action:
+                    # stop motors before changing duty
+                    set_motor_command(0, 0)  
+                    # Update minimum starting duty cycle
+                    action = str.split(action)
+                    new_duty = [int(action[1]), int(action[2])]
+                    globals.min_duty = min(new_duty)
+                    globals.max_duty= max(new_duty)
+                    print(f"Updated duty cycle limits: MIN_START_DUTY={globals.min_duty}, MAX_DUTY={globals.max_duty}")
+                elif "SET_BRIGHTNESS" in action:
+                    action = str.split(action)
+                    globals.brightness = int(action[1])
+                elif "SET_GAMMA" in action:
+                    action = str.split(action)
+                    globals.gamma_val = int(action[1])
+                elif "SET_CONTRAST" in action:
+                    action = str.split(action)
+                    globals.contrast = int(action[1])
+                elif "NIGHT_MODE_ON" in action:
+                    globals.night_vision = True
+                    globals.reset_cam_config = True
+                elif "NIGHT_MODE_OFF" in action:
+                    globals.night_vision = False
+                    globals.reset_cam_config = True
+                elif action=="CAM_MODE_1":
+                        globals.cam_mode = 1
+                elif action=="CAM_MODE_2":
+                        globals.cam_mode = 2
+                elif action == "IR_ON":
+                    ir_on()
+                elif action == "IR_OFF":
+                    ir_off()
+                elif action == "CAM_UP":
+                    servo_up()
+                elif action == "CAM_DOWN":
+                    servo_down()
+                elif action == "CAM_REHOME":
+                    servo_rehome()
                 else:
                     print("Unknown command:", action)
                     await websocket.send(json.dumps(
@@ -123,3 +129,6 @@ async def handle_client(websocket, path):
     except websockets.exceptions.ConnectionClosed:
         print("Command client disconnected")
         set_motor_command(0, 0)  # stop motors on disconnect
+    finally:
+        status_task.cancel()  # stop background task when client disconnects
+        velocity_task.cancel()

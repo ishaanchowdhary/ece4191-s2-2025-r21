@@ -19,39 +19,126 @@ Usage:
     await camera_stream()
 """
 
+"""TESTING """
+
 import asyncio
 import cv2
+import numpy as np
+import json
+from picamera2 import Picamera2
+
 from servers.video_server import video_clients
-from config import CAM_INDEX, CAM_WIDTH, CAM_HEIGHT, CAM_FPS
+from servers.socket_server import socket_clients
+from config import *
+import utils.video_enhancer as enhance
+import globals
+
 
 async def camera_stream():
-    """Continuously capture and broadcast frames."""
-    # Use V4L2 backend if available (keeps your original intent)
-    cap = cv2.VideoCapture(CAM_INDEX, cv2.CAP_V4L2)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_WIDTH)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT)
-    cap.set(cv2.CAP_PROP_FPS, CAM_FPS)
+    """Continuously capture and broadcast frames using Picamera2."""   
+    # Initialize picam2 and cap variables
+    picam2 = None
+    cap = None
 
-    # Sleep interval approximate to CAM_FPS
+    # Attempt to Initialize picamera
+    try:
+        picam2 = Picamera2()
+        # Configure camera for video
+        config = picam2.create_video_configuration(
+            main={"size": (CAM_WIDTH, CAM_HEIGHT), "format": "RGB888"},
+            controls={
+                "FrameDurationLimits": (int(1e6 / CAM_FPS), int(1e6 / CAM_FPS))
+            }
+        )
+        picam2.configure(config)
+        picam2.start()
+        print("[Camera] Camera started successfully.")
+    except Exception as e:
+        print(f"[Camera] Failed to initialize PiCam: {e}")
+        picam2 = None
+    
+    # Fallback to OpenCV if picamera fails
+    if picam2 is None:
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            print("[Camera] No USB camera found. Exiting camera stream.")
+            return
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_WIDTH)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT)
+        cap.set(cv2.CAP_PROP_FPS, CAM_FPS)
+        print("[Camera] USB camera started successfully.")
+
     sleep_dt = 1.0 / CAM_FPS if CAM_FPS > 0 else 0.05
 
     while True:
         await asyncio.sleep(sleep_dt)
-        ret, frame = cap.read()
-        if not ret:
-            # don't spam, short pause and continue
+
+        # Capture frame
+        if picam2:
+            frame = picam2.capture_array()
+            frame = cv2.flip(frame, -1)
+        elif cap:
+            ret, frame = cap.read()
+            if not ret:
+                continue
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        if frame is None or frame.size == 0:
             await asyncio.sleep(0.1)
             continue
 
+        # Apply night vision enhancement if enabled
+        if globals.night_vision:
+            if globals.reset_cam_config:
+                globals.brightness = DEFAULT_BRIGHTNESS
+                globals.contrast = DEFAULT_CONTRAST
+                globals.gamma_val = DEFAULT_GAMMA_VAL
+                globals.reset_cam_config = False
+                globals.cam_mode = 1
+
+            frame = enhance.enhance_frame(
+                frame,
+                mode=globals.cam_mode,
+                brightness=globals.brightness,
+                contrast=globals.contrast,
+                gamma_val=globals.gamma_val
+            )
+        
+        
+
         # Encode to JPEG
-        ret_enc, buffer = cv2.imencode(".jpg", frame)
+        ret_enc, buffer = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY])
         if not ret_enc:
             continue
         frame_bytes = buffer.tobytes()
 
-        # Broadcast to all connected clients
+        # Send to WebSocket video clients
+                # Send to WebSocket video clients (with disconnect handling)
         if video_clients:
-            # gather ensures concurrent sends; preserve original behavior
-            await asyncio.gather(*[
-                ws.send(frame_bytes) for ws in list(video_clients)
-            ])
+            disconnected = []
+            for ws in list(video_clients):
+                try:
+                    await ws.send(frame_bytes)
+                except Exception as e:
+                    # Catch normal disconnects and remove dead clients
+                    if isinstance(e, Exception):
+                        print(f"[Video Stream] Client disconnected: {e}")
+                    disconnected.append(ws)
+
+            # Clean up disconnected clients
+            for ws in disconnected:
+                try:
+                    video_clients.remove(ws)
+                except KeyError:
+                    pass
+
+
+        # Send to raw socket clients (if enabled)
+        if socket_clients and RUN_SOCKET_SERVER:
+            for client in list(socket_clients):
+                try:
+                    client.write(len(frame_bytes).to_bytes(4, byteorder='big') + frame_bytes)
+                    await client.drain()
+                except Exception as e:
+                    print(f"[Raw Socket] Failed to send to client: {e}")
+                    socket_clients.remove(client)

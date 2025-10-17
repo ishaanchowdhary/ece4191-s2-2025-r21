@@ -16,11 +16,14 @@ Usage:
 import asyncio
 import websockets
 
-from config import CMD_PORT, VIDEO_PORT
-from servers.command_server import handle_client, smoother_loop
+from config import CMD_PORT, VIDEO_PORT, RUN_SOCKET_SERVER, SOCKET_PORT
+from servers.command_server import handle_client
 from servers.video_server import handle_video
 from servers.camera_stream import camera_stream
 from controllers.motor_control import cleanup as motor_cleanup
+from controllers.ir_control import cleanup as ir_cleanup
+from controllers.servo_control import cleanup as servo_cleanup
+from servers.socket_server import start_socket_server
 
 async def main():
     # Start both servers
@@ -30,13 +33,18 @@ async def main():
     print(f"Command WebSocket server on port {CMD_PORT}")
     print(f"Video WebSocket server on port {VIDEO_PORT}")
 
-    # Start the smoother loop in the background 
-    asyncio.create_task(smoother_loop())
+    stream_tasks = []
 
-    # Run camera stream forever
-    await camera_stream()
+    # Start camera stream as a background task
+    stream_tasks.append(asyncio.create_task(camera_stream()))
+
+    # Optionally start socket server
+    if RUN_SOCKET_SERVER : stream_tasks.append(asyncio.create_task(start_socket_server(port=SOCKET_PORT)))
+
+    # Wait for all tasks to run (typically forever unless one crashes)
+    await asyncio.gather(*stream_tasks)
+
     
-
 
 if __name__ == "__main__": 
     try:
@@ -44,4 +52,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Server stopped")
     finally: # Runs on exit
+        servo_cleanup()
+        ir_cleanup()
         motor_cleanup()
