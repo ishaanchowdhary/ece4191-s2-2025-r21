@@ -14,7 +14,7 @@ Open command prompt on laptop.
 | `pw: admin`  |  `pw: shreklovers` |
 | `cd ece4191-s2-2025-r21`<br>`git pull`<br>`python script/main.py`  |  `cd ece4191-s2-2025-r21`<br>`git pull`<br>`python script/main.py` |
 
-if issues persist with logging in: `ssh-keygen -R 192.168.4.110`
+if issues persist with logging in: `ssh-keygen -R <IP address>`
 
 **Start Object Detection**
 
