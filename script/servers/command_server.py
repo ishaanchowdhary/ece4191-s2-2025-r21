@@ -27,6 +27,7 @@ import websockets
 from config import *
 from controllers.motor_control import set_motor_command
 from controllers.ir_control import ir_on, ir_off
+from controllers.servo_control import servo_up, servo_down, servo_rehome
 from utils.processes import send_status_periodically, send_velocity_periodically, handle_ping
 import globals
 import asyncio
@@ -107,6 +108,12 @@ async def handle_client(websocket, path):
                     ir_on()
                 elif action == "IR_OFF":
                     ir_off()
+                elif action == "CAM_UP":
+                    servo_up()
+                elif action == "CAM_DOWN":
+                    servo_down()
+                elif action == "CAM_REHOME":
+                    servo_rehome()
                 else:
                     print("Unknown command:", action)
                     await websocket.send(json.dumps(
