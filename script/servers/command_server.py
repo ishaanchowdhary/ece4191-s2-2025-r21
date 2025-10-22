@@ -23,6 +23,7 @@ Dependencies:
 """
 
 import json
+import time, csv
 import websockets
 from config import *
 from controllers.motor_control import set_motor_command
@@ -41,6 +42,14 @@ COMMAND_MAP = {
     "DRIVE_STOP":           {"direction_l": 0, "direction_r": 0},
 }
 
+
+if LOGGING:
+    # ------- CSV Logging setup -------
+    path = "cmd_log.csv"
+    # Open CSV and write header
+    log_fh = open(path, "w", newline="")
+    csv_writer = csv.writer(log_fh)
+    csv_writer.writerow(["timestamp", "cmd"])
 
 # Websocket
 current_client = None 
@@ -62,7 +71,10 @@ async def handle_client(websocket, path):
             try:
                 data = json.loads(message)
                 action = data.get("action", "").upper()
-
+                if LOGGING:
+                    timestamp = time.time()
+                    csv_writer.writerow([timestamp, action])
+                    log_fh.flush()
                 # If client sends ping (for latency measurements)
                 if action == "PING":
                     await handle_ping(websocket,data)

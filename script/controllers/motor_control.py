@@ -35,12 +35,14 @@ from .velocity_smoother import tanh_ramp
 import csv
 import math
 import globals
-# ------- CSV Logging setup -------
-path = "pwm_log.csv"
-# Open CSV and write header
-log_fh = open(path, "w", newline="")
-csv_writer = csv.writer(log_fh)
-csv_writer.writerow(["timestamp", "current_duty", "target_duty", "min_duty"])
+
+if LOGGING:
+    # ------- CSV Logging setup -------
+    path = "pwm_log.csv"
+    # Open CSV and write header
+    log_fh = open(path, "w", newline="")
+    csv_writer = csv.writer(log_fh)
+    csv_writer.writerow(["timestamp", "current_duty", "target_duty", "min_duty"])
 
 # GPIO setup
 GPIO.setmode(GPIO.BCM)
