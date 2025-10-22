@@ -45,9 +45,9 @@ COMMAND_MAP = {
 
 if LOGGING:
     # ------- CSV Logging setup -------
-    path = "cmd_log.csv"
+    cmd_path = "cmd_log.csv"
     # Open CSV and write header
-    log_fh = open(path, "w", newline="")
+    log_fh = open(cmd_path, "w", newline="")
     csv_writer = csv.writer(log_fh)
     csv_writer.writerow(["timestamp", "cmd"])
 
