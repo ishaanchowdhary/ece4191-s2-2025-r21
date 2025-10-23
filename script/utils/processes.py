@@ -56,8 +56,8 @@ async def log_velocity_periodically():
     csv_writer.writerow(["timestamp", "velocity", "left_direction", "right_direction"])
     # Open CSV file and write header if it doesn't exist
     while True:
-        await velocity = round(globals.current_velocity, 4)
-        await timestamp = time.time()  # Unix timestamp
+        velocity = round(globals.current_velocity, 4)
+        timestamp = time.time()  # Unix timestamp
         await csv_writer.writerow([timestamp, velocity, globals.left_direction, globals.right_direction])
         await csv_writer.flush()  # make sure data is written to file
         
