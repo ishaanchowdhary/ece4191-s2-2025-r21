@@ -63,8 +63,8 @@ async def handle_client(websocket, path):
     current_client = websocket
     # Start background task
     status_task = asyncio.create_task(send_status_periodically(websocket))
-    #velocity_task = asyncio.create_task(send_velocity_periodically(websocket))
-    velocity_task = asyncio.create_task(log_velocity_periodically())
+    velocity_task = asyncio.create_task(send_velocity_periodically(websocket))
+    #velocity_task = asyncio.create_task(log_velocity_periodically())
 
     
     try:
