@@ -46,7 +46,7 @@ async def send_velocity_periodically(websocket):
 
 
 CSV_FILE = "velocity_log.csv"
-async def log_velocity_periodically(interval=0.01):
+async def log_velocity_periodically(interval=0.005):
     """Log current velocity to a CSV file at a fixed interval (default 0.1s)."""
     cmd_path = "vel_log.csv"
 
@@ -56,7 +56,7 @@ async def log_velocity_periodically(interval=0.01):
         log_fh.flush()
 
         while True:
-            timestamp = time.time()
+            timestamp = time.perf_counter()
             velocity = round(globals.current_velocity, 4)
 
             csv_writer.writerow([
