@@ -29,7 +29,7 @@ from config import *
 from controllers.motor_control import set_motor_command
 from controllers.ir_control import ir_on, ir_off
 from controllers.servo_control import servo_up, servo_down, servo_rehome
-from utils.processes import send_status_periodically, send_velocity_periodically, handle_ping
+from utils.processes import send_status_periodically, send_velocity_periodically, handle_ping, log_velocity_periodically
 import globals
 import asyncio
 
@@ -63,7 +63,8 @@ async def handle_client(websocket, path):
     current_client = websocket
     # Start background task
     status_task = asyncio.create_task(send_status_periodically(websocket))
-    velocity_task = asyncio.create_task(send_velocity_periodically(websocket))
+    #velocity_task = asyncio.create_task(send_velocity_periodically(websocket))
+    velocity_task = asyncio.create_task(log_velocity_periodically())
 
     
     try:

@@ -3,6 +3,7 @@ import asyncio
 import json 
 import psutil
 from config import *
+import csv, time
 import globals
 def get_throttle_status():
     """Return Raspberry Pi under-voltage and throttled status."""
@@ -42,6 +43,33 @@ async def send_velocity_periodically(websocket):
             await websocket.send(json.dumps({"head": 'velocity_update', "vel":velocity, "l": globals.left_direction, "r":globals.right_direction}))
         last_velocity = velocity
         await asyncio.sleep(SEND_VELOCITY_INTERVAL)
+
+
+CSV_FILE = "velocity_log.csv"
+async def log_velocity_periodically():
+    """Log current velocity to a CSV file at a fixed interval."""
+    
+    # Open CSV file and write header if it doesn't exist
+    with open(CSV_FILE, mode='a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        
+        # Write header only if file is empty
+        csvfile.seek(0)
+        if csvfile.read(1) == "":
+            writer.writerow(["timestamp", "velocity", "left_direction", "right_direction"])
+        
+        last_velocity = 0.0
+        while True:
+            velocity = round(globals.current_velocity, 4)
+            
+            # Only log if last_velocity is not zero (like your original code)
+            if last_velocity != 0.0:
+                timestamp = time.time()  # Unix timestamp
+                writer.writerow([timestamp, velocity, globals.left_direction, globals.right_direction])
+                csvfile.flush()  # make sure data is written to file
+            
+            last_velocity = velocity
+            await asyncio.sleep(0.01)
 
 async def handle_ping(websocket, data):
     """Handle ping messages from client to measure latency"""
