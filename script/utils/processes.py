@@ -46,22 +46,29 @@ async def send_velocity_periodically(websocket):
 
 
 CSV_FILE = "velocity_log.csv"
-async def log_velocity_periodically():
-    """Log current velocity to a CSV file at a fixed interval."""
-    # ------- CSV Logging setup -------
+async def log_velocity_periodically(interval=0.01):
+    """Log current velocity to a CSV file at a fixed interval (default 0.1s)."""
     cmd_path = "vel_log.csv"
-    # Open CSV and write header
-    log_fh = open(cmd_path, "w", newline="")
-    csv_writer = csv.writer(log_fh)
-    csv_writer.writerow(["timestamp", "velocity", "left_direction", "right_direction"])
-    # Open CSV file and write header if it doesn't exist
-    while True:
-        velocity = round(globals.current_velocity, 4)
-        timestamp = time.time()  # Unix timestamp
-        await csv_writer.writerow([timestamp, velocity, globals.left_direction, globals.right_direction])
-        await csv_writer.flush()  # make sure data is written to file
-        
-        await asyncio.sleep(0.01)
+
+    with open(cmd_path, "w", newline="") as log_fh:
+        csv_writer = csv.writer(log_fh)
+        csv_writer.writerow(["timestamp", "velocity", "left_direction", "right_direction"])
+        log_fh.flush()
+
+        while True:
+            timestamp = time.time()
+            velocity = round(globals.current_velocity, 4)
+
+            csv_writer.writerow([
+                timestamp,
+                velocity,
+                globals.left_direction,
+                globals.right_direction
+            ])
+
+            log_fh.flush()  # ensure it's written immediately
+            print(f"Logged velocity: {velocity}")
+            await asyncio.sleep(interval)
 
 async def handle_ping(websocket, data):
     """Handle ping messages from client to measure latency"""
