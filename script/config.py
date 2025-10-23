@@ -33,7 +33,7 @@ PWM_FREQ = 1000  # Hz
 RAMP_TIME = 0.5      # seconds to go from 0 to 100%
 UPDATE_HZ = 50       # update loop frequency
 LEFT_CORRECTION = 1.00   # no change
-RIGHT_CORRECTION = 0.92  # slightly slower motor, reduce PWM by 8%
+RIGHT_CORRECTION = 1.00  # slightly slower motor, reduce PWM by 8%
 
 # Pins
 LEFT_PWM, LEFT_IN1, LEFT_IN2 = 12, 23, 24
