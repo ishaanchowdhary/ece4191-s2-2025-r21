@@ -58,17 +58,13 @@ async def log_velocity_periodically():
         if csvfile.read(1) == "":
             writer.writerow(["timestamp", "velocity", "left_direction", "right_direction"])
         
-        last_velocity = 0.0
         while True:
             velocity = round(globals.current_velocity, 4)
             
-            # Only log if last_velocity is not zero (like your original code)
-            if last_velocity != 0.0:
-                timestamp = time.time()  # Unix timestamp
-                writer.writerow([timestamp, velocity, globals.left_direction, globals.right_direction])
-                csvfile.flush()  # make sure data is written to file
+            timestamp = time.time()  # Unix timestamp
+            writer.writerow([timestamp, velocity, globals.left_direction, globals.right_direction])
+            csvfile.flush()  # make sure data is written to file
             
-            last_velocity = velocity
             await asyncio.sleep(0.01)
 
 async def handle_ping(websocket, data):
