@@ -56,12 +56,12 @@ async def log_velocity_periodically():
         # Write header only if file is empty
         log_fh.seek(0)
         if log_fh.read(1) == "":
-            csv_writer.writerow(["timestamp", "velocity", "left_direction", "right_direction"])
+            await csv_writer.writerow(["timestamp", "velocity", "left_direction", "right_direction"])
         
         while True:
             velocity = round(globals.current_velocity, 4)
             timestamp = time.time()
-            csv_writer.writerow([timestamp, velocity, globals.left_direction, globals.right_direction])
+            await csv_writer.writerow([timestamp, velocity, globals.left_direction, globals.right_direction])
             log_fh.flush()
             await asyncio.sleep(0.01)
 
