@@ -42,7 +42,7 @@ if LOGGING:
     # Open CSV and write header
     log_fh = open(path, "w", newline="")
     csv_writer = csv.writer(log_fh)
-    csv_writer.writerow(["timestamp", "current_duty", "target_duty", "min_duty"])
+    csv_writer.writerow(["timestamp", "corrected_right_duty", "target_duty", "prev_target_duty", "ramp_start_duty", "globals.min_duty"])
 
 # GPIO setup
 GPIO.setmode(GPIO.BCM)
@@ -158,7 +158,7 @@ def pwm_update_loop():
         # Log for debugging
         if LOGGING:
             timestamp = time.time()
-            csv_writer.writerow([timestamp, corrected_left_duty, corrected_right_duty, target_duty, globals.min_duty])
+            csv_writer.writerow([timestamp, corrected_right_duty, target_duty, prev_target_duty, ramp_start_duty, globals.min_duty])
             log_fh.flush()
         # Increment elapsed time
         elapsed += step_time
